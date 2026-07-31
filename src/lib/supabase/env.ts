@@ -16,10 +16,23 @@ function sanitizeEnvValue(value: string | undefined, name: string): string {
 }
 
 export function getSupabaseUrl(): string {
-  return sanitizeEnvValue(
+  let url = sanitizeEnvValue(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
     "NEXT_PUBLIC_SUPABASE_URL"
-  ).replace(/\/+$/, "");
+  );
+
+  // Supprimer slash final et endpoints REST/auth collés par erreur dans Vercel
+  url = url.replace(/\/+$/, "");
+  url = url.replace(/\/rest\/v1\/?$/i, "");
+  url = url.replace(/\/auth\/v1\/?$/i, "");
+
+  if (!/^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(url)) {
+    console.warn(
+      `[Supabase] NEXT_PUBLIC_SUPABASE_URL looks unusual: "${url}". Expected https://<project-ref>.supabase.co`
+    );
+  }
+
+  return url;
 }
 
 export function getSupabaseAnonKey(): string {
