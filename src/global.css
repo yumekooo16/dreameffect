@@ -123,15 +123,15 @@ body {
 
 @media (display-mode: standalone) {
   :root {
-    --header-top-offset: 2.25rem;
-    --page-top-offset: 2.5rem;
+    --header-top-offset: 30px;
+    --page-top-offset: 30px;
   }
 }
 
 @media (max-width: 639px) and (display-mode: standalone) {
   :root {
-    --header-top-offset: 3rem;
-    --page-top-offset: 3rem;
+    --header-top-offset: 40px;
+    --page-top-offset: 40px;
   }
 }
 
