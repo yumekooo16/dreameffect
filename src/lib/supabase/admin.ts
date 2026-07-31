@@ -1,4 +1,15 @@
 import { createClient } from "@supabase/supabase-js";
+import { getSupabaseUrl } from "@/src/lib/supabase/env";
+
+function getServiceRoleKey(): string {
+  const raw = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim();
+  if (!raw) {
+    throw new Error(
+      "SUPABASE_SERVICE_ROLE_KEY est manquante. Définissez-la dans .env.local (jamais côté client)."
+    );
+  }
+  return raw.split(/\s+/)[0];
+}
 
 /**
  * Client Supabase Admin (Service Role).
@@ -7,22 +18,7 @@ import { createClient } from "@supabase/supabase-js";
  * client ou une page Next.js exposée au navigateur.
  */
 export function createAdminClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!url) {
-    throw new Error(
-      "NEXT_PUBLIC_SUPABASE_URL est manquante. Définissez-la dans .env.local."
-    );
-  }
-
-  if (!serviceRoleKey) {
-    throw new Error(
-      "SUPABASE_SERVICE_ROLE_KEY est manquante. Définissez-la dans .env.local (jamais côté client)."
-    );
-  }
-
-  return createClient(url, serviceRoleKey, {
+  return createClient(getSupabaseUrl(), getServiceRoleKey(), {
     auth: {
       autoRefreshToken: false,
       persistSession: false,

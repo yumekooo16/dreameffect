@@ -1,7 +1,8 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-import { REMEMBER_ME_COOKIE, REMEMBER_ME_MAX_AGE } from "@/src/lib/supabase/session";
 import { redirectPathForRole } from "@/src/lib/auth/redirects";
+import { getSupabaseAnonKey, getSupabaseUrl } from "@/src/lib/supabase/env";
+import { REMEMBER_ME_COOKIE, REMEMBER_ME_MAX_AGE } from "@/src/lib/supabase/session";
 
 function isProtectedAdmin(pathname: string) {
   return pathname === "/admin" || pathname.startsWith("/admin/");
@@ -19,10 +20,7 @@ export async function updateSession(request: NextRequest) {
   const rememberMe = request.cookies.get(REMEMBER_ME_COOKIE)?.value === "1";
   const pathname = request.nextUrl.pathname;
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
+  const supabase = createServerClient(getSupabaseUrl(), getSupabaseAnonKey(), {
       cookies: {
         getAll() {
           return request.cookies.getAll();
