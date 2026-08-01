@@ -14,6 +14,7 @@
     "start": "next start",
     "lint": "eslint",
     "create-admin": "tsx scripts/create-admin.ts",
+    "cleanup-test-data": "tsx scripts/cleanup-test-data.ts",
     "generate-pwa-icons": "tsx scripts/generate-pwa-icons.ts"
   },
   "dependencies": {

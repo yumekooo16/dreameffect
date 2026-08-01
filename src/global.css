@@ -486,6 +486,24 @@ button.de-list-item {
   border-color: var(--border-subtle);
 }
 
+/* --- Recherche avec icône loupe --- */
+.de-search-field {
+  position: relative;
+}
+
+.de-search-field__icon {
+  pointer-events: none;
+  position: absolute;
+  left: 0.875rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-subtle);
+}
+
+.de-search-field .de-input {
+  padding-left: calc(0.875rem + 16px + 0.875rem);
+}
+
 .de-input-lg {
   padding: 0.875rem 1.125rem;
   font-size: 1rem;

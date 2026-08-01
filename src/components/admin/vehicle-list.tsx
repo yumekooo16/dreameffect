@@ -59,17 +59,14 @@ export default function VehicleListPanel({
     <div className="space-y-4">
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex flex-1 flex-col gap-3 sm:flex-row">
-          <div className="relative flex-1">
-            <Search
-              size={16}
-              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-subtle)]"
-            />
+          <div className="de-search-field flex-1">
+            <Search size={16} className="de-search-field__icon" aria-hidden />
             <input
               type="search"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Marque, modèle ou propriétaire…"
-              className="de-input w-full pl-9"
+              className="de-input w-full"
             />
           </div>
 
