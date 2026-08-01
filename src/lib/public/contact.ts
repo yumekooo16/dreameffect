@@ -1,7 +1,7 @@
 import { WHATSAPP_URL } from "@/src/lib/constants";
 
 export const CONTACT_PHONE =
-  process.env.NEXT_PUBLIC_CONTACT_PHONE ?? "+33 6 00 00 00 00";
+  process.env.NEXT_PUBLIC_CONTACT_PHONE ?? "06 16 32 03 81";
 
 export const CONTACT_EMAIL =
   process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? "contact@dreameffect.fr";
