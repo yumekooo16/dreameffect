@@ -65,7 +65,7 @@ async function countRows(
 async function deleteAllRows(
   supabase: ReturnType<typeof createAdminClient>,
   table: string
-): Promise<"deleted" | "skipped"> {
+): Promise<void | "skipped"> {
   const { error } = await supabase
     .from(table)
     .delete()
@@ -77,8 +77,6 @@ async function deleteAllRows(
     }
     throw new Error(`Impossible de vider ${table} : ${error.message}`);
   }
-
-  return "deleted";
 }
 
 async function deleteProfilesExcept(

@@ -2,6 +2,8 @@
 
 import { useMemo } from "react";
 import RevenueChart from "@/src/components/revenue-chart";
+import RevenueSplitCard from "@/src/components/owner/revenue-split-card";
+import { computeRevenueSummary, resolveReservationSplit } from "@/src/lib/revenue/split";
 
 type Reservation = {
   id: string;
@@ -10,6 +12,7 @@ type Reservation = {
   customer_name?: string | null;
   status: string;
   owner_amount?: number | null;
+  company_amount?: number | null;
   total_price?: number | null;
 };
 
@@ -27,6 +30,7 @@ export default function VehicleRevenue({
   reservations,
 }: Props) {
   const history = reservations.filter((r) => r.status === "finished");
+  const summary = computeRevenueSummary(history, { finishedOnly: false });
 
   const chartData = useMemo(() => {
     const byMonth = new Map<string, number>();
@@ -34,7 +38,7 @@ export default function VehicleRevenue({
     for (const r of history) {
       const date = new Date(r.end_date);
       const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-01`;
-      const amount = Number(r.owner_amount ?? r.total_price ?? 0);
+      const amount = resolveReservationSplit(r).ownerAmount;
       byMonth.set(key, (byMonth.get(key) ?? 0) + amount);
     }
 
@@ -45,17 +49,25 @@ export default function VehicleRevenue({
 
   return (
     <div className="space-y-6">
+      <RevenueSplitCard
+        totalRevenue={summary.totalRevenue}
+        ownerShare={summary.ownerShare}
+        companyShare={summary.companyShare}
+        title="Répartition des revenus"
+        compact
+      />
+
       <div className="grid gap-3 sm:grid-cols-3">
         <div className="de-card-inner">
-          <p className="de-label">Revenus du mois</p>
+          <p className="de-label">Votre part ce mois</p>
           <p className="de-stat-value mt-1 text-lg sm:text-xl">
             {monthlyRevenue.toLocaleString("fr-FR")} €
           </p>
         </div>
         <div className="de-card-inner">
-          <p className="de-label">Revenus totaux</p>
+          <p className="de-label">Votre part totale</p>
           <p className="de-stat-value mt-1 text-lg sm:text-xl">
-            {totalRevenue.toLocaleString("fr-FR")} €
+            {summary.ownerShare.toLocaleString("fr-FR")} €
           </p>
         </div>
         <div className="de-card-inner">
@@ -95,7 +107,7 @@ export default function VehicleRevenue({
                   )}
                 </div>
                 <p className="text-sm font-medium text-[var(--blue-soft)]">
-                  {(reservation.owner_amount ?? reservation.total_price ?? 0).toLocaleString("fr-FR")} €
+                  {resolveReservationSplit(reservation).ownerAmount.toLocaleString("fr-FR")} €
                 </p>
               </div>
             ))}

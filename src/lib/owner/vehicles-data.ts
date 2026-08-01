@@ -10,6 +10,7 @@ export type OwnerPortalVehicle = {
   initial_mileage?: number | null;
   status: string;
   image_url?: string | null;
+  hero_image_url?: string | null;
   total_revenue?: number | null;
 };
 
@@ -21,6 +22,7 @@ type DashboardVehicleRow = {
   mileage?: number | null;
   status: string;
   image_url?: string | null;
+  hero_image_url?: string | null;
   total_revenue?: number | null;
   plate?: string | null;
   initial_mileage?: number | null;
@@ -44,6 +46,7 @@ function mapDashboardVehicle(row: DashboardVehicleRow): OwnerPortalVehicle {
     initial_mileage: row.initial_mileage ?? null,
     status: row.status,
     image_url: row.image_url,
+    hero_image_url: row.hero_image_url ?? null,
     total_revenue: row.total_revenue,
   };
 }
@@ -83,14 +86,32 @@ async function enrichVehicleExtras(
   const supabase = await createClient();
   const vehicleIds = vehicles.map((vehicle) => vehicle.vehicle_id);
 
-  const withInitial = await supabase
+  const withHero = await supabase
     .from("vehicles")
-    .select("id, plate, initial_mileage")
+    .select("id, plate, initial_mileage, hero_image_url")
     .in("id", vehicleIds);
 
-  let extras = withInitial.data;
+  let extras = withHero.data;
 
-  if (withInitial.error?.message.includes("initial_mileage")) {
+  if (withHero.error?.message.includes("hero_image_url")) {
+    const withInitial = await supabase
+      .from("vehicles")
+      .select("id, plate, initial_mileage")
+      .in("id", vehicleIds);
+    extras = (withInitial.data ?? []).map((row) => ({
+      ...row,
+      hero_image_url: null,
+    }));
+  } else if (withHero.error?.message.includes("initial_mileage")) {
+    const fallback = await supabase
+      .from("vehicles")
+      .select("id, plate, hero_image_url")
+      .in("id", vehicleIds);
+    extras = (fallback.data ?? []).map((row) => ({
+      ...row,
+      initial_mileage: null,
+    }));
+  } else if (withHero.error) {
     const fallback = await supabase
       .from("vehicles")
       .select("id, plate")
@@ -98,6 +119,7 @@ async function enrichVehicleExtras(
     extras = (fallback.data ?? []).map((row) => ({
       ...row,
       initial_mileage: null,
+      hero_image_url: null,
     }));
   }
 
@@ -108,7 +130,11 @@ async function enrichVehicleExtras(
   const extrasMap = new Map(
     extras.map((row) => [
       row.id,
-      { plate: row.plate, initial_mileage: row.initial_mileage },
+      {
+        plate: row.plate,
+        initial_mileage: row.initial_mileage,
+        hero_image_url: row.hero_image_url ?? null,
+      },
     ])
   );
 
@@ -121,6 +147,7 @@ async function enrichVehicleExtras(
       plate: vehicle.plate ?? extra.plate ?? null,
       initial_mileage:
         vehicle.initial_mileage ?? extra.initial_mileage ?? null,
+      hero_image_url: vehicle.hero_image_url ?? extra.hero_image_url ?? null,
     };
   });
 }

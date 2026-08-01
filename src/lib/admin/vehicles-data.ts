@@ -1,6 +1,12 @@
 import { createClient } from "@/src/lib/supabase/server";
 import type { ReservationRow } from "@/src/lib/admin/dashboard-data";
 import {
+  ADMIN_VEHICLE_BASE_SELECT,
+  ADMIN_VEHICLE_FULL_SELECT,
+  ADMIN_VEHICLE_PRICING_SELECT,
+  isMissingColumnError,
+} from "@/src/lib/vehicles/db-columns";
+import {
   computeVehicleRevenue,
   type VehicleDetail,
   type VehicleImageRow,
@@ -86,20 +92,92 @@ export async function fetchVehiclesList(): Promise<VehicleListItem[]> {
   });
 }
 
+async function enrichOptionalVehicleImages(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  vehicle: VehicleRow
+): Promise<VehicleRow> {
+  const { data, error } = await supabase
+    .from("vehicles")
+    .select("public_image_url, hero_image_url")
+    .eq("id", vehicle.id)
+    .maybeSingle();
+
+  if (error?.message.includes("does not exist") || error || !data) {
+    return vehicle;
+  }
+
+  return {
+    ...vehicle,
+    public_image_url: (data.public_image_url as string | null) ?? null,
+    hero_image_url: (data.hero_image_url as string | null) ?? null,
+  };
+}
+
+async function fetchVehicleRow(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  vehicleId: string
+): Promise<VehicleRow | null> {
+  const fullResult = await supabase
+    .from("vehicles")
+    .select(ADMIN_VEHICLE_FULL_SELECT)
+    .eq("id", vehicleId)
+    .single();
+
+  if (!fullResult.error && fullResult.data) {
+    return fullResult.data as VehicleRow;
+  }
+
+  if (fullResult.error && !isMissingColumnError(fullResult.error.message)) {
+    return null;
+  }
+
+  const baseResult = await supabase
+    .from("vehicles")
+    .select(ADMIN_VEHICLE_BASE_SELECT)
+    .eq("id", vehicleId)
+    .single();
+
+  if (!baseResult.error && baseResult.data) {
+    return enrichOptionalVehicleImages(
+      supabase,
+      baseResult.data as VehicleRow
+    );
+  }
+
+  if (baseResult.error && !isMissingColumnError(baseResult.error.message)) {
+    return null;
+  }
+
+  const pricingResult = await supabase
+    .from("vehicles")
+    .select(ADMIN_VEHICLE_PRICING_SELECT)
+    .eq("id", vehicleId)
+    .single();
+
+  if (pricingResult.error || !pricingResult.data) {
+    return null;
+  }
+
+  return enrichOptionalVehicleImages(supabase, {
+    ...(pricingResult.data as VehicleRow),
+    daily_rate: null,
+    fuel: null,
+    transmission: null,
+    power: null,
+    location: null,
+    description: null,
+    slug: null,
+    is_published: true,
+  });
+}
+
 export async function fetchVehicleDetail(
   vehicleId: string
 ): Promise<VehicleDetail | null> {
   const supabase = await createClient();
+  const vehicle = await fetchVehicleRow(supabase, vehicleId);
 
-  const { data: vehicle, error } = await supabase
-    .from("vehicles")
-    .select(
-      "id, owner_id, brand, model, version, year, plate, vin, color, mileage, status, image_url, created_at, updated_at"
-    )
-    .eq("id", vehicleId)
-    .single();
-
-  if (error || !vehicle) {
+  if (!vehicle) {
     return null;
   }
 

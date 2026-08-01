@@ -15,8 +15,131 @@ type ActionResult = {
 function revalidateOwnerPaths(ownerId?: string) {
   revalidatePath("/admin/proprietaires");
   revalidatePath("/admin");
+  revalidatePath("/admin/vehicules");
+  revalidatePath("/admin/reservations");
+  revalidatePath("/admin/finance");
+  revalidatePath("/admin/documents");
+  revalidatePath("/admin/maintenance");
+  revalidatePath("/vehicules");
+  revalidatePath("/espace-proprietaire");
   if (ownerId) {
     revalidatePath(`/admin/proprietaires/${ownerId}`);
+  }
+}
+
+const VEHICLE_IMAGES_BUCKET = "vehicle-images";
+
+async function deleteOwnerRelatedData(
+  admin: ReturnType<typeof createAdminClient>,
+  ownerId: string
+) {
+  const { data: owner, error: ownerError } = await admin
+    .from("profiles")
+    .select("id, role")
+    .eq("id", ownerId)
+    .maybeSingle();
+
+  if (ownerError) {
+    throw new Error(ownerError.message);
+  }
+
+  if (!owner) {
+    throw new Error("Propriétaire introuvable");
+  }
+
+  if (owner.role !== "owner") {
+    throw new Error("Seuls les comptes propriétaires peuvent être supprimés");
+  }
+
+  const { data: vehicles, error: vehiclesError } = await admin
+    .from("vehicles")
+    .select("id, image_url")
+    .eq("owner_id", ownerId);
+
+  if (vehiclesError) {
+    throw new Error(vehiclesError.message);
+  }
+
+  const vehicleIds = (vehicles ?? []).map((vehicle) => vehicle.id);
+  const storagePaths = new Set<string>();
+
+  for (const vehicle of vehicles ?? []) {
+    if (vehicle.image_url?.trim()) {
+      storagePaths.add(vehicle.image_url.trim());
+    }
+  }
+
+  if (vehicleIds.length > 0) {
+    const { data: images } = await admin
+      .from("vehicle_images")
+      .select("image_url")
+      .in("vehicle_id", vehicleIds);
+
+    for (const image of images ?? []) {
+      if (image.image_url?.trim()) {
+        storagePaths.add(image.image_url.trim());
+      }
+    }
+
+    const tables = [
+      "reservations",
+      "maintenance",
+      "documents",
+      "vehicle_images",
+    ] as const;
+
+    for (const table of tables) {
+      const { error } = await admin.from(table).delete().in("vehicle_id", vehicleIds);
+      if (error && !error.message.includes("Could not find the table")) {
+        throw new Error(`${table} : ${error.message}`);
+      }
+    }
+
+    const { error: vehiclesDeleteError } = await admin
+      .from("vehicles")
+      .delete()
+      .eq("owner_id", ownerId);
+
+    if (vehiclesDeleteError) {
+      throw new Error(vehiclesDeleteError.message);
+    }
+  }
+
+  if (storagePaths.size > 0) {
+    const paths = [...storagePaths];
+    const { error: storageError } = await admin.storage
+      .from(VEHICLE_IMAGES_BUCKET)
+      .remove(paths);
+
+    if (storageError && !storageError.message.includes("not found")) {
+      console.warn("[deleteOwnerAccount] Storage:", storageError.message);
+    }
+  }
+
+  const ownerTables = ["owner_payouts", "notifications"] as const;
+
+  for (const table of ownerTables) {
+    const column = table === "owner_payouts" ? "owner_id" : "profile_id";
+    const { error } = await admin.from(table).delete().eq(column, ownerId);
+    if (error && !error.message.includes("Could not find the table")) {
+      throw new Error(`${table} : ${error.message}`);
+    }
+  }
+
+  const { error: profileDeleteError } = await admin
+    .from("profiles")
+    .delete()
+    .eq("id", ownerId)
+    .eq("role", "owner");
+
+  if (profileDeleteError) {
+    throw new Error(profileDeleteError.message);
+  }
+
+  const { error: authDeleteError } = await admin.auth.admin.deleteUser(ownerId);
+
+  if (authDeleteError) {
+    throw new Error(authDeleteError.message);
   }
 }
 
@@ -201,4 +324,23 @@ export async function setOwnerAccountActive(
   revalidateOwnerPaths(ownerId);
 
   return { success: true };
+}
+
+export async function deleteOwnerAccount(ownerId: string): Promise<ActionResult> {
+  await requireAdmin();
+
+  if (!ownerId.trim()) {
+    return { success: false, error: "Propriétaire introuvable" };
+  }
+
+  try {
+    const admin = createAdminClient();
+    await deleteOwnerRelatedData(admin, ownerId);
+    revalidateOwnerPaths();
+    return { success: true, id: ownerId };
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Erreur inattendue";
+    return { success: false, error: message };
+  }
 }

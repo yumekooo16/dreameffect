@@ -11,6 +11,12 @@ import {
   notifyReservationStatusChanged,
 } from "@/src/lib/admin/reservations-notifications";
 import { syncVehicleStatusFromReservations } from "@/src/lib/vehicles/sync-status";
+import { buildVehicleSlug } from "@/src/lib/public/vehicle-slug";
+import { splitRevenue } from "@/src/lib/revenue/split";
+import {
+  accrueReservationDailyRevenue,
+  type ReservationForDailyLedger,
+} from "@/src/lib/revenue/daily-ledger";
 
 type ActionResult = {
   success: boolean;
@@ -25,6 +31,40 @@ function revalidateReservationPaths(id?: string) {
   revalidatePath("/admin/vehicules");
   revalidatePath("/admin/proprietaires");
   revalidatePath("/espace-proprietaire");
+  revalidatePath("/vehicules");
+}
+
+async function revalidatePublicVehiclePaths(vehicleId: string) {
+  revalidatePath("/vehicules");
+
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("vehicles")
+    .select("slug, brand, model, version, id")
+    .eq("id", vehicleId)
+    .maybeSingle();
+
+  if (!data) return;
+
+  if (data.slug) {
+    revalidatePath(`/vehicules/${data.slug}`);
+    return;
+  }
+
+  revalidatePath(
+    `/vehicules/${buildVehicleSlug(data.brand, data.model, data.version)}-${data.id.slice(0, 8)}`
+  );
+}
+
+async function revalidateReservationAndPublicPaths(
+  reservationId?: string,
+  vehicleIds: Array<string | null | undefined> = []
+) {
+  revalidateReservationPaths(reservationId);
+
+  for (const vehicleId of [...new Set(vehicleIds.filter(Boolean) as string[])]) {
+    await revalidatePublicVehiclePaths(vehicleId);
+  }
 }
 
 async function getVehicleInfo(vehicleId: string) {
@@ -39,6 +79,8 @@ async function getVehicleInfo(vehicleId: string) {
 }
 
 function buildPayload(data: ReservationFormData) {
+  const { ownerAmount, companyAmount } = splitRevenue(data.total_price);
+
   return {
     vehicle_id: data.vehicle_id,
     customer_name: data.customer_name.trim(),
@@ -48,8 +90,8 @@ function buildPayload(data: ReservationFormData) {
     pickup_location: data.pickup_location.trim() || null,
     return_location: data.return_location.trim() || null,
     total_price: data.total_price,
-    owner_amount: data.owner_amount,
-    company_amount: data.company_amount,
+    owner_amount: ownerAmount,
+    company_amount: companyAmount,
     distance_km: data.distance_km,
     status: data.status,
     updated_at: new Date().toISOString(),
@@ -62,6 +104,26 @@ function validateFinishedDistance(data: ReservationFormData): string | null {
     return "Indiquez le kilométrage parcouru par le client";
   }
   return null;
+}
+
+async function syncDailyRevenueForConfirmedReservation(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  reservation: ReservationForDailyLedger
+) {
+  if (reservation.status !== "confirmed") return;
+
+  const vehicle = await getVehicleInfo(reservation.vehicle_id);
+  if (!vehicle?.owner_id) return;
+
+  try {
+    await accrueReservationDailyRevenue(
+      supabase,
+      reservation,
+      vehicle.owner_id
+    );
+  } catch (error) {
+    console.error("[syncDailyRevenueForConfirmedReservation]", error);
+  }
 }
 
 function reservationWasModified(
@@ -120,7 +182,16 @@ export async function createReservation(
 
   await syncVehicleStatusFromReservations(reservation.vehicle_id);
 
-  revalidateReservationPaths(reservation.id);
+  if (reservation.status === "confirmed") {
+    await syncDailyRevenueForConfirmedReservation(
+      supabase,
+      reservation as ReservationForDailyLedger
+    );
+  }
+
+  await revalidateReservationAndPublicPaths(reservation.id, [
+    reservation.vehicle_id,
+  ]);
   return { success: true, id: reservation.id };
 }
 
@@ -189,7 +260,17 @@ export async function updateReservation(
     await syncVehicleStatusFromReservations(existing.vehicle_id);
   }
 
-  revalidateReservationPaths(reservationId);
+  if (reservation.status === "confirmed") {
+    await syncDailyRevenueForConfirmedReservation(
+      supabase,
+      reservation as ReservationForDailyLedger
+    );
+  }
+
+  await revalidateReservationAndPublicPaths(reservationId, [
+    reservation.vehicle_id,
+    existing?.vehicle_id,
+  ]);
   return { success: true, id: reservationId };
 }
 
@@ -239,7 +320,16 @@ async function updateReservationStatus(
 
   await syncVehicleStatusFromReservations(reservation.vehicle_id);
 
-  revalidateReservationPaths(reservationId);
+  if (reservation.status === "confirmed") {
+    await syncDailyRevenueForConfirmedReservation(
+      supabase,
+      reservation as ReservationForDailyLedger
+    );
+  }
+
+  await revalidateReservationAndPublicPaths(reservationId, [
+    reservation.vehicle_id,
+  ]);
   return { success: true, id: reservationId };
 }
 
@@ -305,6 +395,8 @@ export async function finishReservation(
 
   await syncVehicleStatusFromReservations(reservation.vehicle_id);
 
-  revalidateReservationPaths(reservationId);
+  await revalidateReservationAndPublicPaths(reservationId, [
+    reservation.vehicle_id,
+  ]);
   return { success: true, id: reservationId };
 }

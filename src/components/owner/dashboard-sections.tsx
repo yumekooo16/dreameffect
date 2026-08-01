@@ -66,6 +66,7 @@ export default function DashboardSections({
     total_rentals: number;
     total_revenue: number;
     owner_revenue: number;
+    company_revenue?: number;
     rented_days: number;
     average_revenue: number;
   };

@@ -7,7 +7,8 @@ export const pwaConfig = {
   name: "DreamEffect",
   shortName: "DreamEffect",
   description: "Plateforme de gestion de conciergerie automobile DreamEffect.",
-  startUrl: "/",
+  /** Page d'ouverture de la PWA installée — admin / propriétaires, pas le site public. */
+  startUrl: "/login",
   scope: "/",
   display: "standalone" as const,
   orientation: "portrait-primary" as const,

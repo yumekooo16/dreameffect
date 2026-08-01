@@ -17,11 +17,13 @@ import VehicleImage from "@/src/components/owner/vehicle-image";
 import LazyWhenVisible from "@/src/components/owner/lazy-when-visible";
 import ChartSkeleton from "@/src/components/owner/chart-skeleton";
 import VehiclePhotosManager from "@/src/components/admin/vehicle-photos-manager";
+import VehicleHeroImageManager from "@/src/components/admin/vehicle-hero-image-manager";
 import VehicleReservationsSection from "@/src/components/admin/vehicle-reservations-section";
 import VehicleRevenueSection from "@/src/components/admin/vehicle-revenue-section";
 import VehicleMaintenanceSection from "@/src/components/admin/vehicle-maintenance-section";
 import VehicleDocumentsSection from "@/src/components/admin/vehicle-documents-section";
 import VehicleActionsPanel from "@/src/components/admin/vehicle-actions";
+import type { VehicleFormData } from "@/src/lib/admin/vehicles-actions";
 
 const Calendar = dynamic(
   () => import("@/src/components/calendar"),
@@ -144,8 +146,20 @@ export default async function AdminVehicleDetailPage({
         </div>
       </Section>
 
-      <Section title="Photos">
-        <VehiclePhotosManager vehicleId={vehicle.id} images={images} />
+      <Section title="Image site internet">
+        <VehiclePhotosManager
+          vehicleId={vehicle.id}
+          images={images}
+          publicImageUrl={vehicle.public_image_url}
+          primaryImageUrl={vehicle.image_url}
+        />
+      </Section>
+
+      <Section title="Image espace propriétaire">
+        <VehicleHeroImageManager
+          vehicleId={vehicle.id}
+          heroImageUrl={vehicle.hero_image_url}
+        />
       </Section>
 
       <Section title="Disponibilités">
@@ -204,6 +218,20 @@ export default async function AdminVehicleDetailPage({
             color: vehicle.color ?? "",
             mileage: vehicle.mileage,
             status: vehicle.status as "available" | "rented" | "maintenance" | "unavailable",
+            pricing: {
+              price_24h_weekday: vehicle.price_24h_weekday ?? null,
+              price_24h_weekend: vehicle.price_24h_weekend ?? null,
+              price_48h_weekend: vehicle.price_48h_weekend ?? null,
+              price_72h_weekend: vehicle.price_72h_weekend ?? null,
+              price_7_days: vehicle.price_7_days ?? null,
+              deposit: vehicle.deposit ?? null,
+            },
+            fuel: (vehicle.fuel as VehicleFormData["fuel"]) ?? "",
+            transmission: (vehicle.transmission as VehicleFormData["transmission"]) ?? "",
+            power: vehicle.power ?? null,
+            location: vehicle.location ?? "",
+            description: vehicle.description ?? "",
+            is_published: vehicle.is_published ?? true,
           }}
         />
       </Section>

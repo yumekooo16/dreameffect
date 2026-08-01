@@ -3,11 +3,21 @@ import { getAuthUser } from "@/src/lib/auth";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import Section from "@/src/components/owner/section";
-import WelcomeCard from "@/src/components/owner/welcome-card";
+import VehicleHero from "@/src/components/owner/vehicle-hero";
+import RevenueSplitCard from "@/src/components/owner/revenue-split-card";
+import DailyRevenueFeed from "@/src/components/owner/daily-revenue-feed";
 import VehicleList from "@/src/components/owner/vehicle-list";
 import DashboardSections from "@/src/components/owner/dashboard-sections";
 import ChartSkeleton from "@/src/components/owner/chart-skeleton";
-import { fetchOwnerPortalVehicles } from "@/src/lib/owner/vehicles-data";
+import {
+  fetchOwnerPortalVehicles,
+  type OwnerPortalVehicle,
+} from "@/src/lib/owner/vehicles-data";
+import {
+  computeRevenueSummaryWithLedger,
+  fetchLedgerForReservations,
+  resolveReservationSplit,
+} from "@/src/lib/revenue/daily-ledger";
 
 type ReservationRow = {
   id: string;
@@ -17,56 +27,65 @@ type ReservationRow = {
   customer_name?: string | null;
   status: string;
   owner_amount?: number | null;
+  company_amount?: number | null;
   total_price?: number | null;
   distance_km?: number | null;
 };
 
-function computeStats(reservations: ReservationRow[]) {
-  const finished = reservations.filter((r) => r.status === "finished");
-  const totalRentals = finished.length;
-  const ownerRevenue = finished.reduce(
-    (sum, r) => sum + Number(r.owner_amount ?? r.total_price ?? 0),
-    0
-  );
+function pickPrimaryVehicle(vehicles: OwnerPortalVehicle[]) {
+  if (vehicles.length === 0) return null;
+  if (vehicles.length === 1) return vehicles[0];
 
-  return {
-    total_rentals: totalRentals,
-    total_revenue: ownerRevenue,
-    owner_revenue: ownerRevenue,
-    rented_days: finished.reduce((sum, r) => {
-      const start = new Date(r.start_date);
-      const end = new Date(r.end_date);
-      return (
-        sum +
-        Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24))
-      );
-    }, 0),
-    average_revenue: totalRentals ? Math.round(ownerRevenue / totalRentals) : 0,
-  };
+  return [...vehicles].sort(
+    (a, b) => Number(b.total_revenue ?? 0) - Number(a.total_revenue ?? 0)
+  )[0];
 }
 
-function countMonthlyRentals(reservations: ReservationRow[]) {
-  const now = new Date();
-  return reservations.filter((r) => {
-    if (r.status === "cancelled") return false;
-    const start = new Date(r.start_date);
-    return (
-      start.getMonth() === now.getMonth() &&
-      start.getFullYear() === now.getFullYear()
-    );
-  }).length;
-}
-
-function findNextReservation(
+function countVehicleReservations(
   reservations: ReservationRow[],
-  vehicles: { vehicle_id: string; brand: string; model: string }[]
+  vehicleId: string
+) {
+  return reservations.filter(
+    (reservation) =>
+      reservation.vehicle_id === vehicleId &&
+      reservation.status !== "cancelled"
+  ).length;
+}
+
+function computeVehicleMonthlyRevenue(
+  reservations: ReservationRow[],
+  vehicleId: string
+) {
+  const now = new Date();
+
+  return reservations
+    .filter((reservation) => {
+      if (reservation.vehicle_id !== vehicleId) return false;
+      if (reservation.status !== "finished") return false;
+      const start = new Date(reservation.start_date);
+      return (
+        start.getMonth() === now.getMonth() &&
+        start.getFullYear() === now.getFullYear()
+      );
+    })
+    .reduce(
+      (sum, reservation) =>
+        sum + resolveReservationSplit(reservation).ownerAmount,
+      0
+    );
+}
+
+function findVehicleNextReservation(
+  reservations: ReservationRow[],
+  vehicleId: string
 ) {
   const now = new Date();
   const upcoming = reservations
     .filter(
-      (r) =>
-        (r.status === "pending" || r.status === "confirmed") &&
-        new Date(r.start_date) >= now
+      (reservation) =>
+        reservation.vehicle_id === vehicleId &&
+        (reservation.status === "pending" || reservation.status === "confirmed") &&
+        new Date(reservation.start_date) >= now
     )
     .sort(
       (a, b) =>
@@ -75,13 +94,49 @@ function findNextReservation(
 
   if (!upcoming[0]) return null;
 
-  const vehicle = vehicles.find((v) => v.vehicle_id === upcoming[0].vehicle_id);
-
   return {
     start_date: upcoming[0].start_date,
     end_date: upcoming[0].end_date,
-    brand: vehicle?.brand,
-    model: vehicle?.model,
+  };
+}
+
+function computeStats(
+  reservations: ReservationRow[],
+  ledgerByReservation: Awaited<ReturnType<typeof fetchLedgerForReservations>>
+) {
+  const finished = reservations.filter((r) => r.status === "finished");
+  const summary = computeRevenueSummaryWithLedger(
+    reservations.filter((r) => r.status !== "cancelled"),
+    ledgerByReservation
+  );
+  const totalRentals = summary.rentalCount;
+
+  return {
+    total_rentals: totalRentals,
+    total_revenue: summary.totalRevenue,
+    owner_revenue: summary.ownerShare,
+    company_revenue: summary.companyShare,
+    rented_days: finished.reduce((sum, r) => {
+      const start = new Date(r.start_date);
+      const end = new Date(r.end_date);
+      return (
+        sum +
+        Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24))
+      );
+    }, 0),
+    average_revenue: summary.rentalCount
+      ? Math.round(summary.ownerShare / summary.rentalCount)
+      : 0,
+  };
+}
+
+function currentMonthBounds() {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), now.getMonth(), 1);
+  const end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+  return {
+    from: start.toISOString().slice(0, 10),
+    to: end.toISOString().slice(0, 10),
   };
 }
 
@@ -100,9 +155,11 @@ function SectionsSkeleton() {
 async function DashboardData({
   vehicleIds,
   userId,
+  ledgerByReservation,
 }: {
   vehicleIds: string[];
   userId: string;
+  ledgerByReservation: Awaited<ReturnType<typeof fetchLedgerForReservations>>;
 }) {
   const supabase = await createClient();
 
@@ -143,7 +200,7 @@ async function DashboardData({
       reservations={reservations}
       maintenances={maintenancesRes.data ?? []}
       documents={documentsRes.data ?? []}
-      stats={computeStats(reservations)}
+      stats={computeStats(reservations as ReservationRow[], ledgerByReservation)}
       monthlyRevenues={monthlyRevenuesRes.data ?? []}
     />
   );
@@ -158,8 +215,7 @@ export default async function OwnerDashboard() {
 
   const supabase = await createClient();
 
-  const [profileRes, vehicles, monthlyRevenueRes, latestNotifRes] =
-    await Promise.all([
+  const [profileRes, vehicles, monthlyRevenueRes] = await Promise.all([
       supabase
         .from("profiles")
         .select("first_name")
@@ -170,13 +226,6 @@ export default async function OwnerDashboard() {
         .from("owner_current_month_revenue")
         .select("amount")
         .eq("owner_id", user.id)
-        .maybeSingle(),
-      supabase
-        .from("notifications")
-        .select("title, created_at")
-        .eq("profile_id", user.id)
-        .order("created_at", { ascending: false })
-        .limit(1)
         .maybeSingle(),
     ]);
 
@@ -192,53 +241,118 @@ export default async function OwnerDashboard() {
 
   const { data: previewReservationsData } = await supabase
     .from("reservations")
-    .select("id, vehicle_id, start_date, end_date, status")
+    .select(
+      "id, vehicle_id, start_date, end_date, status, owner_amount, company_amount, total_price"
+    )
     .in("vehicle_id", vehicleIds)
-    .order("start_date", { ascending: false })
-    .limit(20);
+    .order("start_date", { ascending: false });
 
   const previewReservations = (previewReservationsData ?? []) as ReservationRow[];
-
-  const totalRevenue = vehicles.reduce(
-    (sum, v) => sum + Number(v.total_revenue ?? 0),
-    0
+  const primaryVehicle = pickPrimaryVehicle(vehicles);
+  const reservationIds = previewReservations.map((reservation) => reservation.id);
+  const ledgerByReservation = await fetchLedgerForReservations(
+    supabase,
+    reservationIds
+  );
+  const fleetRevenue = computeRevenueSummaryWithLedger(
+    previewReservations,
+    ledgerByReservation
+  );
+  const primaryReservations = primaryVehicle
+    ? previewReservations.filter(
+        (reservation) => reservation.vehicle_id === primaryVehicle.vehicle_id
+      )
+    : [];
+  const primaryRevenue = computeRevenueSummaryWithLedger(
+    primaryReservations,
+    ledgerByReservation
   );
 
-  const lastActivity = latestNotifRes.data
-    ? {
-        title: latestNotifRes.data.title,
-        date: latestNotifRes.data.created_at,
-      }
-    : previewReservations[0]
-      ? {
-          title: "Activité récente",
-          date: previewReservations[0].start_date,
-        }
-      : null;
+  const monthBounds = currentMonthBounds();
+
+  let primaryMonthlyFromLedger = 0;
+  if (primaryVehicle) {
+    const { data: vehicleMonthLedger } = await supabase
+      .from("reservation_daily_ledger")
+      .select("owner_amount")
+      .eq("vehicle_id", primaryVehicle.vehicle_id)
+      .gte("ledger_date", monthBounds.from)
+      .lte("ledger_date", monthBounds.to);
+
+    primaryMonthlyFromLedger = (vehicleMonthLedger ?? []).reduce(
+      (sum, row) => sum + Number(row.owner_amount ?? 0),
+      0
+    );
+  }
+
+  const { data: recentLedgerData } = await supabase
+    .from("reservation_daily_ledger")
+    .select("ledger_date, owner_amount, daily_total")
+    .eq("owner_id", user.id)
+    .order("ledger_date", { ascending: false })
+    .limit(7);
 
   return (
     <div className="space-y-8">
-      <WelcomeCard
-        name={profileRes.data?.first_name ?? "Propriétaire"}
-        vehicles={vehicles.map((v) => ({
-          vehicle_id: v.vehicle_id,
-          brand: v.brand,
-          model: v.model,
-          status: v.status,
-        }))}
-        monthlyRevenue={monthlyRevenueRes.data?.amount ?? 0}
-        totalRevenue={totalRevenue}
-        monthlyRentals={countMonthlyRentals(previewReservations)}
-        nextReservation={findNextReservation(previewReservations, vehicles)}
-        lastActivity={lastActivity}
-      />
+      {primaryVehicle && (
+        <VehicleHero
+          ownerName={profileRes.data?.first_name ?? "Propriétaire"}
+          brand={primaryVehicle.brand}
+          model={primaryVehicle.model}
+          status={primaryVehicle.status}
+          vehicleId={primaryVehicle.vehicle_id}
+          heroImageUrl={primaryVehicle.hero_image_url}
+          fallbackImageUrl={primaryVehicle.image_url}
+          totalRevenue={primaryRevenue.totalRevenue}
+          ownerShare={primaryRevenue.ownerShare}
+          companyShare={primaryRevenue.companyShare}
+          monthlyRevenue={
+            primaryMonthlyFromLedger ||
+            computeVehicleMonthlyRevenue(
+              previewReservations,
+              primaryVehicle.vehicle_id
+            ) ||
+            Number(monthlyRevenueRes.data?.amount ?? 0)
+          }
+          reservationCount={countVehicleReservations(
+            previewReservations,
+            primaryVehicle.vehicle_id
+          )}
+          nextReservation={findVehicleNextReservation(
+            previewReservations,
+            primaryVehicle.vehicle_id
+          )}
+          fleetCount={vehicles.length}
+        />
+      )}
 
-      <Section title="Ma flotte">
-        <VehicleList vehicles={vehicles} />
+      <Section title="Transparence des revenus">
+        <div className="space-y-6">
+          <RevenueSplitCard
+            totalRevenue={fleetRevenue.totalRevenue}
+            ownerShare={fleetRevenue.ownerShare}
+            companyShare={fleetRevenue.companyShare}
+            title="Gains totaux de votre flotte"
+          />
+          <div>
+            <p className="de-label mb-3">Journal des revenus (locations confirmées)</p>
+            <DailyRevenueFeed entries={recentLedgerData ?? []} />
+          </div>
+        </div>
       </Section>
 
+      {vehicles.length > 1 && (
+        <Section title="Ma flotte">
+          <VehicleList vehicles={vehicles} />
+        </Section>
+      )}
+
       <Suspense fallback={<SectionsSkeleton />}>
-        <DashboardData vehicleIds={vehicleIds} userId={user.id} />
+        <DashboardData
+          vehicleIds={vehicleIds}
+          userId={user.id}
+          ledgerByReservation={ledgerByReservation}
+        />
       </Suspense>
     </div>
   );

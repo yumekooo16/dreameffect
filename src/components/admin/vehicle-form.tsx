@@ -8,6 +8,15 @@ import {
   type VehicleFormData,
 } from "@/src/lib/admin/vehicles-actions";
 import { VEHICLE_STATUSES, type VehicleStatus } from "@/src/lib/vehicles/status";
+import {
+  FUEL_OPTIONS,
+  TRANSMISSION_OPTIONS,
+} from "@/src/lib/vehicles/catalog-fields";
+import {
+  PRICING_TIER_FIELDS,
+  EMPTY_VEHICLE_PRICING,
+  type VehiclePricing,
+} from "@/src/lib/vehicles/pricing";
 
 type OwnerOption = { id: string; label: string };
 
@@ -30,6 +39,13 @@ const defaultForm: VehicleFormData = {
   color: "",
   mileage: 0,
   status: "available",
+  pricing: { ...EMPTY_VEHICLE_PRICING },
+  fuel: "",
+  transmission: "",
+  power: null,
+  location: "",
+  description: "",
+  is_published: true,
 };
 
 export default function VehicleForm({
@@ -43,6 +59,10 @@ export default function VehicleForm({
   const [form, setForm] = useState<VehicleFormData>({
     ...defaultForm,
     ...initial,
+    pricing: {
+      ...EMPTY_VEHICLE_PRICING,
+      ...initial?.pricing,
+    },
   });
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
@@ -52,6 +72,17 @@ export default function VehicleForm({
     value: VehicleFormData[K]
   ) {
     setForm((prev) => ({ ...prev, [key]: value }));
+  }
+
+  function updatePricingField(key: keyof VehiclePricing, raw: string) {
+    setForm((prev) => ({
+      ...prev,
+      pricing: {
+        ...EMPTY_VEHICLE_PRICING,
+        ...prev.pricing,
+        [key]: raw ? Number(raw) : null,
+      },
+    }));
   }
 
   function handleSubmit(e: React.FormEvent) {
@@ -187,6 +218,122 @@ export default function VehicleForm({
               </option>
             ))}
           </select>
+        </div>
+      </div>
+
+      <div className="border-t border-[var(--border)] pt-5">
+        <h3 className="de-display mb-4 text-base tracking-tight">
+          Catalogue public
+        </h3>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div className="sm:col-span-2">
+            <p className="mb-3 text-sm de-muted">
+              Tarifs affichés sur la fiche véhicule du site public. Laissez
+              vide les formules non proposées.
+            </p>
+          </div>
+
+          {PRICING_TIER_FIELDS.map((tier) => (
+            <div key={tier.key}>
+              <label className="de-label mb-1 block">{tier.label} (€)</label>
+              <input
+                type="number"
+                min={0}
+                step={1}
+                value={form.pricing?.[tier.key] ?? ""}
+                onChange={(e) => updatePricingField(tier.key, e.target.value)}
+                className="de-input w-full"
+                placeholder="Ex. 350"
+              />
+              {tier.hint && (
+                <p className="mt-1 text-xs de-muted">{tier.hint}</p>
+              )}
+            </div>
+          ))}
+
+          <div>
+            <label className="de-label mb-1 block">Localisation</label>
+            <input
+              value={form.location ?? ""}
+              onChange={(e) => updateField("location", e.target.value)}
+              className="de-input w-full"
+              placeholder="Ex. Paris"
+            />
+          </div>
+
+          <div>
+            <label className="de-label mb-1 block">Carburant</label>
+            <select
+              value={form.fuel ?? ""}
+              onChange={(e) => updateField("fuel", e.target.value as VehicleFormData["fuel"])}
+              className="de-input w-full"
+            >
+              <option value="">Non renseigné</option>
+              {FUEL_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="de-label mb-1 block">Boîte de vitesses</label>
+            <select
+              value={form.transmission ?? ""}
+              onChange={(e) =>
+                updateField("transmission", e.target.value as VehicleFormData["transmission"])
+              }
+              className="de-input w-full"
+            >
+              <option value="">Non renseigné</option>
+              {TRANSMISSION_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="de-label mb-1 block">Puissance (ch)</label>
+            <input
+              type="number"
+              min={0}
+              value={form.power ?? ""}
+              onChange={(e) =>
+                updateField(
+                  "power",
+                  e.target.value ? Number(e.target.value) : null
+                )
+              }
+              className="de-input w-full"
+              placeholder="Ex. 450"
+            />
+          </div>
+
+          <div className="sm:col-span-2">
+            <label className="de-label mb-1 block">Description</label>
+            <textarea
+              rows={4}
+              value={form.description ?? ""}
+              onChange={(e) => updateField("description", e.target.value)}
+              className="de-input w-full"
+              placeholder="Présentation du véhicule visible sur le site public…"
+            />
+          </div>
+
+          <div className="sm:col-span-2">
+            <label className="flex cursor-pointer items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={form.is_published ?? true}
+                onChange={(e) => updateField("is_published", e.target.checked)}
+                className="h-4 w-4 rounded border-[var(--blue-border)]"
+              />
+              <span>Visible sur le site public</span>
+            </label>
+          </div>
         </div>
       </div>
 

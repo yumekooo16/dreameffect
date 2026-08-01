@@ -2,11 +2,14 @@
 
 import Image from "next/image";
 import { useRef, useState, useTransition } from "react";
-import { Star, Trash2, Upload } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Globe, Star, Trash2, Upload } from "lucide-react";
 import { resolveVehicleImageUrl } from "@/src/lib/image-url";
 import {
+  clearVehiclePublicPhoto,
   deleteVehiclePhoto,
   setVehiclePrimaryPhoto,
+  setVehiclePublicPhoto,
   uploadVehiclePhoto,
 } from "@/src/lib/admin/vehicles-actions";
 import type { VehicleImageRow } from "@/src/lib/admin/vehicles-types";
@@ -14,10 +17,15 @@ import type { VehicleImageRow } from "@/src/lib/admin/vehicles-types";
 export default function VehiclePhotosManager({
   vehicleId,
   images,
+  publicImageUrl,
+  primaryImageUrl,
 }: {
   vehicleId: string;
   images: VehicleImageRow[];
+  publicImageUrl?: string | null;
+  primaryImageUrl?: string | null;
 }) {
+  const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
@@ -39,6 +47,7 @@ export default function VehiclePhotosManager({
 
       if (result.success) {
         setMessage("Photo ajoutée.");
+        router.refresh();
       } else {
         setError(result.error ?? "Échec de l'upload");
       }
@@ -60,6 +69,7 @@ export default function VehiclePhotosManager({
 
       if (result.success) {
         setMessage("Photo principale mise à jour.");
+        router.refresh();
       } else {
         setError(result.error ?? "Échec de la mise à jour");
       }
@@ -80,14 +90,90 @@ export default function VehiclePhotosManager({
       if (result.success) {
         setMessage("Photo supprimée.");
         setDeletingId(null);
+        router.refresh();
       } else {
         setError(result.error ?? "Échec de la suppression");
       }
     });
   }
 
+  function handleSetPublic(image: VehicleImageRow) {
+    setMessage(null);
+    setError(null);
+
+    startTransition(async () => {
+      const result = await setVehiclePublicPhoto(vehicleId, image.image_url);
+
+      if (result.success) {
+        setMessage("Image site web mise à jour.");
+        router.refresh();
+      } else {
+        setError(result.error ?? "Échec de la mise à jour");
+      }
+    });
+  }
+
+  function handleClearPublic() {
+    setMessage(null);
+    setError(null);
+
+    startTransition(async () => {
+      const result = await clearVehiclePublicPhoto(vehicleId);
+
+      if (result.success) {
+        setMessage("Image site web réinitialisée (photo principale).");
+        router.refresh();
+      } else {
+        setError(result.error ?? "Échec de la mise à jour");
+      }
+    });
+  }
+
+  const activePublicImage = publicImageUrl?.trim() || primaryImageUrl?.trim() || null;
+  const usesCustomPublicImage =
+    Boolean(publicImageUrl?.trim()) &&
+    publicImageUrl?.trim() !== primaryImageUrl?.trim();
+
   return (
     <div className="space-y-4">
+      <p className="text-sm de-muted">
+        <strong>Site internet</strong> — choisissez quelle photo apparaît sur le
+        catalogue public (<code>/vehicules</code>). L&apos;image hero ci-dessous
+        sert uniquement à l&apos;espace propriétaire.
+      </p>
+
+      {activePublicImage && (
+        <div className="de-card-inner flex flex-wrap items-center gap-4 p-3">
+          <div className="relative h-16 w-24 overflow-hidden rounded-md bg-muted">
+            <Image
+              src={resolveVehicleImageUrl(activePublicImage) ?? activePublicImage}
+              alt="Aperçu site web"
+              fill
+              className="object-cover"
+              sizes="96px"
+            />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="de-label">Image affichée sur le site</p>
+            <p className="text-sm de-muted">
+              {usesCustomPublicImage
+                ? "Photo dédiée au site public"
+                : "Photo principale (par défaut)"}
+            </p>
+          </div>
+          {usesCustomPublicImage && (
+            <button
+              type="button"
+              disabled={pending}
+              onClick={handleClearPublic}
+              className="de-btn de-btn-ghost text-xs"
+            >
+              Utiliser la principale
+            </button>
+          )}
+        </div>
+      )}
+
       <div className="flex flex-wrap items-center gap-3">
         <input
           ref={inputRef}
@@ -114,6 +200,7 @@ export default function VehiclePhotosManager({
           {images.map((image) => {
             const url = resolveVehicleImageUrl(image.image_url);
             const isDeleting = deletingId === image.id;
+            const isPublicCover = image.image_url === activePublicImage;
 
             return (
               <div key={image.id} className="de-card-inner overflow-hidden p-0">
@@ -134,6 +221,11 @@ export default function VehiclePhotosManager({
                   {image.is_primary && (
                     <span className="absolute left-2 top-2 de-badge de-badge--confirmed">
                       Principale
+                    </span>
+                  )}
+                  {isPublicCover && (
+                    <span className="absolute right-2 top-2 de-badge de-badge--pending">
+                      Site web
                     </span>
                   )}
                 </div>
@@ -162,7 +254,19 @@ export default function VehiclePhotosManager({
                       </div>
                     </>
                   ) : (
-                    <div className="flex gap-2">
+                    <div className="flex flex-col gap-2">
+                      {!isPublicCover && (
+                        <button
+                          type="button"
+                          disabled={pending}
+                          onClick={() => handleSetPublic(image)}
+                          className="de-btn de-btn-ghost flex-1 text-xs"
+                        >
+                          <Globe size={14} className="mr-1 inline" />
+                          Site web
+                        </button>
+                      )}
+                      <div className="flex gap-2">
                       {!image.is_primary && (
                         <button
                           type="button"
@@ -182,6 +286,7 @@ export default function VehiclePhotosManager({
                       >
                         <Trash2 size={14} />
                       </button>
+                      </div>
                     </div>
                   )}
                 </div>

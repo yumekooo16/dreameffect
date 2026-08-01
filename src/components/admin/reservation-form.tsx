@@ -6,6 +6,11 @@ import {
   createReservation,
   updateReservation,
 } from "@/src/lib/admin/reservations-actions";
+import {
+  COMPANY_REVENUE_SHARE_PERCENT,
+  OWNER_REVENUE_SHARE_PERCENT,
+  splitRevenue,
+} from "@/src/lib/revenue/split";
 import type { ReservationFormData } from "@/src/lib/admin/reservations-types";
 
 type VehicleOption = { id: string; label: string };
@@ -65,7 +70,17 @@ export default function ReservationForm({
     key: K,
     value: ReservationFormData[K]
   ) {
-    setForm((prev) => ({ ...prev, [key]: value }));
+    setForm((prev) => {
+      const next = { ...prev, [key]: value };
+
+      if (key === "total_price") {
+        const split = splitRevenue(Number(value));
+        next.owner_amount = split.ownerAmount;
+        next.company_amount = split.companyAmount;
+      }
+
+      return next;
+    });
   }
 
   function toIso(value: string) {
@@ -199,11 +214,12 @@ export default function ReservationForm({
           />
         </div>
 
-        <div>
+        <div className="sm:col-span-2">
           <label className="de-label mb-1 block">Prix total (€)</label>
           <input
             type="number"
             min={0}
+            step="0.01"
             required
             value={form.total_price}
             onChange={(e) => updateField("total_price", Number(e.target.value))}
@@ -211,30 +227,26 @@ export default function ReservationForm({
           />
         </div>
 
-        <div>
-          <label className="de-label mb-1 block">Part propriétaire (€)</label>
-          <input
-            type="number"
-            min={0}
-            required
-            value={form.owner_amount}
-            onChange={(e) => updateField("owner_amount", Number(e.target.value))}
-            className="de-input w-full"
-          />
-        </div>
-
-        <div>
-          <label className="de-label mb-1 block">Commission DreamEffect (€)</label>
-          <input
-            type="number"
-            min={0}
-            required
-            value={form.company_amount}
-            onChange={(e) =>
-              updateField("company_amount", Number(e.target.value))
-            }
-            className="de-input w-full"
-          />
+        <div className="sm:col-span-2 de-card-inner">
+          <p className="de-label">Répartition automatique</p>
+          <div className="mt-2 grid gap-3 sm:grid-cols-2">
+            <div>
+              <p className="text-xs de-muted">
+                Part propriétaire ({OWNER_REVENUE_SHARE_PERCENT}&nbsp;%)
+              </p>
+              <p className="mt-0.5 font-medium">
+                {splitRevenue(form.total_price).ownerAmount.toLocaleString("fr-FR")} €
+              </p>
+            </div>
+            <div>
+              <p className="text-xs de-muted">
+                Commission DreamEffect ({COMPANY_REVENUE_SHARE_PERCENT}&nbsp;%)
+              </p>
+              <p className="mt-0.5 font-medium">
+                {splitRevenue(form.total_price).companyAmount.toLocaleString("fr-FR")} €
+              </p>
+            </div>
+          </div>
         </div>
 
         {mode === "edit" && (

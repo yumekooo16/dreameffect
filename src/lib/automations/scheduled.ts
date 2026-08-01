@@ -1,4 +1,9 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import {
+  accrueAllConfirmedReservations,
+  accrueReservationDailyRevenue,
+  type ReservationForDailyLedger,
+} from "@/src/lib/revenue/daily-ledger";
 
 export async function wasAutomationSentToday(
   supabase: SupabaseClient,
@@ -64,6 +69,7 @@ export type AutomationRunResult = {
   maintenance: number;
   rentalStarts: number;
   rentalEnds: number;
+  dailyRevenue: number;
 };
 
 export async function runScheduledAutomations(
@@ -74,6 +80,7 @@ export async function runScheduledAutomations(
     maintenance: 0,
     rentalStarts: 0,
     rentalEnds: 0,
+    dailyRevenue: 0,
   };
 
   const today = startOfDay(new Date());
@@ -245,6 +252,13 @@ export async function runScheduledAutomations(
         result.rentalEnds += 1;
       }
     }
+  }
+
+  try {
+    const daily = await accrueAllConfirmedReservations(supabase, today);
+    result.dailyRevenue = daily.accrued;
+  } catch (error) {
+    console.error("[automations:daily-revenue]", error);
   }
 
   return result;

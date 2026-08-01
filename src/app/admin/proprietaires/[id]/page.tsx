@@ -9,6 +9,7 @@ import OwnerReservationsList from "@/src/components/admin/owner-reservations";
 import OwnerRevenueSection from "@/src/components/admin/owner-revenue";
 import OwnerProfileForm from "@/src/components/admin/owner-profile-form";
 import OwnerAccountActions from "@/src/components/admin/owner-account-actions";
+import OwnerDeleteButton from "@/src/components/admin/owner-delete-button";
 
 function ownerName(firstName?: string | null, lastName?: string | null) {
   const name = [firstName, lastName].filter(Boolean).join(" ");
@@ -113,6 +114,13 @@ export default async function AdminOwnerDetailPage({
 
       <Section title="Compte">
         <OwnerAccountActions ownerId={owner.id} isActive={isActive} />
+        <OwnerDeleteButton
+          ownerId={owner.id}
+          ownerName={ownerName(owner.first_name, owner.last_name)}
+          vehicleCount={vehicles.length}
+          reservationCount={reservations.length}
+          redirectToList
+        />
       </Section>
     </div>
   );

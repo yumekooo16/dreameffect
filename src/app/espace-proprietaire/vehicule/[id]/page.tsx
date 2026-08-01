@@ -12,6 +12,10 @@ import {
   fetchOwnerPortalVehicle,
   ownerPortalContractMileage,
 } from "@/src/lib/owner/vehicles-data";
+import {
+  computeRevenueSummary,
+  resolveReservationSplit,
+} from "@/src/lib/revenue/split";
 import { getVehicleStatusLabel } from "@/src/lib/vehicles/status";
 
 export default async function VehiclePage({
@@ -38,7 +42,7 @@ export default async function VehiclePage({
     supabase
       .from("reservations")
       .select(
-        "id, start_date, end_date, customer_name, status, owner_amount, total_price, distance_km"
+        "id, start_date, end_date, customer_name, status, owner_amount, company_amount, total_price, distance_km"
       )
       .eq("vehicle_id", id)
       .order("start_date", { ascending: false })
@@ -73,7 +77,14 @@ export default async function VehiclePage({
         end.getFullYear() === now.getFullYear()
       );
     })
-    .reduce((sum, r) => sum + Number(r.owner_amount ?? r.total_price ?? 0), 0);
+    .reduce(
+      (sum, r) => sum + resolveReservationSplit(r).ownerAmount,
+      0
+    );
+
+  const revenueSummary = computeRevenueSummary(finishedReservations, {
+    finishedOnly: false,
+  });
 
   return (
     <div className="space-y-8">
@@ -173,7 +184,7 @@ export default async function VehiclePage({
         calendarReservations={allReservations}
         calendarMaintenances={maintenance}
         revenueProps={{
-          totalRevenue: Number(vehicle.total_revenue ?? 0),
+          totalRevenue: revenueSummary.totalRevenue,
           monthlyRevenue,
           totalRentals: finishedReservations.length,
           reservations: allReservations,

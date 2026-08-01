@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { Plus, Search } from "lucide-react";
+import OwnerDeleteButton from "@/src/components/admin/owner-delete-button";
 import type { OwnerListItem } from "@/src/lib/admin/owners-types";
 
 type Filter = "all" | "with_vehicles" | "without_vehicles" | "active" | "inactive";
@@ -98,52 +99,64 @@ export default function OwnerListPanel({ owners }: { owners: OwnerListItem[] }) 
       ) : (
         <div className="de-list">
           {filtered.map((owner) => (
-            <Link
+            <div
               key={owner.id}
-              href={`/admin/proprietaires/${owner.id}`}
-              className="de-list-item block transition hover:border-[var(--blue-soft)]"
+              className="de-list-item flex flex-wrap items-start justify-between gap-3 transition hover:border-[var(--blue-soft)]"
             >
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <p className="font-medium">{ownerName(owner)}</p>
-                    {!owner.isActive && (
-                      <span className="de-badge de-badge--unavailable">
-                        Désactivé
-                      </span>
-                    )}
+              <Link
+                href={`/admin/proprietaires/${owner.id}`}
+                className="min-w-0 flex-1"
+              >
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="font-medium">{ownerName(owner)}</p>
+                      {!owner.isActive && (
+                        <span className="de-badge de-badge--unavailable">
+                          Désactivé
+                        </span>
+                      )}
+                    </div>
+                    <p className="mt-0.5 text-sm de-muted">
+                      {owner.phone?.trim() || "Téléphone non renseigné"}
+                    </p>
                   </div>
-                  <p className="mt-0.5 text-sm de-muted">
-                    {owner.phone?.trim() || "Téléphone non renseigné"}
+
+                  <p className="text-xs de-muted">
+                    Inscrit le {formatDate(owner.created_at)}
                   </p>
                 </div>
 
-                <p className="text-xs de-muted">
-                  Inscrit le {formatDate(owner.created_at)}
-                </p>
-              </div>
+                <div className="mt-3 grid gap-2 sm:grid-cols-3">
+                  <div>
+                    <p className="de-label text-[0.6875rem]">Véhicules</p>
+                    <p className="mt-0.5 text-sm font-medium">
+                      {owner.vehicleCount}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="de-label text-[0.6875rem]">Réservations</p>
+                    <p className="mt-0.5 text-sm font-medium">
+                      {owner.reservationCount}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="de-label text-[0.6875rem]">Revenus</p>
+                    <p className="mt-0.5 text-sm font-medium text-[var(--blue-soft)]">
+                      {formatEuro(owner.totalRevenue)}
+                    </p>
+                  </div>
+                </div>
+              </Link>
 
-              <div className="mt-3 grid gap-2 sm:grid-cols-3">
-                <div>
-                  <p className="de-label text-[0.6875rem]">Véhicules</p>
-                  <p className="mt-0.5 text-sm font-medium">
-                    {owner.vehicleCount}
-                  </p>
-                </div>
-                <div>
-                  <p className="de-label text-[0.6875rem]">Réservations</p>
-                  <p className="mt-0.5 text-sm font-medium">
-                    {owner.reservationCount}
-                  </p>
-                </div>
-                <div>
-                  <p className="de-label text-[0.6875rem]">Revenus</p>
-                  <p className="mt-0.5 text-sm font-medium text-[var(--blue-soft)]">
-                    {formatEuro(owner.totalRevenue)}
-                  </p>
-                </div>
-              </div>
-            </Link>
+              <OwnerDeleteButton
+                ownerId={owner.id}
+                ownerName={ownerName(owner)}
+                vehicleCount={owner.vehicleCount}
+                reservationCount={owner.reservationCount}
+                compact
+              />
+            </div>
           ))}
         </div>
       )}

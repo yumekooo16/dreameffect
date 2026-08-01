@@ -4,7 +4,15 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/src/lib/supabase/server";
 import { createAdminClient } from "@/src/lib/supabase/admin";
 import { requireAdmin } from "@/src/lib/admin/auth";
+import { ensureUniqueVehicleSlug } from "@/src/lib/admin/vehicle-slug";
 import type { VehicleStatus } from "@/src/lib/vehicles/status";
+import type { FuelType, TransmissionType } from "@/src/lib/vehicles/catalog-fields";
+import {
+  deriveDailyRate,
+  normalizeVehiclePricing,
+  type VehiclePricing,
+} from "@/src/lib/vehicles/pricing";
+import { isMissingColumnError } from "@/src/lib/vehicles/db-columns";
 
 const BUCKET = "vehicle-images";
 
@@ -25,7 +33,63 @@ export type VehicleFormData = {
   color?: string;
   mileage: number;
   status: VehicleStatus;
+  pricing?: Partial<VehiclePricing>;
+  fuel?: FuelType | "";
+  transmission?: TransmissionType | "";
+  power?: number | null;
+  location?: string;
+  description?: string;
+  is_published?: boolean;
 };
+
+function pricingPayload(data: VehicleFormData) {
+  return normalizeVehiclePricing(data.pricing);
+}
+
+function catalogPayload(data: VehicleFormData) {
+  const pricing = pricingPayload(data);
+
+  return {
+    ...pricing,
+    daily_rate: deriveDailyRate(pricing),
+    fuel: data.fuel?.trim() || null,
+    transmission: data.transmission?.trim() || null,
+    power: data.power != null && data.power > 0 ? data.power : null,
+    location: data.location?.trim() || null,
+    description: data.description?.trim() || null,
+    is_published: data.is_published ?? true,
+  };
+}
+
+function coreVehiclePayload(data: VehicleFormData) {
+  return {
+    owner_id: data.owner_id,
+    brand: data.brand.trim(),
+    model: data.model.trim(),
+    version: data.version?.trim() || null,
+    year: data.year ?? null,
+    plate: data.plate?.trim() || null,
+    vin: data.vin?.trim() || null,
+    color: data.color?.trim() || null,
+    mileage: data.mileage,
+    status: data.status,
+  };
+}
+
+function revalidateVehiclePaths(vehicleId?: string, slug?: string | null) {
+  revalidatePath("/admin/vehicules");
+  if (vehicleId) {
+    revalidatePath(`/admin/vehicules/${vehicleId}`);
+  }
+  revalidatePath("/admin");
+  revalidatePath("/admin/proprietaires");
+  revalidatePath("/espace-proprietaire");
+  revalidatePath("/");
+  revalidatePath("/vehicules");
+  if (slug) {
+    revalidatePath(`/vehicules/${slug}`);
+  }
+}
 
 async function syncPrimaryImage(
   supabase: Awaited<ReturnType<typeof createClient>>,
@@ -68,44 +132,48 @@ async function syncPrimaryImage(
     .eq("id", vehicleId);
 }
 
-function revalidateVehiclePaths(vehicleId?: string) {
-  revalidatePath("/admin/vehicules");
-  if (vehicleId) {
-    revalidatePath(`/admin/vehicules/${vehicleId}`);
-  }
-  revalidatePath("/admin");
-  revalidatePath("/admin/proprietaires");
-  revalidatePath("/espace-proprietaire");
-}
-
 export async function createVehicle(
   data: VehicleFormData
 ): Promise<ActionResult> {
   await requireAdmin();
   const supabase = await createClient();
 
-  const { data: vehicle, error } = await supabase
+  const slug = await ensureUniqueVehicleSlug(
+    supabase,
+    data.brand.trim(),
+    data.model.trim(),
+    data.version?.trim() || null
+  );
+
+  let insertResult = await supabase
     .from("vehicles")
     .insert({
-      owner_id: data.owner_id,
-      brand: data.brand.trim(),
-      model: data.model.trim(),
-      version: data.version?.trim() || null,
-      year: data.year ?? null,
-      plate: data.plate?.trim() || null,
-      vin: data.vin?.trim() || null,
-      color: data.color?.trim() || null,
-      mileage: data.mileage,
-      status: data.status,
+      ...coreVehiclePayload(data),
+      slug,
+      ...catalogPayload(data),
     })
     .select("id")
     .single();
+
+  if (insertResult.error && isMissingColumnError(insertResult.error.message)) {
+    insertResult = await supabase
+      .from("vehicles")
+      .insert({
+        ...coreVehiclePayload(data),
+        ...pricingPayload(data),
+      })
+      .select("id")
+      .single();
+  }
+
+  const vehicle = insertResult.data;
+  const error = insertResult.error;
 
   if (error || !vehicle) {
     return { success: false, error: error?.message ?? "Création impossible" };
   }
 
-  revalidateVehiclePaths(vehicle.id);
+  revalidateVehiclePaths(vehicle.id, slug);
   return { success: true, id: vehicle.id };
 }
 
@@ -116,28 +184,59 @@ export async function updateVehicle(
   await requireAdmin();
   const supabase = await createClient();
 
-  const { error } = await supabase
+  const { data: existing } = await supabase
+    .from("vehicles")
+    .select("slug, brand, model, version")
+    .eq("id", vehicleId)
+    .single();
+
+  const brandChanged =
+    existing?.brand !== data.brand.trim() ||
+    existing?.model !== data.model.trim() ||
+    (existing?.version ?? "") !== (data.version?.trim() ?? "");
+
+  const slug =
+    brandChanged || !existing?.slug
+      ? await ensureUniqueVehicleSlug(
+          supabase,
+          data.brand.trim(),
+          data.model.trim(),
+          data.version?.trim() || null,
+          vehicleId
+        )
+      : existing.slug;
+
+  let updateResult = await supabase
     .from("vehicles")
     .update({
-      owner_id: data.owner_id,
-      brand: data.brand.trim(),
-      model: data.model.trim(),
-      version: data.version?.trim() || null,
-      year: data.year ?? null,
-      plate: data.plate?.trim() || null,
-      vin: data.vin?.trim() || null,
-      color: data.color?.trim() || null,
-      mileage: data.mileage,
-      status: data.status,
+      ...coreVehiclePayload(data),
+      slug,
+      ...catalogPayload(data),
       updated_at: new Date().toISOString(),
     })
     .eq("id", vehicleId);
+
+  if (updateResult.error && isMissingColumnError(updateResult.error.message)) {
+    updateResult = await supabase
+      .from("vehicles")
+      .update({
+        ...coreVehiclePayload(data),
+        ...pricingPayload(data),
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", vehicleId);
+  }
+
+  const { error } = updateResult;
 
   if (error) {
     return { success: false, error: error.message };
   }
 
-  revalidateVehiclePaths(vehicleId);
+  revalidateVehiclePaths(vehicleId, slug);
+  if (existing?.slug && existing.slug !== slug) {
+    revalidatePath(`/vehicules/${existing.slug}`);
+  }
   return { success: true, id: vehicleId };
 }
 
@@ -360,6 +459,22 @@ export async function deleteVehiclePhoto(
 
   await admin.storage.from(BUCKET).remove([imagePath]);
 
+  const { data: vehicle } = await supabase
+    .from("vehicles")
+    .select("public_image_url")
+    .eq("id", vehicleId)
+    .maybeSingle();
+
+  if (vehicle?.public_image_url?.trim() === imagePath) {
+    await supabase
+      .from("vehicles")
+      .update({
+        public_image_url: null,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", vehicleId);
+  }
+
   if (imageId.startsWith("legacy-")) {
     await supabase
       .from("vehicles")
@@ -372,6 +487,166 @@ export async function deleteVehiclePhoto(
     await syncPrimaryImage(supabase, vehicleId);
   }
 
+  revalidateVehiclePaths(vehicleId);
+  return { success: true };
+}
+
+export async function setVehiclePublicPhoto(
+  vehicleId: string,
+  imagePath: string
+): Promise<ActionResult> {
+  await requireAdmin();
+  const supabase = await createClient();
+
+  const { error } = await supabase
+    .from("vehicles")
+    .update({
+      public_image_url: imagePath,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", vehicleId);
+
+  if (error) {
+    if (isMissingColumnError(error.message)) {
+      return {
+        success: false,
+        error:
+          "Colonne public_image_url absente — exécutez la migration SQL 20260731220000_vehicle_public_image.sql",
+      };
+    }
+    return { success: false, error: error.message };
+  }
+
+  revalidateVehiclePaths(vehicleId);
+  return { success: true };
+}
+
+export async function clearVehiclePublicPhoto(
+  vehicleId: string
+): Promise<ActionResult> {
+  await requireAdmin();
+  const supabase = await createClient();
+
+  const { error } = await supabase
+    .from("vehicles")
+    .update({
+      public_image_url: null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", vehicleId);
+
+  if (error) {
+    if (isMissingColumnError(error.message)) {
+      return {
+        success: false,
+        error:
+          "Colonne public_image_url absente — exécutez la migration SQL 20260731220000_vehicle_public_image.sql",
+      };
+    }
+    return { success: false, error: error.message };
+  }
+
+  revalidateVehiclePaths(vehicleId);
+  return { success: true };
+}
+
+export async function uploadVehicleHeroImage(
+  vehicleId: string,
+  formData: FormData
+): Promise<ActionResult> {
+  await requireAdmin();
+
+  const file = formData.get("file");
+
+  if (!(file instanceof File) || file.size === 0) {
+    return { success: false, error: "Fichier invalide" };
+  }
+
+  const admin = createAdminClient();
+  const supabase = await createClient();
+
+  const extension = file.name.split(".").pop()?.toLowerCase() || "png";
+  const storagePath = `${vehicleId}/hero-${Date.now()}.${extension}`;
+  const buffer = Buffer.from(await file.arrayBuffer());
+
+  const { data: existingVehicle } = await supabase
+    .from("vehicles")
+    .select("hero_image_url")
+    .eq("id", vehicleId)
+    .maybeSingle();
+
+  const { error: uploadError } = await admin.storage
+    .from(BUCKET)
+    .upload(storagePath, buffer, {
+      contentType: file.type || "image/png",
+      upsert: false,
+    });
+
+  if (uploadError) {
+    return { success: false, error: uploadError.message };
+  }
+
+  const { error: updateError } = await supabase
+    .from("vehicles")
+    .update({
+      hero_image_url: storagePath,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", vehicleId);
+
+  if (updateError) {
+    await admin.storage.from(BUCKET).remove([storagePath]);
+    if (isMissingColumnError(updateError.message)) {
+      return {
+        success: false,
+        error:
+          "Colonne hero_image_url absente — exécutez la migration SQL 20260731200000_vehicle_hero_image.sql",
+      };
+    }
+    return { success: false, error: updateError.message };
+  }
+
+  const previousPath = existingVehicle?.hero_image_url?.trim();
+  if (previousPath && previousPath !== storagePath) {
+    await admin.storage.from(BUCKET).remove([previousPath]);
+  }
+
+  revalidateVehiclePaths(vehicleId);
+  return { success: true };
+}
+
+export async function deleteVehicleHeroImage(
+  vehicleId: string
+): Promise<ActionResult> {
+  await requireAdmin();
+
+  const admin = createAdminClient();
+  const supabase = await createClient();
+
+  const { data: vehicle } = await supabase
+    .from("vehicles")
+    .select("hero_image_url")
+    .eq("id", vehicleId)
+    .maybeSingle();
+
+  const heroPath = vehicle?.hero_image_url?.trim();
+  if (!heroPath) {
+    return { success: false, error: "Aucune image hero à supprimer" };
+  }
+
+  const { error: updateError } = await supabase
+    .from("vehicles")
+    .update({
+      hero_image_url: null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", vehicleId);
+
+  if (updateError) {
+    return { success: false, error: updateError.message };
+  }
+
+  await admin.storage.from(BUCKET).remove([heroPath]);
   revalidateVehiclePaths(vehicleId);
   return { success: true };
 }

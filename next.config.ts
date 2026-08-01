@@ -12,6 +12,16 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ["recharts", "react-day-picker"],
   },
+  /** Redirections permanentes — ajouter ici les anciennes URLs au fil du temps. */
+  async redirects() {
+    return [
+      {
+        source: "/vehicules/bmw-serie-2-gran-coupe-de8ce43a",
+        destination: "/vehicules/bmw-serie-2-gran-coupe",
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       {

@@ -232,8 +232,16 @@ export default function OwnerVehiclesGrid({
                       <div className="mt-2">
                         <VehicleStatusBadge status={vehicle.status} />
                       </div>
+                    <div className="mt-3">
+                      <Link
+                        href={`/admin/vehicules/${vehicle.vehicle_id}`}
+                        className="de-btn de-btn-primary text-xs"
+                      >
+                        Gérer le véhicule →
+                      </Link>
                     </div>
-                    <div className="text-right">
+                  </div>
+                  <div className="text-right">
                       <p className="text-xs de-muted">Revenus</p>
                       <p className="text-sm font-medium text-[var(--blue-soft)]">
                         {(vehicle.total_revenue ?? 0).toLocaleString("fr-FR")} €

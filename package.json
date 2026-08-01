@@ -15,6 +15,9 @@
     "lint": "eslint",
     "create-admin": "tsx scripts/create-admin.ts",
     "cleanup-test-data": "tsx scripts/cleanup-test-data.ts",
+    "setup-catalog-demo": "tsx scripts/setup-catalog-demo.ts",
+    "setup-ammotioncars": "tsx scripts/setup-ammotioncars.ts",
+    "check-catalog": "tsx scripts/check-catalog.ts",
     "generate-pwa-icons": "tsx scripts/generate-pwa-icons.ts"
   },
   "dependencies": {
