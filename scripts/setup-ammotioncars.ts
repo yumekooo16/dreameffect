@@ -101,7 +101,16 @@ async function ensureOwner(supabase: ReturnType<typeof createAdminClient>) {
     user = data.user;
     console.log("✓ Propriétaire créé :", OWNER_EMAIL);
   } else {
-    console.log("✓ Propriétaire existant :", OWNER_EMAIL);
+    const { error: passwordError } = await supabase.auth.admin.updateUserById(
+      user.id,
+      { password: OWNER_PASSWORD, email_confirm: true }
+    );
+
+    if (passwordError) {
+      throw new Error(`Mise à jour mot de passe : ${passwordError.message}`);
+    }
+
+    console.log("✓ Propriétaire existant (mot de passe synchronisé) :", OWNER_EMAIL);
   }
 
   const { error: profileError } = await supabase.from("profiles").upsert(

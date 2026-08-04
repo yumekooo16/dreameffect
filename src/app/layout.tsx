@@ -1,9 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import { Space_Grotesk, Inter } from "next/font/google";
 import { ServiceWorkerRegister } from "@/src/components/pwa/service-worker-register";
+import { StandaloneRedirect } from "@/src/components/pwa/standalone-redirect";
 import { pwaConfig } from "@/src/lib/pwa/config";
+import { DEFAULT_DESCRIPTION } from "@/src/lib/public/seo";
 import "./globals.css";
-
 const display = Space_Grotesk({
   subsets: ["latin"],
   variable: "--font-display",
@@ -29,12 +30,27 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: {
-    default: pwaConfig.name,
+    default: `${pwaConfig.name} — Location véhicules haut de gamme`,
     template: `%s | ${pwaConfig.shortName}`,
   },
-  description:
-    "DreamEffect — location de véhicules haut de gamme et gestion pour propriétaires. Réservation simple, suivi rigoureux, véhicules entretenus.",
+  description: DEFAULT_DESCRIPTION,
   applicationName: pwaConfig.name,
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ?? "https://dreameffect.fr"
+  ),
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
@@ -80,6 +96,7 @@ export default function RootLayout({
     <html lang="fr" className={`${display.variable} ${body.variable}`}>
       <body className="bg-background text-foreground antialiased">
         {children}
+        <StandaloneRedirect />
         <ServiceWorkerRegister />
       </body>
     </html>

@@ -6,10 +6,9 @@ import HomeCtaSection from "@/src/components/public/home-cta";
 import { fetchPublicVehicles } from "@/src/lib/public/vehicles-data";
 import { HOME_KEYWORDS, formatServiceAreaLabel } from "@/src/lib/public/local-seo";
 import { buildPageMetadata } from "@/src/lib/public/seo";
-import { SITE_TAGLINE } from "@/src/lib/public/site";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: SITE_TAGLINE,
+  title: "DreamEffect — Location véhicules haut de gamme",
   description: `Location et gestion de véhicules haut de gamme avec DreamEffect (${formatServiceAreaLabel()}). Réservation simple, flotte entretenue, accompagnement premium.`,
   path: "/",
   keywords: [...HOME_KEYWORDS],

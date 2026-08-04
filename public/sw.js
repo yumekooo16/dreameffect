@@ -3,7 +3,7 @@
  * Push notifications : architecture préparée (voir src/lib/pwa/push.ts).
  */
 
-const CACHE_VERSION = "dreameffect-v1";
+const CACHE_VERSION = "dreameffect-v2";
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const OFFLINE_URL = "/offline";
 
@@ -128,7 +128,7 @@ self.addEventListener("push", (event) => {
     body: payload.body || "",
     icon: payload.icon || "/icons/icon-192x192.png",
     badge: payload.badge || "/icons/icon-192x192.png",
-    data: { url: payload.url || "/" },
+    data: { url: payload.url || "/redirect" },
     vibrate: [100, 50, 100],
   };
 
@@ -137,7 +137,7 @@ self.addEventListener("push", (event) => {
 
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
-  const targetUrl = event.notification.data?.url || "/";
+  const targetUrl = event.notification.data?.url || "/redirect";
 
   event.waitUntil(
     self.clients

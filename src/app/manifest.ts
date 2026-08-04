@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
   const { icons } = pwaConfig;
 
   return {
-    id: pwaConfig.startUrl,
+    id: pwaConfig.manifestId,
     name: pwaConfig.name,
     short_name: pwaConfig.shortName,
     description: pwaConfig.description,

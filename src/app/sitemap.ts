@@ -2,11 +2,10 @@ import type { MetadataRoute } from "next";
 import { fetchPublicVehicleSlugs } from "@/src/lib/public/vehicles-data";
 import { PUBLIC_ROUTES, SITE_URL } from "@/src/lib/public/site";
 
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const lastModified = new Date();
-  const vehicleSlugs = await fetchPublicVehicleSlugs();
+export const revalidate = 3600;
 
-  const staticPages: MetadataRoute.Sitemap = [
+function staticSitemapEntries(lastModified: Date): MetadataRoute.Sitemap {
+  return [
     {
       url: SITE_URL,
       lastModified,
@@ -32,13 +31,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.7,
     },
   ];
+}
 
-  const vehiclePages: MetadataRoute.Sitemap = vehicleSlugs.map((slug) => ({
-    url: `${SITE_URL}${PUBLIC_ROUTES.vehicles}/${slug}`,
-    lastModified,
-    changeFrequency: "daily",
-    priority: 0.85,
-  }));
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const lastModified = new Date();
+  const staticPages = staticSitemapEntries(lastModified);
 
-  return [...staticPages, ...vehiclePages];
+  try {
+    const vehicleSlugs = await fetchPublicVehicleSlugs();
+    const vehiclePages: MetadataRoute.Sitemap = vehicleSlugs.map((slug) => ({
+      url: `${SITE_URL}${PUBLIC_ROUTES.vehicles}/${slug}`,
+      lastModified,
+      changeFrequency: "daily",
+      priority: 0.85,
+    }));
+
+    return [...staticPages, ...vehiclePages];
+  } catch (error) {
+    console.error("[sitemap] Impossible de charger les véhicules :", error);
+    return staticPages;
+  }
 }

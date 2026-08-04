@@ -1,4 +1,4 @@
-import { createAdminClient } from "@/src/lib/supabase/admin";
+import { createPublicClient } from "@/src/lib/supabase/public";
 import { buildVehicleSlug } from "@/src/lib/public/vehicle-slug";
 import {
   deriveDailyRate,
@@ -29,7 +29,7 @@ async function enrichPublicImageUrls(
 ): Promise<PublicVehicleRow[]> {
   if (rows.length === 0) return rows;
 
-  const supabase = createAdminClient();
+  const supabase = createPublicClient();
   const { data, error } = await supabase
     .from("vehicles")
     .select("id, public_image_url")
@@ -55,7 +55,7 @@ async function enrichPublicImageUrls(
 async function fetchPublishedVehicleRow(
   filters: { slug?: string; id?: string }
 ): Promise<PublicVehicleRow | null> {
-  const supabase = createAdminClient();
+  const supabase = createPublicClient();
 
   if (filters.slug) {
     const bySlug = await supabase
@@ -101,7 +101,7 @@ async function fetchPublishedVehicleRow(
 }
 
 async function fetchPublishedRows(): Promise<PublicVehicleRow[]> {
-  const supabase = createAdminClient();
+  const supabase = createPublicClient();
 
   const { data, error } = await supabase
     .from("vehicles")
@@ -251,7 +251,7 @@ export async function fetchPublicVehicles(): Promise<PublicVehicle[]> {
 export async function fetchPublicVehicleBySlug(
   slug: string
 ): Promise<PublicVehicleDetail | null> {
-  const supabase = createAdminClient();
+  const supabase = createPublicClient();
 
   let row = await fetchPublishedVehicleRow({ slug });
 

@@ -6,6 +6,7 @@ import {
   areaServedJsonLd,
   formatServiceAreaLabel,
 } from "@/src/lib/public/local-seo";
+import { buildSameAsLinks } from "@/src/lib/public/llms";
 import { SITE_NAME, SITE_TAGLINE, SITE_URL } from "@/src/lib/public/site";
 
 export const DEFAULT_DESCRIPTION =
@@ -95,6 +96,8 @@ export function buildPageMetadata({
 }
 
 export function organizationJsonLd() {
+  const sameAs = buildSameAsLinks();
+
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
@@ -105,11 +108,14 @@ export function organizationJsonLd() {
     email: CONTACT_EMAIL,
     telephone: CONTACT_PHONE,
     areaServed: areaServedJsonLd(),
-    sameAs: [],
+    ...(sameAs.length > 0 ? { sameAs } : {}),
   };
 }
 
 export function localBusinessJsonLd() {
+  const sameAs = buildSameAsLinks();
+  const streetAddress = process.env.NEXT_PUBLIC_BUSINESS_STREET?.trim();
+
   return {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
@@ -123,6 +129,7 @@ export function localBusinessJsonLd() {
     priceRange: "€€€",
     address: {
       "@type": "PostalAddress",
+      ...(streetAddress ? { streetAddress } : {}),
       addressLocality: process.env.NEXT_PUBLIC_BUSINESS_CITY ?? PRIMARY_SERVICE_CITY,
       addressRegion:
         process.env.NEXT_PUBLIC_BUSINESS_REGION ?? "Oise",
@@ -135,6 +142,7 @@ export function localBusinessJsonLd() {
       "Gestion locative automobile",
       "Conciergerie automobile",
     ],
+    ...(sameAs.length > 0 ? { sameAs } : {}),
   };
 }
 
@@ -155,6 +163,7 @@ export function webSiteJsonLd() {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: SITE_NAME,
+    alternateName: ["Dream Effect", "Dreameffect"],
     description: SITE_TAGLINE,
     url: SITE_URL,
     inLanguage: "fr-FR",
