@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Send, CheckCircle2 } from "lucide-react";
+import GdprConsentField from "@/src/components/gdpr/gdpr-consent-field";
 import { buildWhatsAppUrl, WHATSAPP_NUMBER } from "@/src/lib/constants";
 
 type FormState = {
@@ -11,6 +12,7 @@ type FormState = {
   email: string;
   vehicle: string;
   message: string;
+  gdprConsent: boolean;
 };
 
 const INITIAL: FormState = {
@@ -20,6 +22,7 @@ const INITIAL: FormState = {
   email: "",
   vehicle: "",
   message: "",
+  gdprConsent: false,
 };
 
 type FormErrors = Partial<Record<keyof FormState, string>>;
@@ -48,6 +51,10 @@ function validate(form: FormState): FormErrors {
     errors.message = "Message requis";
   } else if (form.message.trim().length < 10) {
     errors.message = "Minimum 10 caractères";
+  }
+
+  if (!form.gdprConsent) {
+    errors.gdprConsent = "Veuillez accepter le traitement de vos données";
   }
 
   return errors;
@@ -229,6 +236,13 @@ export default function OwnersContactForm() {
           <p className="de-form-error">{errors.message}</p>
         )}
       </div>
+
+      <GdprConsentField
+        id="owner-gdpr-consent"
+        checked={form.gdprConsent}
+        onChange={(checked) => updateField("gdprConsent", checked)}
+        error={errors.gdprConsent}
+      />
 
       <div className="de-form-actions">
         <button type="submit" className="de-btn de-btn-primary de-btn-lg">

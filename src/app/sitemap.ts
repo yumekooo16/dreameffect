@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 import { fetchPublicVehicleSlugs } from "@/src/lib/public/vehicles-data";
-import { PUBLIC_ROUTES, SITE_URL } from "@/src/lib/public/site";
+import { LEGAL_ROUTES, PUBLIC_ROUTES, SITE_URL } from "@/src/lib/public/site";
 
 export const revalidate = 3600;
 
@@ -29,6 +29,12 @@ function staticSitemapEntries(lastModified: Date): MetadataRoute.Sitemap {
       lastModified,
       changeFrequency: "monthly",
       priority: 0.7,
+    },
+    {
+      url: `${SITE_URL}${LEGAL_ROUTES.cookies}`,
+      lastModified,
+      changeFrequency: "yearly",
+      priority: 0.3,
     },
   ];
 }

@@ -11,3 +11,9 @@ export const PUBLIC_ROUTES = {
   owners: "/proprietaires",
   contact: "/contact",
 } as const;
+
+export const LEGAL_ROUTES = {
+  cookies: "/cookies",
+  privacy: "/politique-de-confidentialite",
+  legal: "/mentions-legales",
+} as const;

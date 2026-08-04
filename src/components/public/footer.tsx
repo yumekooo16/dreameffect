@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import FooterLegalLinks from "@/src/components/public/footer-legal-links";
 import { PUBLIC_ROUTES } from "@/src/lib/public/site";
 
 export default function PublicFooter() {
@@ -49,14 +50,7 @@ export default function PublicFooter() {
 
           <nav aria-label="Informations légales">
             <p className="de-label mb-3">Informations</p>
-            <ul className="de-footer-links">
-              <li>
-                <Link href="#">Mentions légales</Link>
-              </li>
-              <li>
-                <Link href="#">Politique de confidentialité</Link>
-              </li>
-            </ul>
+            <FooterLegalLinks />
           </nav>
         </div>
 
