@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Mail, MessageCircle, Phone } from "lucide-react";
+import { Mail, MapPin, MessageCircle, Phone } from "lucide-react";
 import ContactForm from "@/src/components/public/contact-form";
 import {
   CONTACT_EMAIL,
@@ -7,6 +7,7 @@ import {
   CONTACT_WHATSAPP_URL,
   SOCIAL_LINKS,
 } from "@/src/lib/public/contact";
+import { SERVICE_AREAS, formatServiceAreaLabel } from "@/src/lib/public/local-seo";
 
 export default function ContactContent() {
   const socialEntries = Object.entries(SOCIAL_LINKS).filter(
@@ -31,6 +32,28 @@ export default function ContactContent() {
           </div>
 
           <aside className="de-contact-sidebar">
+            <div className="de-contact-zone-card">
+              <span className="de-contact-icon">
+                <MapPin size={20} strokeWidth={1.75} />
+              </span>
+              <div>
+                <p className="de-label">Zone d&apos;intervention</p>
+                <p className="mt-1 text-sm leading-relaxed">
+                  {formatServiceAreaLabel()}
+                </p>
+                <ul className="de-contact-zone-list">
+                  {SERVICE_AREAS.map((area) => (
+                    <li key={area.name}>
+                      {area.name}
+                      {"department" in area && area.department
+                        ? ` (${area.department})`
+                        : ""}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
             <p className="text-sm leading-relaxed de-muted">
               Vous préférez nous joindre directement ? Voici nos coordonnées.
             </p>

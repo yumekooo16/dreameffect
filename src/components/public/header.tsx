@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -45,26 +46,98 @@ export default function PublicHeader() {
     setMenuOpen(false);
   }, [pathname]);
 
-  return (
-    <header
-      className={`de-public-header${scrolled ? " de-public-header--scrolled" : ""}${
-        menuOpen ? " de-public-header--menu-open" : ""
-      }`}
-    >
-      <div className="de-public-header-bar de-public-container">
-        <Link href={PUBLIC_ROUTES.home} className="de-public-header-brand">
-          <Image
-            src="/logo.png"
-            alt="DreΛm Effect"
-            width={34}
-            height={34}
-            className="de-public-header-logo"
-            priority
-          />
-          <span className="de-public-header-name">DreΛm Effect</span>
-        </Link>
+  const mobileMenu =
+    menuOpen && typeof document !== "undefined"
+      ? createPortal(
+          <div className="de-public-mobile-menu">
+            <button
+              type="button"
+              className="de-public-mobile-overlay"
+              aria-label="Fermer le menu"
+              onClick={() => setMenuOpen(false)}
+            />
+            <nav
+              id="public-mobile-drawer"
+              className="de-public-mobile-drawer"
+              aria-label="Navigation mobile"
+            >
+              <div className="de-public-mobile-drawer-top">
+                <div>
+                  <p className="de-public-mobile-drawer-eyebrow">Menu</p>
+                  <p className="de-public-mobile-drawer-tagline">
+                    Location & gestion automobile
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  className="de-public-mobile-drawer-close"
+                  aria-label="Fermer le menu"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  <X size={22} />
+                </button>
+              </div>
 
-        <nav className="de-public-nav-desktop" aria-label="Navigation principale">
+              <div className="de-public-mobile-drawer-links">
+                {NAV_ITEMS.map(({ href, label, exact, index }) => {
+                  const active = isActive(pathname, href, exact);
+
+                  return (
+                    <Link
+                      key={href}
+                      href={href}
+                      className={`de-public-mobile-drawer-link${
+                        active ? " de-public-mobile-drawer-link--active" : ""
+                      }`}
+                      onClick={() => setMenuOpen(false)}
+                      aria-current={active ? "page" : undefined}
+                    >
+                      <span className="de-public-mobile-drawer-index">{index}</span>
+                      <span>{label}</span>
+                    </Link>
+                  );
+                })}
+              </div>
+
+              <div className="de-public-mobile-drawer-footer">
+                <Link
+                  href={PUBLIC_ROUTES.contact}
+                  className="de-btn de-btn-primary de-public-mobile-drawer-cta"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  Nous contacter
+                  <ArrowUpRight size={18} strokeWidth={1.75} aria-hidden />
+                </Link>
+              </div>
+            </nav>
+          </div>,
+          document.body
+        )
+      : null;
+
+  return (
+    <>
+      <header
+        className={`de-public-header${scrolled ? " de-public-header--scrolled" : ""}${
+          menuOpen ? " de-public-header--menu-open" : ""
+        }`}
+      >
+        <div className="de-public-header-bar de-public-container">
+          {!menuOpen && (
+            <Link href={PUBLIC_ROUTES.home} className="de-public-header-brand">
+              <Image
+                src="/logo.png"
+                alt="DreΛm Effect"
+                width={34}
+                height={34}
+                className="de-public-header-logo"
+                priority
+              />
+              <span className="de-public-header-name">DreΛm Effect</span>
+            </Link>
+          )}
+
+          <nav className="de-public-nav-desktop" aria-label="Navigation principale">
           {NAV_ITEMS.map(({ href, label, exact }) => {
             const active = isActive(pathname, href, exact);
 
@@ -95,70 +168,17 @@ export default function PublicHeader() {
           <button
             type="button"
             className="de-public-nav-toggle"
-            onClick={() => setMenuOpen((open) => !open)}
+            onClick={() => setMenuOpen(true)}
             aria-expanded={menuOpen}
             aria-controls="public-mobile-drawer"
-            aria-label={menuOpen ? "Fermer le menu" : "Ouvrir le menu"}
+            aria-label="Ouvrir le menu"
           >
-            {menuOpen ? <X size={22} /> : <Menu size={22} />}
+            <Menu size={22} />
           </button>
         </div>
       </div>
-
-      {menuOpen && (
-        <>
-          <button
-            type="button"
-            className="de-public-mobile-overlay de-public-nav-mobile"
-            aria-label="Fermer le menu"
-            onClick={() => setMenuOpen(false)}
-          />
-          <nav
-            id="public-mobile-drawer"
-            className="de-public-mobile-drawer de-public-nav-mobile"
-            aria-label="Navigation mobile"
-          >
-            <div className="de-public-mobile-drawer-head">
-              <p className="de-public-mobile-drawer-eyebrow">Menu</p>
-              <p className="de-public-mobile-drawer-tagline">
-                Location & gestion automobile
-              </p>
-            </div>
-
-            <div className="de-public-mobile-drawer-links">
-              {NAV_ITEMS.map(({ href, label, exact, index }) => {
-                const active = isActive(pathname, href, exact);
-
-                return (
-                  <Link
-                    key={href}
-                    href={href}
-                    className={`de-public-mobile-drawer-link${
-                      active ? " de-public-mobile-drawer-link--active" : ""
-                    }`}
-                    onClick={() => setMenuOpen(false)}
-                    aria-current={active ? "page" : undefined}
-                  >
-                    <span className="de-public-mobile-drawer-index">{index}</span>
-                    <span>{label}</span>
-                  </Link>
-                );
-              })}
-            </div>
-
-            <div className="de-public-mobile-drawer-footer">
-              <Link
-                href={PUBLIC_ROUTES.contact}
-                className="de-btn de-btn-primary de-public-mobile-drawer-cta"
-                onClick={() => setMenuOpen(false)}
-              >
-                Nous contacter
-                <ArrowUpRight size={18} strokeWidth={1.75} aria-hidden />
-              </Link>
-            </div>
-          </nav>
-        </>
-      )}
-    </header>
+      </header>
+      {mobileMenu}
+    </>
   );
 }

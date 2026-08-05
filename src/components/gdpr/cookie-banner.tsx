@@ -103,7 +103,7 @@ export default function CookieBanner() {
             <>
               <button
                 type="button"
-                className="de-btn de-btn-ghost de-btn-sm"
+                className="de-btn de-btn-secondary de-btn-sm de-cookie-btn-equal"
                 onClick={rejectOptional}
               >
                 Tout refuser
@@ -117,7 +117,7 @@ export default function CookieBanner() {
               </button>
               <button
                 type="button"
-                className="de-btn de-btn-primary de-btn-sm"
+                className="de-btn de-btn-primary de-btn-sm de-cookie-btn-equal"
                 onClick={acceptAll}
               >
                 Tout accepter
@@ -127,7 +127,7 @@ export default function CookieBanner() {
             <>
               <button
                 type="button"
-                className="de-btn de-btn-ghost de-btn-sm"
+                className="de-btn de-btn-secondary de-btn-sm de-cookie-btn-equal"
                 onClick={() => {
                   if (consent) {
                     closePreferences();

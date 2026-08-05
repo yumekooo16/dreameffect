@@ -6,8 +6,11 @@ import { FAQ_ITEMS } from "@/src/components/public/owners-faq";
 import {
   buildPageMetadata,
   breadcrumbJsonLd,
+  faqPageJsonLd,
   organizationJsonLd,
 } from "@/src/lib/public/seo";
+import { fetchPublicVehicles } from "@/src/lib/public/vehicles-data";
+import { resolveHeroImageUrl } from "@/src/lib/public/hero-image";
 import {
   OWNERS_KEYWORDS,
   areaServedJsonLd,
@@ -23,18 +26,7 @@ export const metadata: Metadata = buildPageMetadata({
 });
 
 function ownersFaqJsonLd() {
-  return {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: FAQ_ITEMS.map((item) => ({
-      "@type": "Question",
-      name: item.question,
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: item.answer,
-      },
-    })),
-  };
+  return faqPageJsonLd(FAQ_ITEMS);
 }
 
 function ownersServiceJsonLd() {
@@ -51,7 +43,10 @@ function ownersServiceJsonLd() {
   };
 }
 
-export default function OwnersPage() {
+export default async function OwnersPage() {
+  const vehicles = await fetchPublicVehicles();
+  const heroImageUrl = resolveHeroImageUrl(vehicles);
+
   return (
     <>
       <JsonLd
@@ -64,7 +59,7 @@ export default function OwnersPage() {
           ownersServiceJsonLd(),
         ]}
       />
-      <OwnersHero />
+      <OwnersHero imageUrl={heroImageUrl} />
       <OwnersContent />
     </>
   );

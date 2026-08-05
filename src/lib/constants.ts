@@ -1,6 +1,6 @@
 /** Numéro WhatsApp DreamEffect (sans +), configurable via .env */
 export const WHATSAPP_NUMBER =
-  process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "33600000000";
+  process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "33616320381";
 
 export const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
   "Bonjour DreamEffect, j'aimerais vous contacter concernant mon véhicule."

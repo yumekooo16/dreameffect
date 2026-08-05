@@ -400,3 +400,34 @@ export async function finishReservation(
   ]);
   return { success: true, id: reservationId };
 }
+
+export async function deleteReservation(
+  reservationId: string
+): Promise<ActionResult> {
+  await requireAdmin();
+  const supabase = await createClient();
+
+  const { data: existing } = await supabase
+    .from("reservations")
+    .select("id, vehicle_id, customer_name")
+    .eq("id", reservationId)
+    .single();
+
+  if (!existing) {
+    return { success: false, error: "Réservation introuvable" };
+  }
+
+  const { error } = await supabase
+    .from("reservations")
+    .delete()
+    .eq("id", reservationId);
+
+  if (error) {
+    return { success: false, error: error.message };
+  }
+
+  await syncVehicleStatusFromReservations(existing.vehicle_id);
+  await revalidateReservationAndPublicPaths(undefined, [existing.vehicle_id]);
+
+  return { success: true };
+}

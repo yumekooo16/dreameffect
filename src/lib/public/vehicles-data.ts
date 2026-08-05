@@ -1,4 +1,9 @@
-import { createPublicClient } from "@/src/lib/supabase/public";
+import { createAdminClient } from "@/src/lib/supabase/admin";
+
+/** Lecture catalogue — service role côté serveur (RLS anon souvent absent en dev). */
+function createCatalogClient() {
+  return createAdminClient();
+}
 import { buildVehicleSlug } from "@/src/lib/public/vehicle-slug";
 import {
   deriveDailyRate,
@@ -29,7 +34,7 @@ async function enrichPublicImageUrls(
 ): Promise<PublicVehicleRow[]> {
   if (rows.length === 0) return rows;
 
-  const supabase = createPublicClient();
+  const supabase = createCatalogClient();
   const { data, error } = await supabase
     .from("vehicles")
     .select("id, public_image_url")
@@ -55,7 +60,7 @@ async function enrichPublicImageUrls(
 async function fetchPublishedVehicleRow(
   filters: { slug?: string; id?: string }
 ): Promise<PublicVehicleRow | null> {
-  const supabase = createPublicClient();
+  const supabase = createCatalogClient();
 
   if (filters.slug) {
     const bySlug = await supabase
@@ -101,7 +106,7 @@ async function fetchPublishedVehicleRow(
 }
 
 async function fetchPublishedRows(): Promise<PublicVehicleRow[]> {
-  const supabase = createPublicClient();
+  const supabase = createCatalogClient();
 
   const { data, error } = await supabase
     .from("vehicles")
@@ -171,7 +176,25 @@ function mapPricing(row: PublicVehicleRow): VehiclePricing {
 }
 
 function resolvePublicCoverImage(row: Pick<PublicVehicleRow, "public_image_url" | "image_url">) {
-  return row.public_image_url?.trim() || row.image_url?.trim() || null;
+  const publicChoice = row.public_image_url?.trim();
+  if (publicChoice) return publicChoice;
+
+  return row.image_url?.trim() || null;
+}
+
+function buildPublicCoverImages(
+  vehicleId: string,
+  coverUrl: string | null
+): PublicVehicleImage[] {
+  if (!coverUrl) return [];
+
+  return [
+    {
+      id: `public-${vehicleId}`,
+      image_url: coverUrl,
+      is_primary: true,
+    },
+  ];
 }
 
 function mapPublicVehicle(row: PublicVehicleRow): PublicVehicle {
@@ -199,50 +222,6 @@ function mapPublicVehicle(row: PublicVehicleRow): PublicVehicle {
   };
 }
 
-function normalizeImages(
-  vehicleId: string,
-  imageUrl: string | null,
-  publicImageUrl: string | null,
-  rows: PublicVehicleImage[]
-): PublicVehicleImage[] {
-  const coverUrl = publicImageUrl?.trim() || imageUrl?.trim() || null;
-  let images =
-    rows.length > 0
-      ? rows.map((row) => ({ ...row }))
-      : coverUrl
-        ? [
-            {
-              id: `legacy-${vehicleId}`,
-              image_url: coverUrl,
-              is_primary: true,
-            },
-          ]
-        : [];
-
-  if (!coverUrl || images.length === 0) {
-    return images;
-  }
-
-  const existingIndex = images.findIndex((image) => image.image_url === coverUrl);
-
-  if (existingIndex === -1) {
-    return [
-      {
-        id: `public-${vehicleId}`,
-        image_url: coverUrl,
-        is_primary: true,
-      },
-      ...images.map((image) => ({ ...image, is_primary: false })),
-    ];
-  }
-
-  const [cover] = images.splice(existingIndex, 1);
-  return [
-    { ...cover, is_primary: true },
-    ...images.map((image) => ({ ...image, is_primary: false })),
-  ];
-}
-
 export async function fetchPublicVehicles(): Promise<PublicVehicle[]> {
   const rows = await fetchPublishedRows();
   return rows.map(mapPublicVehicle);
@@ -251,8 +230,6 @@ export async function fetchPublicVehicles(): Promise<PublicVehicle[]> {
 export async function fetchPublicVehicleBySlug(
   slug: string
 ): Promise<PublicVehicleDetail | null> {
-  const supabase = createPublicClient();
-
   let row = await fetchPublishedVehicleRow({ slug });
 
   if (!row) {
@@ -272,23 +249,14 @@ export async function fetchPublicVehicleBySlug(
 
   if (!row) return null;
 
-  const { data: images } = await supabase
-    .from("vehicle_images")
-    .select("id, image_url, is_primary")
-    .eq("vehicle_id", row.id)
-    .order("created_at", { ascending: true });
-
   const base = mapPublicVehicle(row);
+  const coverUrl = resolvePublicCoverImage(row);
 
   return {
     ...base,
     color: row.color,
-    images: normalizeImages(
-      row.id,
-      row.image_url ?? null,
-      row.public_image_url ?? null,
-      (images ?? []) as PublicVehicleImage[]
-    ),
+    image_url: coverUrl,
+    images: buildPublicCoverImages(row.id, coverUrl),
   };
 }
 

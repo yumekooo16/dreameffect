@@ -82,29 +82,24 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="de-page flex min-h-screen items-center justify-center px-4 py-10">
-      <form
-        onSubmit={handleLogin}
-        className="de-login-card w-full max-w-xl space-y-8"
-      >
-        <div className="flex flex-col items-center gap-5 text-center">
+    <main className="de-page de-login-page">
+      <form onSubmit={handleLogin} className="de-login-card">
+        <div className="de-login-header">
           <Image
             src="/logo.png"
             alt="DreΛm Effect"
-            width={100}
-            height={100}
-            className="rounded-xl object-contain"
+            width={88}
+            height={88}
+            className="de-login-logo"
             priority
           />
           <div>
-            <h1 className="de-display text-3xl sm:text-4xl tracking-tight">
-              DreΛm Effect
-            </h1>
-            <p className="mt-2 text-base de-muted">Connexion DreamEffect</p>
+            <h1 className="de-display de-login-title">DreΛm Effect</h1>
+            <p className="de-login-subtitle">Connexion DreamEffect</p>
           </div>
         </div>
 
-        <div className="space-y-4">
+        <div className="de-login-fields">
           <input
             type="email"
             placeholder="Email"
@@ -125,25 +120,23 @@ export default function LoginPage() {
             className="de-input de-input-lg"
           />
 
-          <label className="flex cursor-pointer items-center gap-2 text-sm de-muted">
+          <label className="de-login-remember">
             <input
               type="checkbox"
               checked={rememberMe}
               onChange={(e) => setRememberMe(e.target.checked)}
-              className="h-4 w-4 rounded border-[var(--blue-border)]"
+              className="de-checkbox"
             />
             Rester connecté
           </label>
         </div>
 
-        {error && (
-          <p className="text-center text-sm text-destructive">{error}</p>
-        )}
+        {error && <p className="de-login-error">{error}</p>}
 
         <button
           type="submit"
           disabled={loading}
-          className="de-btn de-btn-primary de-btn-lg w-full"
+          className="de-btn de-btn-primary de-btn-lg de-login-submit"
         >
           {loading ? "Connexion..." : "Se connecter"}
         </button>

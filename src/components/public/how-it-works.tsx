@@ -1,39 +1,69 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { HOME_PROCESS_STEPS } from "@/src/lib/public/home-content";
+import { resolveVehicleImageUrl } from "@/src/lib/image-url";
 import { PUBLIC_ROUTES } from "@/src/lib/public/site";
 
-const POINTS = [
-  {
-    title: "Propriétaires",
-    text: "On s'occupe des réservations, du nettoyage, de l'entretien et du suivi. Vous recevez vos revenus chaque mois, sans vous en occuper.",
-  },
-  {
-    title: "Locataires",
-    text: "Vous choisissez un véhicule, on s'occupe du reste : réservation, remise des clés, accompagnement si besoin.",
-  },
-];
+type HowItWorksSectionProps = {
+  visualUrls?: (string | null)[];
+};
 
-export default function HowItWorksSection() {
+export default function HowItWorksSection({
+  visualUrls = [],
+}: HowItWorksSectionProps) {
   return (
-    <section className="de-section">
+    <section className="de-section" aria-labelledby="home-process-title">
       <div className="de-public-container">
         <div className="de-section-header">
-          <h2 className="de-display de-section-title">Comment ça marche</h2>
+          <p className="de-section-eyebrow">Processus</p>
+          <h2 id="home-process-title" className="de-display de-section-title">
+            Comment ça marche
+          </h2>
           <p className="de-section-description">
-            Deux parcours simples, un seul interlocuteur.
+            Trois étapes, un seul interlocuteur — que vous louiez un véhicule
+            ou que vous confiiez le vôtre.
           </p>
         </div>
 
-        <div className="de-process-grid">
-          {POINTS.map(({ title, text }) => (
-            <article key={title} className="de-process-column">
-              <h3 className="de-display text-xl tracking-tight">{title}</h3>
-              <p className="mt-3 text-sm leading-relaxed de-muted">{text}</p>
-            </article>
-          ))}
+        <div className="de-narrative-steps">
+          {HOME_PROCESS_STEPS.map(({ step, title, text, visualAlt }, index) => {
+            const imageUrl = resolveVehicleImageUrl(visualUrls[index]);
+            const reverse = index % 2 === 1;
+
+            return (
+              <article
+                key={step}
+                className={`de-narrative-step${reverse ? " de-narrative-step--reverse" : ""}`}
+              >
+                <div className="de-narrative-step-visual">
+                  {imageUrl ? (
+                    <Image
+                      src={imageUrl}
+                      alt={visualAlt}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 1024px) 100vw, 50vw"
+                    />
+                  ) : (
+                    <div className="de-narrative-step-visual-fallback">
+                      <span className="de-narrative-step-number-large">{step}</span>
+                    </div>
+                  )}
+                  <div className="de-narrative-step-visual-overlay" />
+                  <span className="de-narrative-step-number">{step}</span>
+                </div>
+
+                <div className="de-narrative-step-content">
+                  <h3 className="de-display de-narrative-step-title">{title}</h3>
+                  <p className="de-narrative-step-text">{text}</p>
+                </div>
+              </article>
+            );
+          })}
         </div>
 
-        <div className="mt-10">
+        <div className="mt-12">
           <Link
             href={PUBLIC_ROUTES.contact}
             className="de-btn de-btn-ghost inline-flex items-center gap-2"

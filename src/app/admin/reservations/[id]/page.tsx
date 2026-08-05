@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { requireAdmin } from "@/src/lib/admin/auth";
 import {
   fetchReservationDetail,
   fetchVehiclesForReservationForm,
@@ -13,6 +12,7 @@ import { formatDistanceKm } from "@/src/lib/admin/reservations-types";
 import Section from "@/src/components/owner/section";
 import VehicleImage from "@/src/components/owner/vehicle-image";
 import ReservationActionsPanel from "@/src/components/admin/reservation-actions";
+import ReservationDeleteButton from "@/src/components/admin/reservation-delete-button";
 
 function formatEuro(amount?: number | null) {
   return `${Number(amount ?? 0).toLocaleString("fr-FR")} €`;
@@ -33,7 +33,6 @@ export default async function ReservationDetailPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  await requireAdmin();
   const { id } = await params;
 
   const [reservation, vehicles] = await Promise.all([
@@ -205,27 +204,33 @@ export default async function ReservationDetailPage({
       </Section>
 
       <Section title="Actions administrateur">
-        <ReservationActionsPanel
-          reservationId={reservation.id}
-          vehicles={vehicles}
-          canConfirm={canConfirm}
-          canFinish={canFinish}
-          canCancel={canCancel}
-          initial={{
-            vehicle_id: reservation.vehicle_id,
-            customer_name: reservation.customer_name ?? "",
-            customer_email: reservation.customer_email ?? "",
-            start_date: reservation.start_date,
-            end_date: reservation.end_date,
-            pickup_location: reservation.pickup_location ?? "",
-            return_location: reservation.return_location ?? "",
-            total_price: Number(reservation.total_price ?? 0),
-            owner_amount: Number(reservation.owner_amount ?? 0),
-            company_amount: Number(reservation.company_amount ?? 0),
-            distance_km: reservation.distance_km ?? null,
-            status: reservation.status as "pending" | "confirmed" | "finished" | "cancelled",
-          }}
-        />
+        <div className="space-y-6">
+          <ReservationActionsPanel
+            reservationId={reservation.id}
+            vehicles={vehicles}
+            canConfirm={canConfirm}
+            canFinish={canFinish}
+            canCancel={canCancel}
+            initial={{
+              vehicle_id: reservation.vehicle_id,
+              customer_name: reservation.customer_name ?? "",
+              customer_email: reservation.customer_email ?? "",
+              start_date: reservation.start_date,
+              end_date: reservation.end_date,
+              pickup_location: reservation.pickup_location ?? "",
+              return_location: reservation.return_location ?? "",
+              total_price: Number(reservation.total_price ?? 0),
+              owner_amount: Number(reservation.owner_amount ?? 0),
+              company_amount: Number(reservation.company_amount ?? 0),
+              distance_km: reservation.distance_km ?? null,
+              status: reservation.status as "pending" | "confirmed" | "finished" | "cancelled",
+            }}
+          />
+          <ReservationDeleteButton
+            reservationId={reservation.id}
+            customerName={reservation.customer_name ?? "Client"}
+          />
+        </div>
       </Section>
     </div>
   );

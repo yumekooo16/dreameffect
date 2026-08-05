@@ -16,6 +16,8 @@
     "create-admin": "tsx scripts/create-admin.ts",
     "cleanup-test-data": "tsx scripts/cleanup-test-data.ts",
     "setup-catalog-demo": "tsx scripts/setup-catalog-demo.ts",
+    "seed-preview-vehicles": "tsx scripts/seed-preview-vehicles.ts",
+    "remove-preview-vehicles": "tsx scripts/remove-preview-vehicles.ts",
     "setup-ammotioncars": "tsx scripts/setup-ammotioncars.ts",
     "check-catalog": "tsx scripts/check-catalog.ts",
     "generate-pwa-icons": "tsx scripts/generate-pwa-icons.ts"

@@ -10,7 +10,7 @@ import { buildSameAsLinks } from "@/src/lib/public/llms";
 import { SITE_NAME, SITE_TAGLINE, SITE_URL } from "@/src/lib/public/site";
 
 export const DEFAULT_DESCRIPTION =
-  "DreamEffect — location de véhicules haut de gamme et gestion pour propriétaires à Beauvais, Gisors et dans l'Oise. Réservation simple, véhicules entretenus.";
+  "DreamEffect — location de véhicules haut de gamme et gestion locative pour propriétaires à Beauvais, Gisors et dans l'Oise. Tarifs affichés, réservation WhatsApp.";
 
 export const DEFAULT_OG_IMAGE = "/icons/icon-512x512.png";
 
@@ -112,13 +112,30 @@ export function organizationJsonLd() {
   };
 }
 
+export function faqPageJsonLd(
+  items: readonly { question: string; answer: string }[]
+) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: items.map((item) => ({
+      "@type": "Question",
+      name: item.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: item.answer,
+      },
+    })),
+  };
+}
+
 export function localBusinessJsonLd() {
   const sameAs = buildSameAsLinks();
   const streetAddress = process.env.NEXT_PUBLIC_BUSINESS_STREET?.trim();
 
   return {
     "@context": "https://schema.org",
-    "@type": "LocalBusiness",
+    "@type": ["LocalBusiness", "AutomotiveBusiness"],
     "@id": `${SITE_URL}/#localbusiness`,
     name: SITE_NAME,
     description: DEFAULT_DESCRIPTION,

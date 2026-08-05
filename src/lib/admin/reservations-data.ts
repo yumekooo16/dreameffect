@@ -109,11 +109,29 @@ export async function fetchReservationDetail(
 
   const record = reservation as ReservationRecord;
 
-  const { data: vehicle } = await supabase
-    .from("vehicles")
-    .select("id, brand, model, image_url, owner_id")
-    .eq("id", record.vehicle_id)
-    .single();
+  const { data: dashboardVehicle } = await supabase
+    .from("owner_vehicle_dashboard")
+    .select("vehicle_id, brand, model, image_url, owner_id")
+    .eq("vehicle_id", record.vehicle_id)
+    .maybeSingle();
+
+  const { data: rawVehicle } = dashboardVehicle
+    ? { data: null }
+    : await supabase
+        .from("vehicles")
+        .select("id, brand, model, image_url, owner_id")
+        .eq("id", record.vehicle_id)
+        .maybeSingle();
+
+  const vehicle = dashboardVehicle
+    ? {
+        id: dashboardVehicle.vehicle_id,
+        brand: dashboardVehicle.brand,
+        model: dashboardVehicle.model,
+        image_url: dashboardVehicle.image_url,
+        owner_id: dashboardVehicle.owner_id,
+      }
+    : rawVehicle;
 
   if (!vehicle) {
     return null;

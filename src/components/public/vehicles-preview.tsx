@@ -12,20 +12,25 @@ type VehiclesPreviewProps = {
 
 export default function VehiclesPreview({
   vehicles = [],
-  limit = 3,
+  limit = 6,
 }: VehiclesPreviewProps) {
   const preview = vehicles.slice(0, limit);
-  const hasVehicles = preview.length > 0;
+
+  if (preview.length === 0) {
+    return null;
+  }
 
   return (
     <section className="de-section de-section-alt">
       <div className="de-public-container">
         <div className="de-section-header de-section-header-row">
           <div>
-            <h2 className="de-display de-section-title">Notre flotte</h2>
+            <p className="de-section-eyebrow">Flotte</p>
+            <h2 className="de-display de-section-title">Nos véhicules</h2>
             <p className="de-section-description">
-              Véhicules disponibles à la location, classés par marque dans le
-              catalogue.
+              {preview.length} modèle{preview.length > 1 ? "s" : ""} disponible
+              {preview.length > 1 ? "s" : ""} — tarifs à la journée, réservation
+              par WhatsApp ou formulaire.
             </p>
           </div>
           <Link
@@ -37,30 +42,11 @@ export default function VehiclesPreview({
           </Link>
         </div>
 
-        {hasVehicles ? (
-          <div className="de-vehicles-grid">
-            {preview.map((vehicle) => (
-              <PublicVehicleCard key={vehicle.id} vehicle={vehicle} />
-            ))}
-          </div>
-        ) : (
-          <div className="de-vehicles-empty">
-            <p className="de-display text-lg tracking-tight">
-              Le catalogue arrive bientôt
-            </p>
-            <p className="mt-2 max-w-md text-sm de-muted">
-              Les véhicules seront publiés ici dès la connexion à la base de
-              données. En attendant, contactez-nous pour connaître les
-              disponibilités.
-            </p>
-            <Link
-              href={PUBLIC_ROUTES.contact}
-              className="de-btn de-btn-primary mt-6"
-            >
-              Nous contacter
-            </Link>
-          </div>
-        )}
+        <div className="de-vehicles-grid">
+          {preview.map((vehicle) => (
+            <PublicVehicleCard key={vehicle.id} vehicle={vehicle} />
+          ))}
+        </div>
       </div>
     </section>
   );

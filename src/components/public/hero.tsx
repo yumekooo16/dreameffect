@@ -1,30 +1,34 @@
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, MessageCircle } from "lucide-react";
+import HeroBackground from "@/src/components/public/hero-background";
+import { CONTACT_WHATSAPP_URL } from "@/src/lib/public/contact";
 import { formatServiceAreaLabel } from "@/src/lib/public/local-seo";
 import { PUBLIC_ROUTES } from "@/src/lib/public/site";
 
-export default function HeroSection() {
-  return (
-    <section className="de-hero">
-      <div className="de-hero-visual" aria-hidden>
-        <div className="de-hero-visual-overlay" />
-      </div>
+type HeroSectionProps = {
+  imageUrl?: string | null;
+};
 
-      <div className="de-public-container de-hero-content">
-        <p className="de-hero-eyebrow">
-          {formatServiceAreaLabel()} · Location & gestion · Premium
+export default function HeroSection({ imageUrl }: HeroSectionProps) {
+  return (
+    <section className="de-hero de-hero--photo">
+      <HeroBackground imageUrl={imageUrl} />
+
+      <div className="de-public-container de-hero-content de-hero-content--wide">
+        <p className="de-hero-eyebrow de-hero-location-badge">
+          {formatServiceAreaLabel()} · 24h/24
         </p>
 
         <h1 className="de-display de-hero-title">
-          Location et gestion
+          Louez ou faites rentabiliser
           <br />
-          de véhicules haut de gamme.
+          un véhicule haut de gamme.
         </h1>
 
         <p className="de-hero-subtitle">
-          Vous souhaitez louer un véhicule ou faire rentabiliser le vôtre ?
-          Nous gérons les réservations, l&apos;entretien et le suivi au
-          quotidien.
+          Flotte entretenue à Beauvais et Gisors. Réservation en ligne,
+          remise des clés sous 24 h, gestion locative clé en main pour les
+          propriétaires.
         </p>
 
         <div className="de-hero-actions">
@@ -36,10 +40,13 @@ export default function HeroSection() {
             <ArrowRight size={18} strokeWidth={2} />
           </Link>
           <Link
-            href={PUBLIC_ROUTES.owners}
+            href={CONTACT_WHATSAPP_URL}
+            target="_blank"
+            rel="noopener noreferrer"
             className="de-btn de-btn-ghost de-btn-lg de-hero-btn de-hero-btn-outline"
           >
-            Confier mon véhicule
+            <MessageCircle size={18} strokeWidth={2} />
+            WhatsApp direct
           </Link>
         </div>
       </div>
