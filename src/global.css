@@ -1222,6 +1222,13 @@ button.de-list-item {
 
 .de-landing {
   padding-top: 0;
+  overflow-x: clip;
+  max-width: 100%;
+}
+
+.de-landing main {
+  overflow-x: clip;
+  max-width: 100%;
 }
 
 /* --- Header public (style conciergerie premium) ------------- */
@@ -1923,11 +1930,18 @@ button.de-list-item {
 .de-owners-contact-layout {
   display: grid;
   gap: 2.5rem;
+  width: 100%;
+  min-width: 0;
+}
+
+.de-owners-contact-layout > * {
+  min-width: 0;
+  max-width: 100%;
 }
 
 @media (min-width: 1024px) {
   .de-owners-contact-layout {
-    grid-template-columns: 1fr 1.1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
     gap: 4rem;
     align-items: start;
   }
@@ -1935,6 +1949,37 @@ button.de-list-item {
 
 .de-owners-contact-points {
   margin-top: 1.5rem;
+}
+
+@media (max-width: 639px) {
+  .de-owners-page .de-section-header {
+    text-align: center;
+    margin-inline: auto;
+  }
+
+  .de-owners-hero .de-hero-content {
+    text-align: center;
+  }
+
+  .de-owners-hero .de-hero-actions {
+    justify-content: center;
+  }
+
+  .de-owners-hero .de-hero-location-badge {
+    margin-inline: auto;
+  }
+
+  .de-owners-contact-section .de-owners-contact-layout > div:first-child {
+    text-align: center;
+  }
+
+  .de-owners-contact-section .de-owners-contact-points {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-inline: auto;
+    text-align: left;
+  }
 }
 
 /* --- Contact page ------------------------------------------- */
@@ -1956,6 +2001,8 @@ button.de-list-item {
   border: 1px solid var(--border);
   background: var(--card);
   padding: 1.75rem;
+  min-width: 0;
+  max-width: 100%;
 }
 
 @media (min-width: 640px) {
@@ -2070,6 +2117,14 @@ button.de-list-item {
   flex-direction: column;
   gap: 0.75rem;
   padding-top: 0.5rem;
+}
+
+@media (max-width: 639px) {
+  .de-form-actions .de-btn {
+    width: 100%;
+    white-space: normal;
+    text-wrap: balance;
+  }
 }
 
 @media (min-width: 640px) {

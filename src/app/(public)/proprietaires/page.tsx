@@ -48,7 +48,7 @@ export default async function OwnersPage() {
   const heroImageUrl = resolveHeroImageUrl(vehicles);
 
   return (
-    <>
+    <div className="de-owners-page">
       <JsonLd
         data={[
           breadcrumbJsonLd([
@@ -61,6 +61,6 @@ export default async function OwnersPage() {
       />
       <OwnersHero imageUrl={heroImageUrl} />
       <OwnersContent />
-    </>
+    </div>
   );
 }
