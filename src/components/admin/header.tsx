@@ -13,6 +13,7 @@ import {
   Wrench,
   FileText,
   Wallet,
+  MessageSquare,
 } from "lucide-react";
 import NotificationsBell from "@/src/components/owner/notifications-bell";
 
@@ -40,6 +41,12 @@ const NAV_ITEMS = [
     label: "Réservations",
     icon: CalendarDays,
     match: (path: string) => path.startsWith("/admin/reservations"),
+  },
+  {
+    href: "/admin/contacts",
+    label: "Contacts",
+    icon: MessageSquare,
+    match: (path: string) => path.startsWith("/admin/contacts"),
   },
   {
     href: "/admin/maintenance",

@@ -18,7 +18,7 @@ export const PRICING_TIER_FIELDS = [
     key: "price_24h_weekend" as const,
     label: "24 h — week-end",
     shortLabel: "24 h week-end",
-    hint: "Vendredi soir → dimanche soir",
+    hint: "Du vendredi au dimanche",
   },
   {
     key: "price_48h_weekend" as const,

@@ -5,6 +5,7 @@ import {
   Calendar,
   FileWarning,
   Wrench,
+  MessageSquare,
 } from "lucide-react";
 import type { AlertItem } from "@/src/lib/admin/dashboard-data";
 
@@ -13,6 +14,7 @@ const ICONS = {
   reservation_today: Calendar,
   document_expiring: FileWarning,
   maintenance_due: Wrench,
+  contact_lead: MessageSquare,
 } as const;
 
 function AlertContent({

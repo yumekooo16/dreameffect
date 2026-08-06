@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Send, CheckCircle2 } from "lucide-react";
+import { Send, CheckCircle2, Loader2 } from "lucide-react";
 import GdprConsentField from "@/src/components/gdpr/gdpr-consent-field";
 import { buildWhatsAppUrl, WHATSAPP_NUMBER } from "@/src/lib/constants";
+import { submitContactLead } from "@/src/lib/public/contact-actions";
 
 const TOPICS = [
   { value: "location", label: "Louer un véhicule" },
@@ -68,31 +69,22 @@ function validate(form: FormState): FormErrors {
   return errors;
 }
 
-function buildContactMessage(form: FormState) {
-  const lines = [
+function buildWhatsAppMessage(form: FormState) {
+  return [
     "Bonjour DreamEffect,",
     "",
-    `Nom : ${form.firstName.trim()} ${form.lastName.trim()}`,
-    `Email : ${form.email.trim()}`,
-  ];
-
-  if (form.phone.trim()) {
-    lines.push(`Téléphone : ${form.phone.trim()}`);
-  }
-
-  lines.push(
     `Demande : ${topicLabel(form.topic)}`,
     "",
     form.message.trim(),
-  );
-
-  return lines.join("\n");
+  ].join("\n");
 }
 
 export default function ContactForm() {
   const [form, setForm] = useState<FormState>(INITIAL);
   const [errors, setErrors] = useState<FormErrors>({});
   const [sent, setSent] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   function updateField<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -105,9 +97,10 @@ export default function ContactForm() {
     }
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSent(false);
+    setSubmitError(null);
 
     const nextErrors = validate(form);
     if (Object.keys(nextErrors).length > 0) {
@@ -115,7 +108,26 @@ export default function ContactForm() {
       return;
     }
 
-    const url = buildWhatsAppUrl(WHATSAPP_NUMBER, buildContactMessage(form));
+    setSubmitting(true);
+
+    const result = await submitContactLead({
+      firstName: form.firstName,
+      lastName: form.lastName,
+      email: form.email,
+      phone: form.phone,
+      topic: form.topic,
+      topicLabel: topicLabel(form.topic),
+      message: form.message,
+    });
+
+    setSubmitting(false);
+
+    if (!result.ok) {
+      setSubmitError(result.error);
+      return;
+    }
+
+    const url = buildWhatsAppUrl(WHATSAPP_NUMBER, buildWhatsAppMessage(form));
     window.open(url, "_blank", "noopener,noreferrer");
     setSent(true);
     setForm(INITIAL);
@@ -130,9 +142,8 @@ export default function ContactForm() {
           Message prêt à envoyer
         </h2>
         <p className="mt-2 text-sm leading-relaxed de-muted">
-          WhatsApp s&apos;est ouvert avec votre message. Il ne reste qu&apos;à
-          appuyer sur Envoyer. Si la fenêtre ne s&apos;est pas ouverte,
-          réessayez ci-dessous.
+          Vos coordonnées ont été enregistrées. WhatsApp s&apos;est ouvert avec
+          votre demande — il ne reste qu&apos;à appuyer sur Envoyer.
         </p>
         <button
           type="button"
@@ -262,12 +273,26 @@ export default function ContactForm() {
       />
 
       <div className="de-form-actions">
-        <button type="submit" className="de-btn de-btn-primary de-btn-lg">
-          <Send size={18} strokeWidth={2} />
-          Envoyer ma demande
+        {submitError && (
+          <p className="de-form-error mb-3" role="alert">
+            {submitError}
+          </p>
+        )}
+        <button
+          type="submit"
+          className="de-btn de-btn-primary de-btn-lg"
+          disabled={submitting}
+        >
+          {submitting ? (
+            <Loader2 size={18} strokeWidth={2} className="animate-spin" />
+          ) : (
+            <Send size={18} strokeWidth={2} />
+          )}
+          {submitting ? "Enregistrement…" : "Envoyer ma demande"}
         </button>
         <p className="de-form-note">
-          Votre message sera envoyé via WhatsApp. Réponse habituelle sous 24 h.
+          Vos coordonnées sont enregistrées côté DreamEffect. WhatsApp
+          s&apos;ouvrira avec uniquement votre demande et votre message.
         </p>
       </div>
     </form>

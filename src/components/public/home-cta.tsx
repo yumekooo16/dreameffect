@@ -19,9 +19,8 @@ export default function HomeCtaSection() {
             </h2>
             <p className="de-home-cta-text">
               Disponibles {formatServiceAreaLabel()}. Réponse le jour même par
-              WhatsApp, sous 24 h via le formulaire. Propriétaires : premier
-              échange gratuit pour évaluer le potentiel locatif de votre
-              véhicule.
+              WhatsApp, sous 24 h via le formulaire. Propriétaires : échangeons
+              sur la gestion locative de votre véhicule.
             </p>
           </div>
 

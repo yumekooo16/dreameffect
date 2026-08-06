@@ -3,7 +3,7 @@ export const WHATSAPP_NUMBER =
   process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "33616320381";
 
 export const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
-  "Bonjour DreamEffect, j'aimerais vous contacter concernant mon véhicule."
+  "Bonjour DreamEffect, j'aurais besoin de quelques renseignements."
 )}`;
 
 /** Construit un lien WhatsApp vers un numéro (format international sans +). */

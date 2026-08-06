@@ -3,6 +3,10 @@ import {
   computeOwnerFinanceList,
   computeVehicleFinanceList,
 } from "@/src/lib/admin/finance-types";
+import {
+  formatContactTopic,
+  type ContactSubmission,
+} from "@/src/lib/admin/contacts-data";
 
 export type ReservationRow = {
   id: string;
@@ -59,7 +63,12 @@ export type ActivityEvent = {
 
 export type AlertItem = {
   id: string;
-  type: "vehicle_unavailable" | "reservation_today" | "document_expiring" | "maintenance_due";
+  type:
+    | "vehicle_unavailable"
+    | "reservation_today"
+    | "document_expiring"
+    | "maintenance_due"
+    | "contact_lead";
   title: string;
   description?: string;
   priority: "high" | "medium";
@@ -391,6 +400,31 @@ export function buildAlerts(
   return alerts.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
 }
 
+export function buildContactAlerts(contacts: ContactSubmission[]): AlertItem[] {
+  const alerts: AlertItem[] = [];
+  const since = Date.now() - 7 * 24 * 60 * 60 * 1000;
+
+  for (const contact of contacts) {
+    if (new Date(contact.created_at).getTime() < since) continue;
+
+    const fullName = `${contact.first_name} ${contact.last_name}`.trim();
+    const contactInfo = contact.phone
+      ? `${fullName} — ${contact.email} — ${contact.phone}`
+      : `${fullName} — ${contact.email}`;
+
+    alerts.push({
+      id: `contact-${contact.id}`,
+      type: "contact_lead",
+      title: `Nouvelle demande — ${formatContactTopic(contact.topic)}`,
+      description: contactInfo,
+      priority: "high",
+      href: "/admin/contacts",
+    });
+  }
+
+  return alerts;
+}
+
 export function computeDashboardInsights(
   reservations: ReservationRow[],
   vehicles: VehicleRow[],
@@ -477,6 +511,7 @@ export async function fetchAdminDashboardData() {
     maintenancesRes,
     documentsRes,
     ownerProfilesRes,
+    contactsRes,
   ] = await Promise.all([
     supabase
       .from("profiles")
@@ -504,15 +539,30 @@ export async function fetchAdminDashboardData() {
       .from("profiles")
       .select("id, first_name, last_name")
       .eq("role", "owner"),
+    supabase
+      .from("contact_submissions")
+      .select(
+        "id, first_name, last_name, email, phone, topic, message, created_at"
+      )
+      .order("created_at", { ascending: false })
+      .limit(10),
   ]);
 
   const vehicles = (vehiclesRes.data ?? []) as VehicleRow[];
   const reservations = (reservationsRes.data ?? []) as ReservationRow[];
   const maintenances = (maintenancesRes.data ?? []) as MaintenanceRow[];
   const documents = (documentsRes.data ?? []) as DocumentRow[];
+  const contacts = (contactsRes.data ?? []) as ContactSubmission[];
 
   const stats = computeStats(reservations, vehicles);
   stats.ownersCount = ownersRes.count ?? 0;
+
+  const contactAlerts = buildContactAlerts(contacts);
+  const systemAlerts = buildAlerts(vehicles, reservations, documents, maintenances);
+  const priorityOrder = { high: 0, medium: 1 };
+  const alerts = [...contactAlerts, ...systemAlerts].sort(
+    (a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]
+  );
 
   return {
     stats,
@@ -525,6 +575,6 @@ export async function fetchAdminDashboardData() {
     monthlyRevenues: computeMonthlyRevenues(reservations),
     monthlyReservationCounts: computeMonthlyReservationCounts(reservations),
     activity: buildActivityFeed(reservations, maintenances, documents, vehicles),
-    alerts: buildAlerts(vehicles, reservations, documents, maintenances),
+    alerts,
   };
 }
