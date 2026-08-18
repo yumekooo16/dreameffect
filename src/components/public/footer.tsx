@@ -17,13 +17,11 @@ export default function PublicFooter() {
                 alt="DreamEffect"
                 width={40}
                 height={40}
-                className="object-contain"
+                className="rounded-xl object-contain"
               />
               <div>
-                <p className="de-display text-xl font-light">DreamEffect</p>
-                <p className="mt-1 text-[10px] uppercase tracking-[0.22em] text-white/35">
-                  Location et gestion
-                </p>
+                <p className="de-display text-sm tracking-tight">DreamEffect</p>
+                <p className="text-xs de-muted">Location & gestion automobile</p>
               </div>
             </div>
             <p className="mt-4 max-w-xs text-sm leading-relaxed de-muted">
