@@ -21,11 +21,11 @@ export const pwaConfig = {
   categories: ["business", "productivity"] as const,
 
   /** Couleurs alignées sur le thème admin */
-  themeColor: "#070708",
-  backgroundColor: "#070708",
+  themeColor: "#0b1018",
+  backgroundColor: "#0b1018",
 
   /** Version du cache service worker — incrémenter à chaque déploiement majeur */
-  cacheVersion: "dreameffect-v5",
+  cacheVersion: "dreameffect-v6",
 
   icons: {
     /** Fichier source — remplacer logo.png puis relancer `npm run generate-pwa-icons` */

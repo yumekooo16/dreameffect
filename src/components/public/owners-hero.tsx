@@ -14,12 +14,11 @@ export default function OwnersHero({ imageUrl }: OwnersHeroProps) {
         <div className="de-hero-bar-copy">
           <p className="de-hero-eyebrow">Propriétaires</p>
           <h1 className="de-display de-hero-title">
-            Confiez votre véhicule.
+            Confiez votre véhicule, conservez les revenus.
           </h1>
-          <p className="de-hero-lede">Conservez les revenus.</p>
           <p className="de-hero-subtitle">
             Réservations, remises de clés, préparation et suivi : DreamEffect
-            s&apos;en charge. Vous consultez vos revenus chaque mois.
+            s&apos;en charge. Vous consultez l&apos;activité chaque mois.
           </p>
         </div>
         <div className="de-hero-bar-actions">

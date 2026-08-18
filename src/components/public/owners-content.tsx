@@ -20,6 +20,7 @@ export default function OwnersContent() {
         <div className="de-public-container">
           <div className="de-owners-contact-layout">
             <div>
+              <p className="de-section-eyebrow">Contact</p>
               <h2 id="owners-contact-title" className="de-display de-section-title">
                 Parlons de votre véhicule
               </h2>

@@ -114,6 +114,7 @@ export default function VehicleBookingPanel({ vehicle, availability }: Props) {
   return (
     <section className="de-booking-section" aria-labelledby="booking-title">
       <div className="de-booking-header">
+        <p className="de-section-eyebrow">Disponibilités</p>
         <h2 id="booking-title" className="de-display de-booking-title">
           Réserver ce véhicule
         </h2>

@@ -1,5 +1,6 @@
-import Link from "next/link";
 import Image from "next/image";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import { HOME_PROCESS_STEPS } from "@/src/lib/public/home-content";
 import { resolveVehicleImageUrl } from "@/src/lib/image-url";
 import { PUBLIC_ROUTES } from "@/src/lib/public/site";
@@ -18,39 +19,60 @@ export default function HowItWorksSection({
   visualUrls = [],
 }: HowItWorksSectionProps) {
   return (
-    <section className="de-chapters" aria-labelledby="home-process-title">
-      <h2 id="home-process-title" className="sr-only">
-        Comment ça marche
-      </h2>
-      {HOME_PROCESS_STEPS.map(({ step, title, text, visualAlt }, index) => {
-        const imageUrl = resolveVehicleImageUrl(visualUrls[index]);
-        const link = STEP_LINKS[index];
+    <section className="de-section" aria-labelledby="home-process-title">
+      <div className="de-public-container">
+        <div className="de-section-header">
+          <p className="de-section-eyebrow">Le parcours</p>
+          <h2 id="home-process-title" className="de-display de-section-title">
+            De la sélection à la remise des clés
+          </h2>
+          <p className="de-section-description">
+            Trois temps, un interlocuteur — que vous louiez un véhicule ou
+            que vous nous confiiez le vôtre.
+          </p>
+        </div>
 
-        return (
-          <article key={step} className="de-chapter">
-            <div className="de-chapter-media">
-              {imageUrl ? (
-                <Image
-                  src={imageUrl}
-                  alt={visualAlt}
-                  fill
-                  className="object-cover"
-                  sizes="100vw"
-                />
-              ) : null}
-              <div className="de-chapter-overlay" />
-            </div>
-            <div className="de-public-container de-chapter-copy">
-              <span className="de-chapter-index">{step}</span>
-              <h3 className="de-chapter-title">{title}</h3>
-              <p className="de-chapter-text">{text}</p>
-              <Link href={link.href} className="de-text-link de-chapter-link">
-                {link.label}
-              </Link>
-            </div>
-          </article>
-        );
-      })}
+        <div className="de-narrative-steps">
+          {HOME_PROCESS_STEPS.map(({ step, title, text, visualAlt }, index) => {
+            const imageUrl = resolveVehicleImageUrl(visualUrls[index]);
+            const reverse = index % 2 === 1;
+            const link = STEP_LINKS[index];
+
+            return (
+              <article
+                key={step}
+                className={`de-narrative-step${reverse ? " de-narrative-step--reverse" : ""}`}
+              >
+                <div className="de-narrative-step-visual">
+                  {imageUrl ? (
+                    <Image
+                      src={imageUrl}
+                      alt={visualAlt}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 1024px) 100vw, 50vw"
+                    />
+                  ) : (
+                    <div className="de-narrative-step-visual-fallback">
+                      <span className="de-narrative-step-number-large">{step}</span>
+                    </div>
+                  )}
+                  <span className="de-narrative-step-number">{step}</span>
+                </div>
+
+                <div className="de-narrative-step-content">
+                  <h3 className="de-display de-narrative-step-title">{title}</h3>
+                  <p className="de-narrative-step-text">{text}</p>
+                  <Link href={link.href} className="de-link-inline de-narrative-step-link">
+                    {link.label}
+                    <ArrowRight size={14} />
+                  </Link>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      </div>
     </section>
   );
 }

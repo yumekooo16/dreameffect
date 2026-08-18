@@ -10,8 +10,8 @@ export default function HomeFaqSection() {
             L&apos;essentiel
           </h2>
           <p className="de-section-description">
-            Location à Beauvais et Gisors, gestion locative dans l&apos;Oise et
-            l&apos;Eure — l&apos;essentiel, clairement.
+            Tarifs, flotte, réservation et remise des clés — les réponses
+            utiles, sans détour.
           </p>
         </div>
 

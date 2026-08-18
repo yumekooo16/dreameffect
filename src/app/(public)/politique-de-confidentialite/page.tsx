@@ -16,8 +16,10 @@ export default function PrivacyPolicyPage() {
   return (
     <>
       <PageHero
+        eyebrow="Informations"
         title="Politique de confidentialité"
         description="Le traitement de vos données, et vos droits."
+        compact
       />
       <LegalDocument blocks={getPrivacyBlocks()} />
     </>

@@ -31,6 +31,7 @@ export default function OwnersFaq() {
     <section className="de-section" aria-labelledby="owners-faq-title">
       <div className="de-public-container">
         <div className="de-section-header">
+          <p className="de-section-eyebrow">FAQ</p>
           <h2 id="owners-faq-title" className="de-display de-section-title">
             Questions fréquentes
           </h2>

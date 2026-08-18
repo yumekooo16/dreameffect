@@ -26,6 +26,7 @@ export default function OwnersServices() {
     <section className="de-section de-section-alt" aria-labelledby="owners-services-title">
       <div className="de-public-container">
         <div className="de-section-header">
+          <p className="de-section-eyebrow">Prestations</p>
           <h2 id="owners-services-title" className="de-display de-section-title">
             Ce que nous prenons en charge
           </h2>

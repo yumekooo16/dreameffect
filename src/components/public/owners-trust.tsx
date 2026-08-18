@@ -30,6 +30,7 @@ export default function OwnersTrust() {
     <section className="de-section" aria-labelledby="owners-trust-title">
       <div className="de-public-container">
         <div className="de-section-header">
+          <p className="de-section-eyebrow">Confiance</p>
           <h2 id="owners-trust-title" className="de-display de-section-title">
             Ce qui nous distingue
           </h2>

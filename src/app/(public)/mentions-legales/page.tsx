@@ -16,8 +16,10 @@ export default function LegalNoticePage() {
   return (
     <>
       <PageHero
+        eyebrow="Informations"
         title="Mentions légales"
         description="Éditeur, hébergeur, propriété intellectuelle et contact."
+        compact
       />
       <LegalDocument blocks={getLegalNoticeBlocks()} />
     </>

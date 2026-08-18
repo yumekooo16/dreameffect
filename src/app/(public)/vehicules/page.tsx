@@ -45,6 +45,7 @@ export default async function VehiclesPage() {
         ]}
       />
       <PageHero
+        eyebrow="Catalogue"
         title="La flotte"
         description={`Véhicules disponibles à ${formatServiceAreaLabel()} — tarifs affichés, demande par WhatsApp ou formulaire.`}
         imageUrl={heroImageUrl}

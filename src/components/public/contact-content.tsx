@@ -19,6 +19,7 @@ export default function ContactContent() {
       <div className="de-public-container">
         <div className="de-contact-page-layout">
           <div className="de-contact-form-block">
+            <p className="de-section-eyebrow">Message</p>
             <h2 className="de-display text-xl sm:text-2xl">
               Écrivez-nous
             </h2>

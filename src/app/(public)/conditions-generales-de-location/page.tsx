@@ -16,8 +16,10 @@ export default function RentalTermsPage() {
   return (
     <>
       <PageHero
+        eyebrow="Location"
         title="Conditions générales de location"
         description="Caution, assurance, âge, permis, kilométrage et réservation."
+        compact
       />
       <LegalDocument blocks={getRentalTermsBlocks()} />
     </>

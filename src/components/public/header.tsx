@@ -63,9 +63,9 @@ export default function PublicHeader() {
             >
               <div className="de-public-mobile-drawer-top">
                 <div>
-                  <p className="de-public-mobile-drawer-eyebrow">Menu</p>
+                  <p className="de-public-mobile-drawer-eyebrow">Navigation</p>
                   <p className="de-public-mobile-drawer-tagline">
-                    Conciergerie automobile
+                    DreΛm Effect
                   </p>
                 </div>
                 <button
