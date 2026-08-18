@@ -17,7 +17,7 @@ export default function PrivacyPolicyPage() {
     <>
       <PageHero
         title="Politique de confidentialité"
-        description="Comment DreamEffect traite vos données personnelles."
+        description="Le traitement de vos données, et vos droits."
       />
       <LegalDocument blocks={getPrivacyBlocks()} />
     </>

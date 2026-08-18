@@ -20,7 +20,7 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "DreamEffect — Location véhicules haut de gamme",
-  description: `Location et gestion de véhicules premium à ${formatServiceAreaLabel()}. Flotte entretenue, tarifs affichés, réservation WhatsApp. Gestion locative pour propriétaires.`,
+  description: `Location et gestion de véhicules haut de gamme à ${formatServiceAreaLabel()}. Flotte entretenue, tarifs affichés, réservation par WhatsApp. Gestion locative pour propriétaires.`,
   path: "/",
   keywords: [...HOME_KEYWORDS],
   absoluteTitle: true,

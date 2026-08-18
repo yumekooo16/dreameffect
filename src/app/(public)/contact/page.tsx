@@ -39,7 +39,7 @@ export default async function ContactPage() {
       />
       <PageHero
         title="Contact"
-        description="Une question sur une location ou sur la gestion de votre véhicule ? Réponse le jour même par WhatsApp, sous 24 h via le formulaire."
+        description="Une question sur une location, ou sur la gestion de votre véhicule ? WhatsApp le jour même, formulaire sous 24 h."
         imageUrl={heroImageUrl}
       />
       <ContactContent />

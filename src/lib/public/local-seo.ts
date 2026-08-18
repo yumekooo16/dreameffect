@@ -95,7 +95,7 @@ export function buildVehicleSeoDescription({
     `à ${city} avec DreamEffect.`,
     fromPrice ? `Dès ${fromPrice}.` : null,
     fuel ? `Carburant : ${fuel}.` : null,
-    "Réservation simple, véhicule entretenu et suivi rigoureux.",
+    "Réservation par WhatsApp, véhicule préparé, suivi attentif.",
   ].filter(Boolean);
 
   return parts.join(" ").slice(0, 160);

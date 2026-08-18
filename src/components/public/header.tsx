@@ -65,7 +65,7 @@ export default function PublicHeader() {
                 <div>
                   <p className="de-public-mobile-drawer-eyebrow">Menu</p>
                   <p className="de-public-mobile-drawer-tagline">
-                    Location & gestion automobile
+                    Conciergerie automobile
                   </p>
                 </div>
                 <button
@@ -133,7 +133,7 @@ export default function PublicHeader() {
                 className="de-public-header-logo"
                 priority
               />
-              <span className="de-public-header-name">DreΛm Effect</span>
+              <span className="de-public-header-name de-wordmark">DreΛm Effect</span>
             </Link>
           )}
 

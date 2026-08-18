@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { Bodoni_Moda, Source_Sans_3 } from "next/font/google";
 import { ServiceWorkerRegister } from "@/src/components/pwa/service-worker-register";
 import { StandaloneRedirect } from "@/src/components/pwa/standalone-redirect";
 import { CookieConsentProvider } from "@/src/components/gdpr/cookie-consent-provider";
@@ -7,6 +8,19 @@ import { pwaConfig } from "@/src/lib/pwa/config";
 import { DEFAULT_DESCRIPTION, DEFAULT_OG_IMAGE } from "@/src/lib/public/seo";
 import { SITE_NAME, SITE_URL } from "@/src/lib/public/site";
 import "./globals.css";
+
+const display = Bodoni_Moda({
+  subsets: ["latin", "latin-ext"],
+  variable: "--font-bodoni",
+  display: "swap",
+  style: ["normal", "italic"],
+});
+
+const body = Source_Sans_3({
+  subsets: ["latin", "latin-ext"],
+  variable: "--font-source",
+  display: "swap",
+});
 
 export const viewport: Viewport = {
   themeColor: pwaConfig.themeColor,
@@ -89,7 +103,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="fr">
+    <html lang="fr" className={`${display.variable} ${body.variable}`}>
       <body className="bg-background text-foreground antialiased">
         <CookieConsentProvider>
           {children}

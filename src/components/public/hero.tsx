@@ -20,13 +20,13 @@ export default function HeroSection({ imageUrl }: HeroSectionProps) {
         </p>
 
         <h1 className="de-display de-hero-title">
-          Louez ou faites rentabiliser un véhicule haut de gamme.
+          L&apos;automobile haut de gamme, en location comme en gestion.
         </h1>
 
         <p className="de-hero-subtitle">
-          Flotte entretenue à Beauvais et Gisors. Réservation en ligne,
-          remise des clés sous 24 h, gestion locative clé en main pour les
-          propriétaires.
+          Flotte préparée à Beauvais et Gisors. Réservation par WhatsApp,
+          remise des clés sous 24 h. Propriétaires : nous gérons
+          l&apos;exploitation, vous percevez les revenus.
         </p>
 
         <div className="de-hero-actions">
@@ -34,7 +34,7 @@ export default function HeroSection({ imageUrl }: HeroSectionProps) {
             href={PUBLIC_ROUTES.vehicles}
             className="de-btn de-btn-primary de-btn-lg de-hero-btn"
           >
-            Voir les véhicules
+            Découvrir la flotte
             <ArrowRight size={18} strokeWidth={2} />
           </Link>
           <Link
@@ -44,7 +44,7 @@ export default function HeroSection({ imageUrl }: HeroSectionProps) {
             className="de-btn de-btn-ghost de-btn-lg de-hero-btn de-hero-btn-outline"
           >
             <MessageCircle size={18} strokeWidth={2} />
-            WhatsApp direct
+            Écrire sur WhatsApp
           </Link>
         </div>
       </div>

@@ -1,23 +1,23 @@
 const SERVICES = [
   {
-    title: "Gestion des réservations",
-    text: "Calendrier, disponibilités et confirmations gérés pour vous.",
+    title: "Les réservations",
+    text: "Calendrier, disponibilités et confirmations, gérés pour vous.",
   },
   {
-    title: "Accueil des locataires",
-    text: "Remise et restitution des clés dans les règles, avec un interlocuteur unique.",
+    title: "L'accueil des locataires",
+    text: "Remise et restitution des clés, avec un interlocuteur unique.",
   },
   {
-    title: "Nettoyage",
-    text: "Préparation et remise en état du véhicule entre chaque location.",
+    title: "La préparation",
+    text: "Nettoyage et remise en état du véhicule entre chaque location.",
   },
   {
-    title: "Suivi des locations",
-    text: "Kilométrage, état du véhicule et suivi opérationnel de bout en bout.",
+    title: "Le suivi",
+    text: "Kilométrage, état du véhicule et historique de chaque séjour.",
   },
   {
-    title: "Accompagnement personnalisé",
-    text: "Une équipe disponible pour répondre à vos questions à tout moment.",
+    title: "L'accompagnement",
+    text: "Une équipe disponible, pour vous comme pour les locataires.",
   },
 ];
 
@@ -26,12 +26,13 @@ export default function OwnersServices() {
     <section className="de-section de-section-alt" aria-labelledby="owners-services-title">
       <div className="de-public-container">
         <div className="de-section-header">
+          <p className="de-section-eyebrow">Périmètre</p>
           <h2 id="owners-services-title" className="de-display de-section-title">
-            Ce que DreamEffect prend en charge
+            Ce que nous prenons en charge
           </h2>
           <p className="de-section-description">
-            Vous conservez la propriété de votre véhicule. Nous gérons
-            l&apos;exploitation au quotidien.
+            Vous restez propriétaire. Nous assurons l&apos;exploitation au
+            quotidien.
           </p>
         </div>
 

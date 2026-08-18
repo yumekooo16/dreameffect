@@ -16,8 +16,8 @@ import { resolveHeroImageUrl } from "@/src/lib/public/hero-image";
 import { PUBLIC_ROUTES } from "@/src/lib/public/site";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Nos véhicules",
-  description: `Catalogue DreamEffect — véhicules haut de gamme à louer à ${formatServiceAreaLabel()}. Berlines, SUV et sportives entretenues, tarifs à la journée, réservation WhatsApp.`,
+  title: "La flotte",
+  description: `Catalogue DreamEffect — véhicules haut de gamme à louer à ${formatServiceAreaLabel()}. Berlines, SUV et sportives entretenues, tarifs à la journée, réservation par WhatsApp.`,
   path: PUBLIC_ROUTES.vehicles,
   keywords: [...CATALOG_KEYWORDS],
 });
@@ -34,7 +34,7 @@ export default async function VehiclesPage() {
         data={[
           breadcrumbJsonLd([
             { name: "Accueil", path: "/" },
-            { name: "Nos véhicules", path: PUBLIC_ROUTES.vehicles },
+            { name: "La flotte", path: PUBLIC_ROUTES.vehicles },
           ]),
           vehicleCatalogItemListJsonLd(
             vehicles.map((vehicle) => ({
@@ -45,8 +45,8 @@ export default async function VehiclesPage() {
         ]}
       />
       <PageHero
-        title="Nos véhicules"
-        description={`Flotte disponible à ${formatServiceAreaLabel()} — tarifs affichés, réservation par WhatsApp ou formulaire.`}
+        title="La flotte"
+        description={`Véhicules disponibles à ${formatServiceAreaLabel()} — tarifs affichés, demande par WhatsApp ou formulaire.`}
         imageUrl={heroImageUrl}
       />
       <section className="de-section de-section-compact">

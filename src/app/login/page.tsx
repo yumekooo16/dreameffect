@@ -94,8 +94,8 @@ export default function LoginPage() {
             priority
           />
           <div>
-            <h1 className="de-display de-login-title">DreΛm Effect</h1>
-            <p className="de-login-subtitle">Connexion DreamEffect</p>
+            <h1 className="de-display de-login-title de-wordmark">DreΛm Effect</h1>
+            <p className="de-login-subtitle">Espace propriétaire et administration</p>
           </div>
         </div>
 

@@ -6,7 +6,7 @@
 export const pwaConfig = {
   name: "DreamEffect",
   shortName: "DreamEffect",
-  description: "Plateforme de gestion de conciergerie automobile DreamEffect.",
+  description: "Plateforme de conciergerie automobile DreamEffect.",
   /** Identifiant stable du manifest — ne pas modifier sauf nouvelle application. */
   manifestId: "dreameffect-app",
   /** Page d'ouverture de la PWA installée — admin / propriétaires, pas le site public. */

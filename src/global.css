@@ -2,6 +2,7 @@
 
 /* ============================================================
    DREAMEFFECT — thème sobre noir / gris / blanc
+   Typographie : Bodoni Moda (titres) · Source Sans 3 (texte)
    ============================================================ */
 
 :root {
@@ -53,8 +54,8 @@
 
   --radius: 0.75rem;
 
-  --font-display: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
-  --font-body: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+  --font-display: var(--font-bodoni, "Bodoni Moda"), "Didot", "Times New Roman", serif;
+  --font-body: var(--font-source, "Source Sans 3"), ui-sans-serif, system-ui, sans-serif;
   --font-mono: ui-monospace, monospace;
 
   /* Zones sûres — iPhone encoche / PWA standalone */
@@ -110,6 +111,9 @@ body {
   background-color: var(--background);
   color: var(--foreground);
   font-family: var(--font-body);
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  line-height: 1.6;
   padding-left: var(--safe-left);
   padding-right: var(--safe-right);
 }
@@ -646,23 +650,38 @@ body {
   }
 }
 
-/* --- Typographie -------------------------------------------- */
+/* --- Typographie luxe : Bodoni Moda (titres) + Source Sans 3 (texte) */
 .de-display {
   font-family: var(--font-display);
-  font-weight: 600;
-  letter-spacing: 0;
-  word-spacing: 0.04em;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.12;
+  font-optical-sizing: auto;
+  font-feature-settings: "liga" 1, "kern" 1;
+}
+
+.de-wordmark {
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  line-height: 1.2;
+  font-style: normal;
 }
 
 .de-label {
-  font-size: 0.8125rem;
-  font-weight: 500;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
   color: var(--text-muted);
 }
 
 .de-section-label {
-  font-size: 0.8125rem;
-  font-weight: 500;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
   color: var(--text-muted);
 }
 
@@ -780,8 +799,10 @@ body {
   gap: 0.5rem;
   border-radius: calc(var(--radius) - 2px);
   padding: 0.5rem 1rem;
-  font-size: 0.875rem;
-  font-weight: 500;
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
   transition: background-color 0.15s, border-color 0.15s, color 0.15s;
   white-space: nowrap;
 }
@@ -900,7 +921,9 @@ button.de-list-item {
   border: 1px solid var(--border);
   background: var(--bg);
   padding: 0.625rem 0.875rem;
+  font-family: var(--font-body);
   font-size: 0.875rem;
+  letter-spacing: 0.01em;
   color: var(--text);
   transition: border-color 0.15s;
 }
@@ -980,7 +1003,7 @@ button.de-list-item {
 .de-login-title {
   font-size: clamp(1.75rem, 4vw, 2.25rem);
   line-height: 1.1;
-  letter-spacing: -0.03em;
+  letter-spacing: 0.04em;
 }
 
 .de-login-subtitle {
@@ -1269,7 +1292,7 @@ button.de-list-item {
   font-family: var(--font-display);
   font-size: 0.9375rem;
   font-weight: 500;
-  letter-spacing: -0.02em;
+  letter-spacing: 0.06em;
 }
 
 .de-public-nav-desktop {
@@ -1282,8 +1305,8 @@ button.de-list-item {
 .de-public-nav-link {
   position: relative;
   font-size: 0.6875rem;
-  font-weight: 500;
-  letter-spacing: 0.14em;
+  font-weight: 600;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--text-muted);
   transition: color 0.2s;
@@ -1463,9 +1486,9 @@ button.de-list-item {
 }
 
 .de-public-mobile-drawer-eyebrow {
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   font-weight: 600;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--blue-soft);
 }
@@ -1612,10 +1635,9 @@ button.de-list-item {
 }
 
 .de-page-hero-title {
-  font-size: clamp(2rem, 4vw, 3rem);
-  line-height: 1.15;
-  letter-spacing: 0;
-  word-spacing: 0.06em;
+  font-size: clamp(2rem, 4.5vw, 3.25rem);
+  line-height: 1.08;
+  letter-spacing: -0.02em;
 }
 
 .de-page-hero-description {
@@ -1881,10 +1903,11 @@ button.de-list-item {
 }
 
 .de-owners-text-title {
-  font-size: 1.0625rem;
-  font-weight: 600;
-  letter-spacing: 0;
-  word-spacing: 0.03em;
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
 }
 
 .de-owners-text-columns {
@@ -2343,19 +2366,18 @@ button.de-list-item {
 }
 
 .de-hero-eyebrow {
-  font-size: 0.8125rem;
-  font-weight: 500;
-  letter-spacing: 0.08em;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--blue-soft);
 }
 
 .de-hero-title {
   margin-top: 1.25rem;
-  font-size: clamp(2.25rem, 5vw, 3.75rem);
-  line-height: 1.15;
-  letter-spacing: 0;
-  word-spacing: 0.06em;
+  font-size: clamp(2.35rem, 5.5vw, 4rem);
+  line-height: 1.08;
+  letter-spacing: -0.02em;
 }
 
 .de-hero-subtitle {
@@ -2404,17 +2426,17 @@ button.de-list-item {
 }
 
 .de-section-eyebrow {
-  font-size: 0.8125rem;
-  font-weight: 500;
-  letter-spacing: 0.08em;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--blue-soft);
 }
 
 .de-section-title {
   margin-top: 0.75rem;
-  font-size: clamp(1.75rem, 3.5vw, 2.5rem);
-  line-height: 1.15;
+  font-size: clamp(1.85rem, 3.8vw, 2.75rem);
+  line-height: 1.1;
   letter-spacing: -0.02em;
 }
 

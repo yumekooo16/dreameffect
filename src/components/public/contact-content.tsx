@@ -19,12 +19,11 @@ export default function ContactContent() {
       <div className="de-public-container">
         <div className="de-contact-page-layout">
           <div className="de-contact-form-block">
-            <h2 className="de-display text-xl tracking-tight sm:text-2xl">
-              Envoyez-nous un message
+            <h2 className="de-display text-xl sm:text-2xl">
+              Écrivez-nous
             </h2>
             <p className="mt-2 text-sm de-muted">
-              Remplissez le formulaire ci-dessous. On revient vers vous
-              rapidement.
+              Nous vous répondons sous 24 h, ou le jour même sur WhatsApp.
             </p>
             <div className="mt-8">
               <ContactForm />
@@ -55,7 +54,7 @@ export default function ContactContent() {
             </div>
 
             <p className="text-sm leading-relaxed de-muted">
-              Vous préférez nous joindre directement ? Voici nos coordonnées.
+              Vous préférez un échange direct ? Voici nos coordonnées.
             </p>
 
             <div className="de-contact-sidebar-cards">
@@ -93,12 +92,11 @@ export default function ContactContent() {
                 <span className="de-contact-icon">
                   <MessageCircle size={22} strokeWidth={1.75} />
                 </span>
-                <h3 className="de-display mt-4 text-lg tracking-tight">
-                  WhatsApp direct
+                <h3 className="de-display mt-4 text-lg">
+                  WhatsApp
                 </h3>
                 <p className="mt-2 text-sm leading-relaxed de-muted">
-                  Sans passer par le formulaire, ouvrez une conversation
-                  directement.
+                  Une conversation directe, sans passer par le formulaire.
                 </p>
                 <Link
                   href={CONTACT_WHATSAPP_URL}
@@ -107,7 +105,7 @@ export default function ContactContent() {
                   className="de-btn de-btn-ghost mt-5 w-full justify-center"
                 >
                   <MessageCircle size={18} strokeWidth={2} />
-                  Ouvrir WhatsApp
+                  Écrire sur WhatsApp
                 </Link>
               </div>
             </div>

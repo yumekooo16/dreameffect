@@ -113,12 +113,12 @@ export default function OwnersContactForm() {
     return (
       <div className="de-contact-form-success">
         <CheckCircle2 size={28} strokeWidth={1.75} className="text-[var(--blue-soft)]" />
-        <h3 className="de-display mt-4 text-xl tracking-tight">
+        <h3 className="de-display mt-4 text-xl">
           Demande prête à envoyer
         </h3>
         <p className="mt-2 text-sm leading-relaxed de-muted">
-          WhatsApp s&apos;est ouvert avec votre message. Il ne reste qu&apos;à
-          appuyer sur Envoyer pour nous contacter.
+          WhatsApp s&apos;est ouvert avec votre message. Il reste à appuyer
+          sur Envoyer pour nous joindre.
         </p>
         <button
           type="button"

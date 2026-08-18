@@ -33,7 +33,7 @@ export default function CookieBanner() {
     >
       <div className="de-cookie-banner-panel">
         <div className="de-cookie-banner-content">
-          <p id="cookie-banner-title" className="de-display text-base tracking-tight">
+          <p id="cookie-banner-title" className="de-display text-base">
             {preferencesOpen && consent ? "Préférences cookies" : "Respect de votre vie privée"}
           </p>
 

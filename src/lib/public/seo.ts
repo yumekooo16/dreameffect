@@ -10,7 +10,7 @@ import { buildSameAsLinks } from "@/src/lib/public/llms";
 import { SITE_NAME, SITE_TAGLINE, SITE_URL } from "@/src/lib/public/site";
 
 export const DEFAULT_DESCRIPTION =
-  "DreamEffect — location de véhicules haut de gamme et gestion locative pour propriétaires à Beauvais, Gisors et dans l'Oise. Tarifs affichés, réservation WhatsApp.";
+  "DreamEffect — location de véhicules haut de gamme et gestion locative pour propriétaires, à Beauvais, Gisors et dans l'Oise. Flotte entretenue, tarifs affichés, réservation par WhatsApp.";
 
 /** Image sociale 1200×630 — distincte de l'icône PWA 512. */
 export const DEFAULT_OG_IMAGE = "/og.png";

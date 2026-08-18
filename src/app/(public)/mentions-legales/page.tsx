@@ -17,7 +17,7 @@ export default function LegalNoticePage() {
     <>
       <PageHero
         title="Mentions légales"
-        description="Informations légales relatives au site DreamEffect."
+        description="Éditeur, hébergeur, propriété intellectuelle et contact."
       />
       <LegalDocument blocks={getLegalNoticeBlocks()} />
     </>

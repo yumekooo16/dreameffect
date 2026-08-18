@@ -21,8 +21,8 @@ export default function NotFound() {
             <p className="de-hero-eyebrow">Erreur 404</p>
             <h1 className="de-display de-page-hero-title">Page introuvable</h1>
             <p className="de-page-hero-description">
-              Cette page n&apos;existe pas ou a été déplacée. Retournez à
-              l&apos;accueil ou parcourez notre catalogue.
+              Cette page n&apos;existe pas, ou a été déplacée. Retournez à
+              l&apos;accueil, ou parcourez le catalogue.
             </p>
             <div className="de-hero-actions mt-8">
               <Link href={PUBLIC_ROUTES.home} className="de-btn de-btn-primary de-btn-lg">
@@ -32,7 +32,7 @@ export default function NotFound() {
                 href={PUBLIC_ROUTES.vehicles}
                 className="de-btn de-btn-ghost de-btn-lg de-hero-btn-outline"
               >
-                Voir les véhicules
+                Découvrir la flotte
               </Link>
             </div>
           </div>

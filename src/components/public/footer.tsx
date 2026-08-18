@@ -20,13 +20,13 @@ export default function PublicFooter() {
                 className="rounded-xl object-contain"
               />
               <div>
-                <p className="de-display text-sm tracking-tight">DreΛm Effect</p>
-                <p className="text-xs de-muted">Location & gestion automobile</p>
+                <p className="de-display de-wordmark text-sm">DreΛm Effect</p>
+                <p className="text-xs de-muted">Conciergerie automobile</p>
               </div>
             </div>
             <p className="mt-4 max-w-xs text-sm leading-relaxed de-muted">
-              Mise en location et gestion de véhicules pour propriétaires et
-              locataires exigeants.
+              Location et gestion de véhicules haut de gamme, pour locataires
+              et propriétaires exigeants.
             </p>
           </div>
 

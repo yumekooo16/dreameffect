@@ -18,13 +18,13 @@ export default function OwnersHero({ imageUrl }: OwnersHeroProps) {
         </p>
 
         <h1 className="de-display de-hero-title">
-          Rentabilisez votre véhicule sans vous en occuper.
+          Confiez votre véhicule. Conservez les revenus.
         </h1>
 
         <p className="de-hero-subtitle">
-          DreamEffect gère réservations, remises de clés, nettoyage et suivi.
-          Vous percevez vos revenus chaque mois — revenus consultables en ligne,
-          sans charge opérationnelle.
+          Réservations, remises de clés, préparation et suivi : DreamEffect
+          s&apos;en charge. Vous consultez vos revenus chaque mois, sans
+          charge opérationnelle.
         </p>
 
         <div className="de-hero-actions">
@@ -32,7 +32,7 @@ export default function OwnersHero({ imageUrl }: OwnersHeroProps) {
             href="#proprietaire-contact"
             className="de-btn de-btn-primary de-btn-lg de-hero-btn"
           >
-            Confier mon véhicule
+            Nous écrire
             <ArrowRight size={18} strokeWidth={2} />
           </Link>
         </div>

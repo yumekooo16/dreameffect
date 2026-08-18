@@ -87,7 +87,7 @@ export default function AdminHeader() {
             priority
           />
           <div className="min-w-0">
-            <span className="de-display block truncate text-sm tracking-tight text-foreground">
+            <span className="de-display de-wordmark block truncate text-sm text-foreground">
               DreΛm Effect
             </span>
             <span className="text-xs de-muted">Administration</span>

@@ -1,26 +1,26 @@
 const TRUST_POINTS = [
   {
     title: "Transparence",
-    text: "Revenus, activité et suivi accessibles à tout moment — sans zone d'ombre.",
+    text: "Revenus, activité et suivi, accessibles à tout moment.",
   },
   {
-    title: "Suivi complet",
-    text: "Chaque location est tracée : dates, kilométrage, entretien et historique.",
+    title: "Traçabilité",
+    text: "Chaque location est documentée : dates, kilométrage, entretien.",
   },
   {
-    title: "Interface propriétaire",
+    title: "Espace propriétaire",
     text: "Un espace dédié pour suivre votre véhicule et vos performances.",
   },
   {
-    title: "Revenus consultables",
-    text: "Visualisez vos gains mois par mois, clairement et simplement.",
+    title: "Revenus lisibles",
+    text: "Vos gains, mois par mois, sans zone d'ombre.",
   },
   {
-    title: "Équipe disponible",
-    text: "Des interlocuteurs réactifs pour les locataires comme pour vous.",
+    title: "Disponibilité",
+    text: "Des interlocuteurs réactifs, pour les locataires comme pour vous.",
   },
   {
-    title: "Accompagnement",
+    title: "Continuité",
     text: "De la mise en location au suivi mensuel, nous restons à vos côtés.",
   },
 ];
@@ -30,12 +30,12 @@ export default function OwnersTrust() {
     <section className="de-section" aria-labelledby="owners-trust-title">
       <div className="de-public-container">
         <div className="de-section-header">
+          <p className="de-section-eyebrow">Confiance</p>
           <h2 id="owners-trust-title" className="de-display de-section-title">
-            Pourquoi nous faire confiance
+            Ce qui nous distingue
           </h2>
           <p className="de-section-description">
-            DreamEffect a été conçu pour les propriétaires exigeants qui veulent
-            des résultats sans compromis sur la qualité.
+            Une gestion exigeante, lisible, et un interlocuteur unique.
           </p>
         </div>
 

@@ -15,12 +15,12 @@ export default function HomeCtaSection() {
           <div className="de-home-cta-content">
             <p className="de-section-eyebrow">Contact</p>
             <h2 className="de-display de-home-cta-title">
-              Réservez ou confiez votre véhicule
+              Parlons de votre projet
             </h2>
             <p className="de-home-cta-text">
-              Disponibles {formatServiceAreaLabel()}. Réponse le jour même par
-              WhatsApp, sous 24 h via le formulaire. Propriétaires : échangeons
-              sur la gestion locative de votre véhicule.
+              Disponibles à {formatServiceAreaLabel()}. WhatsApp le jour même,
+              formulaire sous 24 h. Propriétaires : étudions ensemble la
+              gestion locative de votre véhicule.
             </p>
           </div>
 
@@ -32,7 +32,7 @@ export default function HomeCtaSection() {
               className="de-btn de-btn-primary de-btn-lg w-full justify-center sm:w-auto"
             >
               <MessageCircle size={18} strokeWidth={2} />
-              Ouvrir WhatsApp
+              Écrire sur WhatsApp
             </Link>
             <Link
               href={`tel:${CONTACT_PHONE.replace(/\s/g, "")}`}

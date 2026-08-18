@@ -1,22 +1,22 @@
-/** Contenu éditorial de la page d'accueil — copy concret, orienté SEO local. */
+/** Contenu éditorial de la page d'accueil — voix luxe, SEO local conservé. */
 
 export const HOME_PROCESS_STEPS = [
   {
     step: "01",
-    title: "Choisissez votre véhicule",
-    text: "Parcourez la flotte en ligne : berlines, SUV ou sportives. Tarifs affichés à la journée, disponibilités mises à jour. Réservation par WhatsApp ou formulaire — réponse sous 24 h ouvrées.",
+    title: "Choisissez le véhicule",
+    text: "Berlines, SUV ou sportives : tarifs à la journée, disponibilités à jour. Une demande par WhatsApp ou formulaire, une réponse sous 24 h ouvrées.",
     visualAlt: "Sélection d'un véhicule premium dans la flotte DreamEffect",
   },
   {
     step: "02",
-    title: "On s'occupe de tout",
-    text: "Remise des clés à Beauvais, Gisors ou sur votre lieu de rendez-vous dans l'Oise et l'Eure. Véhicule préparé, nettoyé et contrôlé avant chaque location. Un interlocuteur unique du début à la fin.",
+    title: "Nous préparons tout",
+    text: "Remise des clés à Beauvais, Gisors ou sur le lieu convenu dans l'Oise et l'Eure. Véhicule contrôlé, nettoyé, prêt. Un interlocuteur unique jusqu'au retour.",
     visualAlt: "Remise de clés et préparation véhicule DreamEffect",
   },
   {
     step: "03",
-    title: "Profitez — ou faites travailler le vôtre",
-    text: "Locataires : profitez de votre véhicule le temps qu'il vous faut. Propriétaires : percevez vos revenus chaque mois pendant que nous gérons réservations, entretien et suivi locatif.",
+    title: "Profitez — ou percevez",
+    text: "Locataires : le véhicule, le temps qu'il vous faut. Propriétaires : vos revenus chaque mois, pendant que nous gérons réservations, entretien et suivi.",
     visualAlt: "Location ou gestion locative avec DreamEffect",
   },
 ] as const;
@@ -25,36 +25,36 @@ export const HOME_FAQ_ITEMS = [
   {
     question: "Combien coûte la location d'un véhicule à Beauvais ?",
     answer:
-      "Les tarifs varient selon le modèle et la durée (24 h, week-end, semaine). Chaque fiche véhicule affiche le prix à la journée, au week-end ou à la semaine. Contactez-nous par WhatsApp pour un devis personnalisé selon vos dates.",
+      "Les tarifs dépendent du modèle et de la durée (24 h, week-end, semaine). Chaque fiche affiche le prix à la journée, au week-end ou à la semaine. Un devis selon vos dates se précise par WhatsApp.",
   },
   {
     question: "Quels véhicules proposez-vous dans l'Oise et l'Eure ?",
     answer:
-      "Notre flotte comprend des berlines, SUV et modèles sportifs entretenus aux standards premium. Les véhicules disponibles sont listés dans notre catalogue, classés par marque, avec photos et caractéristiques détaillées.",
+      "Berlines, SUV et sportives, entretenues aux standards d'une flotte haut de gamme. Le catalogue présente les modèles disponibles, classés par marque, avec photos et caractéristiques.",
   },
   {
     question: "Comment réserver un véhicule chez DreamEffect ?",
     answer:
-      "Choisissez votre modèle dans le catalogue, sélectionnez vos dates sur la fiche véhicule, puis confirmez par WhatsApp ou via le formulaire de contact. Nous validons la disponibilité et organisons la remise des clés.",
+      "Choisissez le modèle, indiquez vos dates sur la fiche, puis confirmez par WhatsApp ou via le formulaire. Nous validons la disponibilité et organisons la remise des clés.",
   },
   {
     question: "Où se fait la remise des clés ?",
     answer:
-      "Nous intervenons à Beauvais, Gisors et dans l'ensemble de l'Oise et de l'Eure. Le lieu exact est convenu ensemble lors de la réservation — domicile, gare, aéroport de Beauvais-Tillé ou autre point de rendez-vous.",
+      "À Beauvais, Gisors et dans l'ensemble de l'Oise et de l'Eure. Le lieu se convient lors de la réservation — domicile, gare, aéroport de Beauvais-Tillé ou autre rendez-vous.",
   },
   {
     question: "Comment confier mon véhicule en gestion locative ?",
     answer:
-      "Contactez-nous avec la marque, le modèle et l'année de votre véhicule. Nous échangeons sur vos attentes, créons l'annonce avec photos et tarifs, puis gérons réservations, remises de clés et entretien. Vous percevez vos revenus chaque mois.",
+      "Indiquez-nous la marque, le modèle et l'année. Nous échangeons sur vos attentes, créons l'annonce, puis gérons réservations, remises de clés et entretien. Vous percevez vos revenus chaque mois.",
   },
   {
     question: "Quel délai pour obtenir une réponse ?",
     answer:
-      "Par WhatsApp ou téléphone, nous répondons généralement le jour même en heures ouvrées. Via le formulaire de contact, comptez une réponse sous 24 h ouvrées.",
+      "Par WhatsApp ou téléphone, généralement le jour même en heures ouvrées. Via le formulaire, une réponse sous 24 h ouvrées.",
   },
   {
     question: "Les véhicules sont-ils assurés pour la location ?",
     answer:
-      "Les conditions d'assurance sont définies lors de la réservation ou de la mise en gestion. Nous vérifions avec vous que la couverture est adaptée à l'activité de location, en toute transparence.",
+      "Les conditions d'assurance se définissent lors de la réservation ou de la mise en gestion. Nous vérifions avec vous que la couverture convient à l'activité de location.",
   },
 ] as const;

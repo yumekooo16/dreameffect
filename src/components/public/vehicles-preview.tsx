@@ -27,10 +27,10 @@ export default function VehiclesPreview({
         <div className="de-section-header de-section-header-row">
           <div>
             <p className="de-section-eyebrow">Flotte</p>
-            <h2 className="de-display de-section-title">Nos véhicules</h2>
+            <h2 className="de-display de-section-title">La sélection</h2>
             <p className="de-section-description">
               {preview.length} modèle{preview.length > 1 ? "s" : ""} disponible
-              {preview.length > 1 ? "s" : ""} — tarifs à la journée, réservation
+              {preview.length > 1 ? "s" : ""} — tarifs à la journée, demande
               par WhatsApp ou formulaire.
             </p>
           </div>
@@ -38,7 +38,7 @@ export default function VehiclesPreview({
             href={PUBLIC_ROUTES.vehicles}
             className="de-btn de-btn-ghost shrink-0 self-start"
           >
-            Tout voir
+            Voir le catalogue
             <ArrowRight size={16} />
           </Link>
         </div>

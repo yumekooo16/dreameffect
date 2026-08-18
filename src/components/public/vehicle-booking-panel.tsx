@@ -118,8 +118,8 @@ export default function VehicleBookingPanel({ vehicle, availability }: Props) {
           Réserver ce véhicule
         </h2>
         <p className="de-booking-subtitle">
-          Choisissez vos dates, puis envoyez votre demande via WhatsApp. Aucun
-          paiement en ligne — notre équipe vous recontacte pour finaliser.
+          Choisissez vos dates, puis adressez votre demande sur WhatsApp.
+          Aucun paiement en ligne — nous finalisons ensuite avec vous.
         </p>
       </div>
 

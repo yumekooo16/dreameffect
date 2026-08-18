@@ -138,12 +138,12 @@ export default function ContactForm() {
     return (
       <div className="de-contact-form-success">
         <CheckCircle2 size={28} strokeWidth={1.75} className="text-[var(--blue-soft)]" />
-        <h2 className="de-display mt-4 text-xl tracking-tight">
+        <h2 className="de-display mt-4 text-xl">
           Message prêt à envoyer
         </h2>
         <p className="mt-2 text-sm leading-relaxed de-muted">
           Vos coordonnées ont été enregistrées. WhatsApp s&apos;est ouvert avec
-          votre demande — il ne reste qu&apos;à appuyer sur Envoyer.
+          votre demande — il reste à appuyer sur Envoyer.
         </p>
         <button
           type="button"

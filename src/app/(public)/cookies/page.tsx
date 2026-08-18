@@ -26,7 +26,7 @@ export default function CookiesPage() {
     <>
       <PageHero
         title="Politique cookies"
-        description="Transparence sur les traceurs utilisés et vos choix."
+        description="Les traceurs utilisés, et vos choix."
       />
 
       <LegalSection>
