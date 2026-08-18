@@ -17,7 +17,7 @@ export default function OwnerHeader() {
         >
           <Image
             src="/logo.png"
-            alt="DreamEffect"
+            alt="DreΛm Effect"
             width={40}
             height={40}
             className="shrink-0 rounded-xl object-contain transition group-hover:opacity-90"
@@ -25,7 +25,7 @@ export default function OwnerHeader() {
           />
           <div className="min-w-0">
             <span className="de-display block truncate text-sm tracking-tight text-foreground">
-              DreamEffect
+              DreΛm Effect
             </span>
             <span className="text-xs de-muted">Espace propriétaire</span>
           </div>

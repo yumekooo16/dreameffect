@@ -87,14 +87,14 @@ export default function LoginPage() {
         <div className="de-login-header">
           <Image
             src="/logo.png"
-            alt="DreamEffect"
+            alt="DreΛm Effect"
             width={88}
             height={88}
             className="de-login-logo"
             priority
           />
           <div>
-            <h1 className="de-display de-login-title">DreamEffect</h1>
+            <h1 className="de-display de-login-title">DreΛm Effect</h1>
             <p className="de-login-subtitle">Connexion DreamEffect</p>
           </div>
         </div>

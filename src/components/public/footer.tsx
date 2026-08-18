@@ -14,13 +14,13 @@ export default function PublicFooter() {
             <div className="flex items-center gap-3">
               <Image
                 src="/logo.png"
-                alt="DreamEffect"
+                alt="DreΛm Effect"
                 width={40}
                 height={40}
                 className="rounded-xl object-contain"
               />
               <div>
-                <p className="de-display text-sm tracking-tight">DreamEffect</p>
+                <p className="de-display text-sm tracking-tight">DreΛm Effect</p>
                 <p className="text-xs de-muted">Location & gestion automobile</p>
               </div>
             </div>

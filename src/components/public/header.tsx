@@ -127,13 +127,13 @@ export default function PublicHeader() {
             <Link href={PUBLIC_ROUTES.home} className="de-public-header-brand">
               <Image
                 src="/logo.png"
-                alt="DreamEffect"
+                alt="DreΛm Effect"
                 width={34}
                 height={34}
                 className="de-public-header-logo"
                 priority
               />
-              <span className="de-public-header-name">DreamEffect</span>
+              <span className="de-public-header-name">DreΛm Effect</span>
             </Link>
           )}
 
