@@ -23,12 +23,12 @@ export const HOME_PROCESS_STEPS = [
 
 export const HOME_FAQ_ITEMS = [
   {
-    question: "Combien coûte la location d'un véhicule à Beauvais ?",
+    question: "Combien coûte la location d'un véhicule ?",
     answer:
       "Les tarifs dépendent du modèle et de la durée (24 h, week-end, semaine). Chaque fiche affiche le prix à la journée, au week-end ou à la semaine. Un devis selon vos dates se précise par WhatsApp.",
   },
   {
-    question: "Quels véhicules proposez-vous dans l'Oise et l'Eure ?",
+    question: "Quels véhicules proposez-vous ?",
     answer:
       "Berlines, SUV et sportives, entretenues aux standards d'une flotte haut de gamme. Le catalogue présente les modèles disponibles, classés par marque, avec photos et caractéristiques.",
   },
