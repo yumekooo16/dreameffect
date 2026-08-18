@@ -20,9 +20,7 @@ export default function HeroSection({ imageUrl }: HeroSectionProps) {
         </p>
 
         <h1 className="de-display de-hero-title">
-          Louez ou faites rentabiliser
-          <br />
-          un véhicule haut de gamme.
+          Louez ou faites rentabiliser un véhicule haut de gamme.
         </h1>
 
         <p className="de-hero-subtitle">

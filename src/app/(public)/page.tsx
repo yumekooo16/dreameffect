@@ -23,12 +23,13 @@ export const metadata: Metadata = buildPageMetadata({
   description: `Location et gestion de véhicules premium à ${formatServiceAreaLabel()}. Flotte entretenue, tarifs affichés, réservation WhatsApp. Gestion locative pour propriétaires.`,
   path: "/",
   keywords: [...HOME_KEYWORDS],
+  absoluteTitle: true,
 });
 
 export default async function HomePage() {
   const vehicles = await fetchPublicVehicles();
   const heroImageUrl = resolveHeroImageUrl(vehicles);
-  const narrativeVisuals = pickNarrativeVisuals(vehicles);
+  const narrativeVisuals = pickNarrativeVisuals(vehicles, 3, heroImageUrl);
 
   return (
     <>

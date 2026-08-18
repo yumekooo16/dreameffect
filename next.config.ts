@@ -24,6 +24,12 @@ const nextConfig: NextConfig = {
         destination: "/vehicules/bmw-serie-2-gran-coupe",
         permanent: true,
       },
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "dreameffect.fr" }],
+        destination: "https://www.dreameffect.fr/:path*",
+        permanent: true,
+      },
     ];
   },
   async headers() {

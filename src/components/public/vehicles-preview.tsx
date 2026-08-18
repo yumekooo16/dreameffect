@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import PublicVehicleCard from "@/src/components/public/public-vehicle-card";
 import type { PublicVehicle } from "@/src/lib/public/vehicles-types";
+import { pickPreviewVehicles } from "@/src/lib/public/group-vehicles-by-brand";
 import { PUBLIC_ROUTES } from "@/src/lib/public/site";
 
 type VehiclesPreviewProps = {
@@ -14,7 +15,7 @@ export default function VehiclesPreview({
   vehicles = [],
   limit = 6,
 }: VehiclesPreviewProps) {
-  const preview = vehicles.slice(0, limit);
+  const preview = pickPreviewVehicles(vehicles, limit);
 
   if (preview.length === 0) {
     return null;

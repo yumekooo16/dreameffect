@@ -21,7 +21,6 @@ export default function HeroBackground({ imageUrl }: HeroBackgroundProps) {
         />
       ) : null}
       <div className="de-hero-visual-overlay" />
-      <div className="de-hero-visual-grain" />
     </div>
   );
 }

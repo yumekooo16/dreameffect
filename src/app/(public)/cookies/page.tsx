@@ -14,14 +14,12 @@ export const metadata: Metadata = buildPageMetadata({
 const CATEGORY_LABELS = {
   essential: "Essentiels",
   preferences: "Préférences",
-  analytics: "Mesure d'audience",
 } as const;
 
 export default function CookiesPage() {
   const grouped = {
     essential: COOKIE_DEFINITIONS.filter((item) => item.category === "essential"),
     preferences: COOKIE_DEFINITIONS.filter((item) => item.category === "preferences"),
-    analytics: COOKIE_DEFINITIONS.filter((item) => item.category === "analytics"),
   };
 
   return (
@@ -42,7 +40,7 @@ export default function CookiesPage() {
             </p>
           </section>
 
-          {(["essential", "preferences", "analytics"] as const).map((category) => {
+          {(["essential", "preferences"] as const).map((category) => {
             const items = grouped[category];
             if (items.length === 0) return null;
 
@@ -54,9 +52,7 @@ export default function CookiesPage() {
                 <p className="mt-2 text-sm de-muted">
                   {category === "essential"
                     ? "Indispensables au fonctionnement du site. Ils ne nécessitent pas votre consentement."
-                    : category === "preferences"
-                      ? "Facultatifs — activés uniquement si vous les acceptez."
-                      : "Non utilisés actuellement sur DreamEffect."}
+                    : "Facultatifs — activés uniquement si vous les acceptez."}
                 </p>
                 <div className="de-legal-table-wrap mt-4">
                   <table className="de-legal-table">
@@ -85,10 +81,21 @@ export default function CookiesPage() {
           })}
 
           <section>
+            <h2 className="de-display text-xl tracking-tight">Mesure d&apos;audience</h2>
+            <p className="mt-3 text-sm leading-relaxed de-muted">
+              Aucun cookie de mesure d&apos;audience (Google Analytics, Matomo ou
+              équivalent) n&apos;est déposé actuellement. Le bouton « Tout
+              accepter » n&apos;active donc aucun traceur d&apos;audience — uniquement
+              les cookies de préférences, s&apos;ils sont concernés.
+            </p>
+          </section>
+
+          <section>
             <h2 className="de-display text-xl tracking-tight">Modifier votre choix</h2>
             <p className="mt-3 text-sm leading-relaxed de-muted">
               Vous pouvez à tout moment modifier vos préférences via le lien
-              « Gérer les cookies » en bas de page.
+              « Gérer les cookies » en bas de page. « Tout refuser » et « Tout
+              accepter » sont proposés au même niveau.
             </p>
           </section>
         </div>

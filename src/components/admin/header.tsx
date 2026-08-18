@@ -80,7 +80,7 @@ export default function AdminHeader() {
         >
           <Image
             src="/logo.png"
-            alt="DreΛm Effect"
+            alt="DreamEffect"
             width={40}
             height={40}
             className="shrink-0 rounded-xl object-contain transition group-hover:opacity-90"
@@ -88,7 +88,7 @@ export default function AdminHeader() {
           />
           <div className="min-w-0">
             <span className="de-display block truncate text-sm tracking-tight text-foreground">
-              DreΛm Effect
+              DreamEffect
             </span>
             <span className="text-xs de-muted">Administration</span>
           </div>

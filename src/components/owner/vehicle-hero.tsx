@@ -99,7 +99,6 @@ export default function VehicleHero({
         </div>
 
         <div className="de-vehicle-hero__visual">
-          <div className="de-vehicle-hero__halo" aria-hidden />
           <div className="de-vehicle-hero__shadow" aria-hidden />
 
           <div className="de-vehicle-hero__car-wrap">

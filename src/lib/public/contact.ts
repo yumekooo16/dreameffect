@@ -14,3 +14,17 @@ export const SOCIAL_LINKS = {
   facebook: process.env.NEXT_PUBLIC_FACEBOOK_URL ?? null,
   linkedin: process.env.NEXT_PUBLIC_LINKEDIN_URL ?? null,
 } as const;
+
+/** Format E.164 (+33…) pour schema.org / tel: international. */
+export function formatPhoneE164(phone: string): string {
+  const digits = phone.replace(/\D/g, "");
+
+  if (digits.startsWith("33")) return `+${digits}`;
+  if (digits.startsWith("0") && digits.length === 10) {
+    return `+33${digits.slice(1)}`;
+  }
+  if (digits.length > 0) return `+${digits}`;
+  return phone;
+}
+
+export const CONTACT_PHONE_E164 = formatPhoneE164(CONTACT_PHONE);

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useCookieConsent } from "@/src/components/gdpr/cookie-consent-provider";
 import { LEGAL_ROUTES } from "@/src/lib/public/site";
 
@@ -17,14 +17,8 @@ export default function CookieBanner() {
     consent,
   } = useCookieConsent();
 
-  const [preferences, setPreferences] = useState(false);
-  const [analytics, setAnalytics] = useState(false);
-
-  useEffect(() => {
-    if (!consent) return;
-    setPreferences(consent.preferences);
-    setAnalytics(consent.analytics);
-  }, [consent]);
+  const [draftPreferences, setDraftPreferences] = useState<boolean | null>(null);
+  const preferences = draftPreferences ?? consent?.preferences ?? false;
 
   const showPanel = bannerOpen || preferencesOpen;
   if (!showPanel) return null;
@@ -46,9 +40,9 @@ export default function CookieBanner() {
           <p id="cookie-banner-desc" className="mt-2 text-sm leading-relaxed de-muted">
             DreamEffect utilise des cookies essentiels au fonctionnement du site et,
             avec votre accord, des cookies de préférences. Aucun cookie publicitaire
-            n&apos;est utilisé à ce jour.{" "}
+            ni de mesure d&apos;audience n&apos;est utilisé à ce jour.{" "}
             <Link href={LEGAL_ROUTES.cookies} className="de-link-inline">
-              En savoir plus
+              Politique cookies
             </Link>
           </p>
 
@@ -74,23 +68,7 @@ export default function CookieBanner() {
                 <input
                   type="checkbox"
                   checked={preferences}
-                  onChange={(event) => setPreferences(event.target.checked)}
-                  className="de-checkbox"
-                />
-              </label>
-
-              <label className="de-cookie-pref-row de-cookie-pref-row--disabled">
-                <span>
-                  <span className="font-medium text-foreground">Mesure d&apos;audience</span>
-                  <span className="mt-0.5 block text-xs de-muted">
-                    Non utilisée pour le moment (Google Analytics, etc.).
-                  </span>
-                </span>
-                <input
-                  type="checkbox"
-                  checked={analytics}
-                  disabled
-                  readOnly
+                  onChange={(event) => setDraftPreferences(event.target.checked)}
                   className="de-checkbox"
                 />
               </label>
@@ -103,7 +81,7 @@ export default function CookieBanner() {
             <>
               <button
                 type="button"
-                className="de-btn de-btn-secondary de-btn-sm de-cookie-btn-equal"
+                className="de-btn de-btn-cookie-reject de-cookie-choice"
                 onClick={rejectOptional}
               >
                 Tout refuser
@@ -117,7 +95,7 @@ export default function CookieBanner() {
               </button>
               <button
                 type="button"
-                className="de-btn de-btn-primary de-btn-sm de-cookie-btn-equal"
+                className="de-btn de-btn-cookie-accept de-cookie-choice"
                 onClick={acceptAll}
               >
                 Tout accepter
@@ -127,8 +105,9 @@ export default function CookieBanner() {
             <>
               <button
                 type="button"
-                className="de-btn de-btn-secondary de-btn-sm de-cookie-btn-equal"
+                className="de-btn de-btn-cookie-reject de-cookie-choice"
                 onClick={() => {
+                  setDraftPreferences(null);
                   if (consent) {
                     closePreferences();
                     return;
@@ -140,7 +119,7 @@ export default function CookieBanner() {
               </button>
               <button
                 type="button"
-                className="de-btn de-btn-primary de-btn-sm"
+                className="de-btn de-btn-cookie-accept de-cookie-choice"
                 onClick={() => savePreferences({ preferences, analytics: false })}
               >
                 Enregistrer

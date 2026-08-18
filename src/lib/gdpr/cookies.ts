@@ -59,11 +59,12 @@ export const DEFAULT_CONSENT: CookieConsent = {
   updatedAt: new Date(0).toISOString(),
 };
 
+/** Aligne « Tout accepter » sur /cookies : pas de mesure d'audience à ce jour. */
 export const ACCEPT_ALL_CONSENT = (): CookieConsent => ({
   version: CONSENT_VERSION,
   essential: true,
   preferences: true,
-  analytics: true,
+  analytics: false,
   updatedAt: new Date().toISOString(),
 });
 

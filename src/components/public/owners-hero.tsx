@@ -18,9 +18,7 @@ export default function OwnersHero({ imageUrl }: OwnersHeroProps) {
         </p>
 
         <h1 className="de-display de-hero-title">
-          Rentabilisez votre véhicule
-          <br />
-          sans vous en occuper.
+          Rentabilisez votre véhicule sans vous en occuper.
         </h1>
 
         <p className="de-hero-subtitle">
