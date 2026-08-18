@@ -137,7 +137,7 @@ export function getPrivacyBlocks(): LegalBlock[] {
       bullets: [
         "Identité et coordonnées : nom, prénom, email, téléphone.",
         "Contenu du message : dates souhaitées, véhicule, précisions sur un projet propriétaire.",
-        "Données techniques essentielles : cookies de session pour les espaces connectés (admin, propriétaire).",
+        "Session de connexion pour les espaces admin et propriétaire, et l'option « Rester connecté » si elle est cochée.",
         "Échanges WhatsApp ou téléphoniques lorsque vous nous contactez par ces canaux.",
       ],
     },
@@ -156,7 +156,7 @@ export function getPrivacyBlocks(): LegalBlock[] {
       paragraphs: [
         "Les données sont destinées à l'équipe DreamEffect. Elles peuvent être traitées par nos sous-traitants techniques (hébergement Vercel, base de données Supabase, messagerie) dans le cadre de leur mission, uniquement.",
         "WhatsApp (Meta) est utilisé si vous choisissez ce canal : son traitement est alors régi par les conditions de ce service.",
-        "Aucune donnée n'est vendue. Aucun cookie publicitaire, ni de mesure d'audience, n'est déposé.",
+        "Aucune donnée n'est vendue. Aucune mesure d'audience publicitaire n'est déposée.",
       ],
     },
     {
@@ -164,7 +164,7 @@ export function getPrivacyBlocks(): LegalBlock[] {
       paragraphs: [
         "Les demandes de contact sont conservées le temps du traitement, puis jusqu'à 3 ans après le dernier échange pour le suivi commercial, sauf opposition.",
         "Les données liées à une location (contrat, identité, caution) sont conservées pendant la durée légale applicable (notamment pièces comptables : 10 ans).",
-        "Les cookies de session des espaces connectés durent le temps de la connexion. L'option « Rester connecté » est conservée 30 jours.",
+        "Une session connectée dure le temps de la connexion. L'option « Rester connecté » est conservée 30 jours.",
       ],
     },
     {
@@ -172,13 +172,6 @@ export function getPrivacyBlocks(): LegalBlock[] {
       paragraphs: [
         "Vous disposez des droits d'accès, de rectification, d'effacement, d'opposition, de limitation et de portabilité, dans les conditions du RGPD.",
         `Pour les exercer : ${LEGAL_ENTITY.email}. Vous pouvez également introduire une réclamation auprès de la CNIL (www.cnil.fr).`,
-      ],
-    },
-    {
-      title: "Cookies",
-      paragraphs: [
-        "Aucun cookie publicitaire, de tracking ou de mesure d'audience n'est utilisé. Aucun bandeau de consentement n'est donc affiché.",
-        "Seuls des cookies techniques de session (connexion admin / propriétaire) et, si vous le cochez, l'option « Rester connecté » (30 jours) sont déposés.",
       ],
     },
     {

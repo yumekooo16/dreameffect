@@ -3361,7 +3361,7 @@ button.de-list-item {
   background: var(--border);
 }
 
-/* --- RGPD / Cookies ----------------------------------------- */
+/* --- Formulaires / RGPD ------------------------------------- */
 .de-link-inline {
   color: var(--blue-soft);
   text-decoration: underline;
@@ -3390,91 +3390,6 @@ button.de-list-item {
   align-items: flex-start;
   gap: 0.75rem;
   cursor: pointer;
-}
-
-.de-footer-link-button {
-  font-size: 0.875rem;
-  color: var(--text-muted);
-  text-align: left;
-  transition: color 0.15s;
-}
-
-.de-footer-link-button:hover {
-  color: var(--text);
-}
-
-.de-cookie-banner {
-  position: fixed;
-  inset-inline: 0;
-  bottom: 0;
-  z-index: 100;
-  padding: 1rem;
-  padding-bottom: calc(1rem + var(--safe-bottom));
-}
-
-.de-cookie-banner-panel {
-  max-width: 56rem;
-  margin-inline: auto;
-  border: 1px solid var(--blue-border);
-  border-radius: var(--radius);
-  background: color-mix(in srgb, var(--surface) 92%, black);
-  box-shadow: 0 20px 60px rgb(0 0 0 / 35%);
-  backdrop-filter: blur(12px);
-  padding: 1.25rem;
-}
-
-@media (min-width: 768px) {
-  .de-cookie-banner-panel {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 1.25rem;
-    align-items: end;
-    padding: 1.5rem;
-  }
-}
-
-.de-cookie-banner-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 1rem;
-}
-
-.de-cookie-btn-equal {
-  min-width: 7.5rem;
-  flex: 1 1 auto;
-}
-
-@media (min-width: 768px) {
-  .de-cookie-banner-actions {
-    margin-top: 0;
-    justify-content: flex-end;
-    flex-wrap: nowrap;
-  }
-
-  .de-cookie-btn-equal {
-    flex: 0 0 auto;
-  }
-}
-
-.de-cookie-preferences {
-  display: grid;
-  gap: 0.75rem;
-  margin-top: 1rem;
-}
-
-.de-cookie-pref-row {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1rem;
-  border: 1px solid var(--border);
-  border-radius: calc(var(--radius) - 4px);
-  padding: 0.875rem 1rem;
-}
-
-.de-cookie-pref-row--disabled {
-  opacity: 0.65;
 }
 
 .de-legal-content {
