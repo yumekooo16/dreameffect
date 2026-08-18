@@ -29,7 +29,6 @@ export const PUBLIC_ROUTES = {
 } as const;
 
 export const LEGAL_ROUTES = {
-  cookies: "/cookies",
   privacy: "/politique-de-confidentialite",
   legal: "/mentions-legales",
   terms: "/conditions-generales-de-location",

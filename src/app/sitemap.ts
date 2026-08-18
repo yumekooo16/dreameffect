@@ -31,12 +31,6 @@ function staticSitemapEntries(lastModified: Date): MetadataRoute.Sitemap {
       priority: 0.7,
     },
     {
-      url: `${SITE_URL}${LEGAL_ROUTES.cookies}`,
-      lastModified,
-      changeFrequency: "yearly",
-      priority: 0.3,
-    },
-    {
       url: `${SITE_URL}${LEGAL_ROUTES.legal}`,
       lastModified,
       changeFrequency: "yearly",

@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useCookieConsent } from "@/src/components/gdpr/cookie-consent-provider";
 import { LEGAL_ROUTES } from "@/src/lib/public/site";
 
 type GdprConsentFieldProps = {
@@ -39,15 +38,5 @@ export default function GdprConsentField({
       </label>
       {error && <p className="de-form-error">{error}</p>}
     </div>
-  );
-}
-
-export function ManageCookiesButton() {
-  const { openPreferences } = useCookieConsent();
-
-  return (
-    <button type="button" className="de-footer-link-button" onClick={openPreferences}>
-      Gérer les cookies
-    </button>
   );
 }

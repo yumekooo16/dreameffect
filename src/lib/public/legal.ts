@@ -106,10 +106,9 @@ export function getLegalNoticeBlocks(): LegalBlock[] {
       ],
     },
     {
-      title: "Données personnelles et cookies",
+      title: "Données personnelles",
       paragraphs: [
         `Le traitement des données est décrit dans la politique de confidentialité (${LEGAL_ROUTES.privacy}).`,
-        `La gestion des cookies est détaillée sur ${LEGAL_ROUTES.cookies}.`,
       ],
     },
     {
@@ -138,7 +137,7 @@ export function getPrivacyBlocks(): LegalBlock[] {
       bullets: [
         "Identité et coordonnées : nom, prénom, email, téléphone.",
         "Contenu du message : dates souhaitées, véhicule, précisions sur un projet propriétaire.",
-        "Données techniques essentielles : cookies de consentement et, le cas échéant, cookies de session (espaces connectés).",
+        "Données techniques essentielles : cookies de session pour les espaces connectés (admin, propriétaire).",
         "Échanges WhatsApp ou téléphoniques lorsque vous nous contactez par ces canaux.",
       ],
     },
@@ -148,7 +147,7 @@ export function getPrivacyBlocks(): LegalBlock[] {
       bullets: [
         "Exécution de mesures précontractuelles ou contractuelles : traiter une demande de réservation ou de mise en gestion.",
         "Intérêt légitime : répondre aux messages, suivre une location, prévenir la fraude ou les abus.",
-        "Consentement : cookies non essentiels (préférences de connexion) et, le cas échéant, mémorisation de l'email de connexion.",
+        "Consentement : traitement d'une demande via le formulaire de contact.",
         "Obligation légale : conservation de pièces utiles à la facturation ou à un litige.",
       ],
     },
@@ -157,7 +156,7 @@ export function getPrivacyBlocks(): LegalBlock[] {
       paragraphs: [
         "Les données sont destinées à l'équipe DreamEffect. Elles peuvent être traitées par nos sous-traitants techniques (hébergement Vercel, base de données Supabase, messagerie) dans le cadre de leur mission, uniquement.",
         "WhatsApp (Meta) est utilisé si vous choisissez ce canal : son traitement est alors régi par les conditions de ce service.",
-        "Aucune donnée n'est vendue. Aucun cookie publicitaire n'est déposé.",
+        "Aucune donnée n'est vendue. Aucun cookie publicitaire, ni de mesure d'audience, n'est déposé.",
       ],
     },
     {
@@ -165,7 +164,7 @@ export function getPrivacyBlocks(): LegalBlock[] {
       paragraphs: [
         "Les demandes de contact sont conservées le temps du traitement, puis jusqu'à 3 ans après le dernier échange pour le suivi commercial, sauf opposition.",
         "Les données liées à une location (contrat, identité, caution) sont conservées pendant la durée légale applicable (notamment pièces comptables : 10 ans).",
-        "Le cookie de consentement est conservé 6 mois. Les cookies de session des espaces connectés durent le temps de la connexion.",
+        "Les cookies de session des espaces connectés durent le temps de la connexion. L'option « Rester connecté » est conservée 30 jours.",
       ],
     },
     {
@@ -176,11 +175,10 @@ export function getPrivacyBlocks(): LegalBlock[] {
       ],
     },
     {
-      title: "Cookies et mesure d'audience",
+      title: "Cookies",
       paragraphs: [
-        `Le détail des cookies est publié sur ${LEGAL_ROUTES.cookies}.`,
-        "Aucun cookie de mesure d'audience (Google Analytics, Matomo ou équivalent) n'est utilisé à ce jour. Le consentement « Tout accepter » n'active donc aucun traceur d'audience.",
-        "Les cookies essentiels (mémorisation du choix cookies, session de connexion) ne nécessitent pas de consentement.",
+        "Aucun cookie publicitaire, de tracking ou de mesure d'audience n'est utilisé. Aucun bandeau de consentement n'est donc affiché.",
+        "Seuls des cookies techniques de session (connexion admin / propriétaire) et, si vous le cochez, l'option « Rester connecté » (30 jours) sont déposés.",
       ],
     },
     {

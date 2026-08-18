@@ -9,7 +9,6 @@ import {
   REMEMBER_ME_MAX_AGE,
   REMEMBER_EMAIL_KEY,
 } from "@/src/lib/supabase/session";
-import { readConsentFromDocument } from "@/src/lib/gdpr/cookies";
 
 function setRememberMePreference(enabled: boolean) {
   if (enabled) {
@@ -41,9 +40,6 @@ export default function LoginPage() {
   }, [router, supabase]);
 
   useEffect(() => {
-    const consent = readConsentFromDocument();
-    if (!consent?.preferences) return;
-
     const savedEmail = localStorage.getItem(REMEMBER_EMAIL_KEY);
     const hasRememberCookie = document.cookie.includes(`${REMEMBER_ME_COOKIE}=1`);
     if (savedEmail) setEmail(savedEmail);
@@ -66,12 +62,9 @@ export default function LoginPage() {
       return;
     }
 
-    const consent = readConsentFromDocument();
-    const canRemember = rememberMe && consent?.preferences === true;
+    setRememberMePreference(rememberMe);
 
-    setRememberMePreference(canRemember);
-
-    if (canRemember) {
+    if (rememberMe) {
       localStorage.setItem(REMEMBER_EMAIL_KEY, email);
     } else {
       localStorage.removeItem(REMEMBER_EMAIL_KEY);
