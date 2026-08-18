@@ -5,13 +5,13 @@ export default function HomeFaqSection() {
     <section className="de-section de-section-alt" aria-labelledby="home-faq-title">
       <div className="de-public-container">
         <div className="de-section-header">
-          <p className="de-section-eyebrow">Questions fréquentes</p>
+          <p className="de-section-eyebrow">FAQ</p>
           <h2 id="home-faq-title" className="de-display de-section-title">
-            L&apos;essentiel
+            Questions fréquentes
           </h2>
           <p className="de-section-description">
-            Tarifs, flotte, réservation et remise des clés — les réponses
-            utiles, sans détour.
+            Location à Beauvais et Gisors, gestion locative dans l&apos;Oise et
+            l&apos;Eure — les réponses aux questions les plus courantes.
           </p>
         </div>
 

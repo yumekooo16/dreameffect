@@ -12,11 +12,12 @@ import {
   fetchPublicVehicles,
   getVehicleDisplayName,
 } from "@/src/lib/public/vehicles-data";
+import { resolveHeroImageUrl } from "@/src/lib/public/hero-image";
 import { PUBLIC_ROUTES } from "@/src/lib/public/site";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "La flotte",
-  description: `Catalogue DreamEffect — véhicules haut de gamme à louer à ${formatServiceAreaLabel()}. Berlines, SUV et sportives entretenues, tarifs à la journée, réservation par WhatsApp.`,
+  title: "Nos véhicules",
+  description: `Catalogue DreamEffect — véhicules haut de gamme à louer à ${formatServiceAreaLabel()}. Berlines, SUV et sportives entretenues, tarifs à la journée, réservation WhatsApp.`,
   path: PUBLIC_ROUTES.vehicles,
   keywords: [...CATALOG_KEYWORDS],
 });
@@ -25,6 +26,7 @@ export const dynamic = "force-dynamic";
 
 export default async function VehiclesPage() {
   const vehicles = await fetchPublicVehicles();
+  const heroImageUrl = resolveHeroImageUrl(vehicles);
 
   return (
     <>
@@ -32,7 +34,7 @@ export default async function VehiclesPage() {
         data={[
           breadcrumbJsonLd([
             { name: "Accueil", path: "/" },
-            { name: "La flotte", path: PUBLIC_ROUTES.vehicles },
+            { name: "Nos véhicules", path: PUBLIC_ROUTES.vehicles },
           ]),
           vehicleCatalogItemListJsonLd(
             vehicles.map((vehicle) => ({
@@ -43,9 +45,9 @@ export default async function VehiclesPage() {
         ]}
       />
       <PageHero
-        eyebrow="Catalogue"
-        title="La flotte"
-        description={`Véhicules disponibles à ${formatServiceAreaLabel()} — tarifs affichés, demande par WhatsApp ou formulaire.`}
+        title="Nos véhicules"
+        description={`Flotte disponible à ${formatServiceAreaLabel()} — tarifs affichés, réservation par WhatsApp ou formulaire.`}
+        imageUrl={heroImageUrl}
       />
       <section className="de-section de-section-compact">
         <div className="de-public-container">

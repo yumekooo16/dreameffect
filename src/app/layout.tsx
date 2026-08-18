@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { EB_Garamond, Manrope } from "next/font/google";
+import { Space_Grotesk, Inter } from "next/font/google";
 import { ServiceWorkerRegister } from "@/src/components/pwa/service-worker-register";
 import { StandaloneRedirect } from "@/src/components/pwa/standalone-redirect";
 import { pwaConfig } from "@/src/lib/pwa/config";
@@ -7,17 +7,17 @@ import { DEFAULT_DESCRIPTION, DEFAULT_OG_IMAGE } from "@/src/lib/public/seo";
 import { SITE_NAME, SITE_URL } from "@/src/lib/public/site";
 import "./globals.css";
 
-const sans = Manrope({
-  subsets: ["latin", "latin-ext"],
-  variable: "--font-manrope",
+const display = Space_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-display",
+  weight: ["500", "600"],
   display: "swap",
 });
 
-const display = EB_Garamond({
-  subsets: ["latin", "latin-ext"],
-  weight: ["400", "500", "600"],
-  style: ["normal", "italic"],
-  variable: "--font-garamond",
+const body = Inter({
+  subsets: ["latin"],
+  variable: "--font-body",
+  weight: ["400", "500"],
   display: "swap",
 });
 
@@ -102,7 +102,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="fr" className={`${sans.variable} ${display.variable}`}>
+    <html lang="fr" className={`${display.variable} ${body.variable}`}>
       <body className="bg-background text-foreground antialiased">
         {children}
         <StandaloneRedirect />

@@ -19,7 +19,6 @@ export default function LegalNoticePage() {
         eyebrow="Informations"
         title="Mentions légales"
         description="Éditeur, hébergeur, propriété intellectuelle et contact."
-        compact
       />
       <LegalDocument blocks={getLegalNoticeBlocks()} />
     </>

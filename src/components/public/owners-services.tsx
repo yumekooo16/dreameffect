@@ -1,23 +1,36 @@
+import {
+  CalendarCheck,
+  Sparkles,
+  CarFront,
+  Route,
+  Headphones,
+} from "lucide-react";
+
 const SERVICES = [
   {
-    title: "Les réservations",
-    text: "Calendrier, disponibilités et confirmations, gérés pour vous.",
+    icon: CalendarCheck,
+    title: "Gestion des réservations",
+    text: "Calendrier, disponibilités et confirmations gérés pour vous.",
   },
   {
-    title: "L'accueil des locataires",
-    text: "Remise et restitution des clés, avec un interlocuteur unique.",
+    icon: CarFront,
+    title: "Accueil des locataires",
+    text: "Remise et restitution des clés dans les règles, avec un interlocuteur unique.",
   },
   {
-    title: "La préparation",
-    text: "Nettoyage et remise en état du véhicule entre chaque location.",
+    icon: Sparkles,
+    title: "Nettoyage",
+    text: "Préparation et remise en état du véhicule entre chaque location.",
   },
   {
-    title: "Le suivi",
-    text: "Kilométrage, état du véhicule et historique de chaque séjour.",
+    icon: Route,
+    title: "Suivi des locations",
+    text: "Kilométrage, état du véhicule et suivi opérationnel de bout en bout.",
   },
   {
-    title: "L'accompagnement",
-    text: "Une équipe disponible, pour vous comme pour les locataires.",
+    icon: Headphones,
+    title: "Accompagnement personnalisé",
+    text: "Une équipe disponible pour répondre à vos questions à tout moment.",
   },
 ];
 
@@ -26,27 +39,26 @@ export default function OwnersServices() {
     <section className="de-section de-section-alt" aria-labelledby="owners-services-title">
       <div className="de-public-container">
         <div className="de-section-header">
-          <p className="de-section-eyebrow">Prestations</p>
           <h2 id="owners-services-title" className="de-display de-section-title">
-            Ce que nous prenons en charge
+            Ce que DreamEffect prend en charge
           </h2>
           <p className="de-section-description">
-            Vous restez propriétaire. Nous assurons l&apos;exploitation au
-            quotidien.
+            Vous conservez la propriété de votre véhicule. Nous gérons
+            l&apos;exploitation au quotidien.
           </p>
         </div>
 
-        <ol className="de-owners-text-list">
-          {SERVICES.map(({ title, text }, index) => (
-            <li key={title} className="de-owners-text-item">
-              <p className="de-owners-text-index">{String(index + 1).padStart(2, "0")}</p>
-              <div>
-                <h3 className="de-owners-text-title">{title}</h3>
-                <p className="mt-2 text-sm leading-relaxed de-muted">{text}</p>
+        <div className="de-owners-services-grid">
+          {SERVICES.map(({ icon: Icon, title, text }) => (
+            <article key={title} className="de-owners-service-card">
+              <div className="de-owners-service-icon" aria-hidden>
+                <Icon size={22} strokeWidth={1.75} />
               </div>
-            </li>
+              <h3 className="de-display mt-4 text-base tracking-tight">{title}</h3>
+              <p className="mt-2 text-sm leading-relaxed de-muted">{text}</p>
+            </article>
           ))}
-        </ol>
+        </div>
       </div>
     </section>
   );

@@ -1,26 +1,41 @@
+import {
+  ShieldCheck,
+  LayoutDashboard,
+  Wallet,
+  Users,
+  Eye,
+  HeartHandshake,
+} from "lucide-react";
+
 const TRUST_POINTS = [
   {
+    icon: Eye,
     title: "Transparence",
-    text: "Revenus, activité et suivi, accessibles à tout moment.",
+    text: "Revenus, activité et suivi accessibles à tout moment — sans zone d'ombre.",
   },
   {
-    title: "Traçabilité",
-    text: "Chaque location est documentée : dates, kilométrage, entretien.",
+    icon: ShieldCheck,
+    title: "Suivi complet",
+    text: "Chaque location est tracée : dates, kilométrage, entretien et historique.",
   },
   {
-    title: "Espace propriétaire",
+    icon: LayoutDashboard,
+    title: "Interface propriétaire",
     text: "Un espace dédié pour suivre votre véhicule et vos performances.",
   },
   {
-    title: "Revenus lisibles",
-    text: "Vos gains, mois par mois, sans zone d'ombre.",
+    icon: Wallet,
+    title: "Revenus consultables",
+    text: "Visualisez vos gains mois par mois, clairement et simplement.",
   },
   {
-    title: "Disponibilité",
-    text: "Des interlocuteurs réactifs, pour les locataires comme pour vous.",
+    icon: Users,
+    title: "Équipe disponible",
+    text: "Des interlocuteurs réactifs pour les locataires comme pour vous.",
   },
   {
-    title: "Continuité",
+    icon: HeartHandshake,
+    title: "Accompagnement",
     text: "De la mise en location au suivi mensuel, nous restons à vos côtés.",
   },
 ];
@@ -30,19 +45,22 @@ export default function OwnersTrust() {
     <section className="de-section" aria-labelledby="owners-trust-title">
       <div className="de-public-container">
         <div className="de-section-header">
-          <p className="de-section-eyebrow">Confiance</p>
           <h2 id="owners-trust-title" className="de-display de-section-title">
-            Ce qui nous distingue
+            Pourquoi nous faire confiance
           </h2>
           <p className="de-section-description">
-            Une gestion exigeante, lisible, et un interlocuteur unique.
+            DreamEffect a été conçu pour les propriétaires exigeants qui veulent
+            des résultats sans compromis sur la qualité.
           </p>
         </div>
 
-        <div className="de-owners-text-columns">
-          {TRUST_POINTS.map(({ title, text }) => (
-            <article key={title} className="de-owners-text-block">
-              <h3 className="de-owners-text-title">{title}</h3>
+        <div className="de-owners-trust-grid">
+          {TRUST_POINTS.map(({ icon: Icon, title, text }) => (
+            <article key={title} className="de-owners-trust-card">
+              <div className="de-owners-trust-icon" aria-hidden>
+                <Icon size={20} strokeWidth={1.75} />
+              </div>
+              <h3 className="de-display mt-3 text-base tracking-tight">{title}</h3>
               <p className="mt-2 text-sm leading-relaxed de-muted">{text}</p>
             </article>
           ))}

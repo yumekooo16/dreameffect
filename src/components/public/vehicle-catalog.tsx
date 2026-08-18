@@ -208,11 +208,11 @@ export default function VehicleCatalog({ vehicles }: VehicleCatalogProps) {
 
       {filtered.length === 0 ? (
         <div className="de-vehicles-empty">
-          <p className="de-display text-lg">
+          <p className="de-display text-lg tracking-tight">
             Aucun véhicule ne correspond
           </p>
           <p className="mt-2 max-w-md text-sm de-muted">
-            Élargissez la recherche, ou retirez certains filtres.
+            Essayez d&apos;élargir votre recherche ou de retirer certains filtres.
           </p>
           {hasActiveFilters && (
             <button

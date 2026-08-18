@@ -6,7 +6,7 @@
 export const pwaConfig = {
   name: "DreamEffect",
   shortName: "DreamEffect",
-  description: "Plateforme de conciergerie automobile DreamEffect.",
+  description: "Plateforme de gestion de conciergerie automobile DreamEffect.",
   /** Identifiant stable du manifest — ne pas modifier sauf nouvelle application. */
   manifestId: "dreameffect-app",
   /** Page d'ouverture de la PWA installée — admin / propriétaires, pas le site public. */
@@ -20,12 +20,12 @@ export const pwaConfig = {
   dir: "ltr" as const,
   categories: ["business", "productivity"] as const,
 
-  /** Couleurs alignées sur le thème admin */
-  themeColor: "#0b1018",
-  backgroundColor: "#0b1018",
+  /** Couleurs alignées sur le thème sombre premium (--bg / --blue) */
+  themeColor: "#09090b",
+  backgroundColor: "#09090b",
 
   /** Version du cache service worker — incrémenter à chaque déploiement majeur */
-  cacheVersion: "dreameffect-v7",
+  cacheVersion: "dreameffect-v8",
 
   icons: {
     /** Fichier source — remplacer logo.png puis relancer `npm run generate-pwa-icons` */

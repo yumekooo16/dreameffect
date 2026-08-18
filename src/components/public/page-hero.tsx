@@ -1,20 +1,26 @@
+import HeroBackground from "@/src/components/public/hero-background";
+import { formatServiceAreaLabel } from "@/src/lib/public/local-seo";
+
 type PageHeroProps = {
   title: string;
   description?: string;
   eyebrow?: string;
-  compact?: boolean;
+  imageUrl?: string | null;
 };
 
 export default function PageHero({
   title,
   description,
   eyebrow,
-  compact = false,
+  imageUrl,
 }: PageHeroProps) {
   return (
-    <section className={`de-page-hero${compact ? " de-page-hero--compact" : ""}`}>
+    <section className={`de-page-hero${imageUrl ? " de-page-hero--photo" : ""}`}>
+      {imageUrl ? <HeroBackground imageUrl={imageUrl} /> : null}
       <div className="de-public-container de-page-hero-content">
-        {eyebrow ? <p className="de-hero-eyebrow">{eyebrow}</p> : null}
+        <p className="de-hero-eyebrow">
+          {eyebrow ?? formatServiceAreaLabel()}
+        </p>
         <h1 className="de-display de-page-hero-title">{title}</h1>
         {description && (
           <p className="de-page-hero-description">{description}</p>

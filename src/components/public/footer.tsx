@@ -17,16 +17,16 @@ export default function PublicFooter() {
                 alt="DreΛm Effect"
                 width={40}
                 height={40}
-                className="object-contain"
+                className="rounded-xl object-contain"
               />
               <div>
-                <p className="de-display de-wordmark text-sm">DreΛm Effect</p>
-                <p className="text-xs de-muted">Conciergerie automobile</p>
+                <p className="de-display text-sm tracking-tight">DreΛm Effect</p>
+                <p className="text-xs de-muted">Location & gestion automobile</p>
               </div>
             </div>
             <p className="mt-4 max-w-xs text-sm leading-relaxed de-muted">
-              Location et gestion de véhicules haut de gamme, pour locataires
-              et propriétaires exigeants.
+              Mise en location et gestion de véhicules pour propriétaires et
+              locataires exigeants.
             </p>
           </div>
 

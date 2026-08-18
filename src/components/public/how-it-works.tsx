@@ -5,12 +5,6 @@ import { HOME_PROCESS_STEPS } from "@/src/lib/public/home-content";
 import { resolveVehicleImageUrl } from "@/src/lib/image-url";
 import { PUBLIC_ROUTES } from "@/src/lib/public/site";
 
-const STEP_LINKS = [
-  { href: PUBLIC_ROUTES.vehicles, label: "Voir la flotte" },
-  { href: PUBLIC_ROUTES.contact, label: "Organiser une remise" },
-  { href: PUBLIC_ROUTES.owners, label: "Confier mon véhicule" },
-] as const;
-
 type HowItWorksSectionProps = {
   visualUrls?: (string | null)[];
 };
@@ -22,13 +16,13 @@ export default function HowItWorksSection({
     <section className="de-section" aria-labelledby="home-process-title">
       <div className="de-public-container">
         <div className="de-section-header">
-          <p className="de-section-eyebrow">Le parcours</p>
+          <p className="de-section-eyebrow">Processus</p>
           <h2 id="home-process-title" className="de-display de-section-title">
-            De la sélection à la remise des clés
+            Comment ça marche
           </h2>
           <p className="de-section-description">
-            Trois temps, un interlocuteur — que vous louiez un véhicule ou
-            que vous nous confiiez le vôtre.
+            Trois étapes, un seul interlocuteur — que vous louiez un véhicule
+            ou que vous confiiez le vôtre.
           </p>
         </div>
 
@@ -36,7 +30,6 @@ export default function HowItWorksSection({
           {HOME_PROCESS_STEPS.map(({ step, title, text, visualAlt }, index) => {
             const imageUrl = resolveVehicleImageUrl(visualUrls[index]);
             const reverse = index % 2 === 1;
-            const link = STEP_LINKS[index];
 
             return (
               <article
@@ -57,20 +50,27 @@ export default function HowItWorksSection({
                       <span className="de-narrative-step-number-large">{step}</span>
                     </div>
                   )}
+                  <div className="de-narrative-step-visual-overlay" />
                   <span className="de-narrative-step-number">{step}</span>
                 </div>
 
                 <div className="de-narrative-step-content">
                   <h3 className="de-display de-narrative-step-title">{title}</h3>
                   <p className="de-narrative-step-text">{text}</p>
-                  <Link href={link.href} className="de-link-inline de-narrative-step-link">
-                    {link.label}
-                    <ArrowRight size={14} />
-                  </Link>
                 </div>
               </article>
             );
           })}
+        </div>
+
+        <div className="mt-12">
+          <Link
+            href={PUBLIC_ROUTES.contact}
+            className="de-btn de-btn-ghost inline-flex items-center gap-2"
+          >
+            Une question avant de commencer ?
+            <ArrowRight size={16} />
+          </Link>
         </div>
       </div>
     </section>

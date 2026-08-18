@@ -63,9 +63,9 @@ export default function PublicHeader() {
             >
               <div className="de-public-mobile-drawer-top">
                 <div>
-                  <p className="de-public-mobile-drawer-eyebrow">Navigation</p>
+                  <p className="de-public-mobile-drawer-eyebrow">Menu</p>
                   <p className="de-public-mobile-drawer-tagline">
-                    DreΛm Effect
+                    Location & gestion automobile
                   </p>
                 </div>
                 <button
@@ -133,7 +133,7 @@ export default function PublicHeader() {
                 className="de-public-header-logo"
                 priority
               />
-              <span className="de-public-header-name de-wordmark">DreΛm Effect</span>
+              <span className="de-public-header-name">DreΛm Effect</span>
             </Link>
           )}
 

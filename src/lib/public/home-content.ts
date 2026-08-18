@@ -1,22 +1,22 @@
-/** Contenu éditorial de la page d'accueil — voix luxe, SEO local conservé. */
+/** Contenu éditorial de la page d'accueil — copy concret, orienté SEO local. */
 
 export const HOME_PROCESS_STEPS = [
   {
     step: "01",
-    title: "Choisissez le véhicule",
-    text: "Berlines, SUV ou sportives : tarifs à la journée, disponibilités à jour. Une demande par WhatsApp ou formulaire, une réponse sous 24 h ouvrées.",
+    title: "Choisissez votre véhicule",
+    text: "Parcourez la flotte en ligne : berlines, SUV ou sportives. Tarifs affichés à la journée, disponibilités mises à jour. Réservation par WhatsApp ou formulaire — réponse sous 24 h ouvrées.",
     visualAlt: "Sélection d'un véhicule premium dans la flotte DreamEffect",
   },
   {
     step: "02",
-    title: "Nous préparons tout",
-    text: "Remise des clés à Beauvais, Gisors ou sur le lieu convenu dans l'Oise et l'Eure. Véhicule contrôlé, nettoyé, prêt. Un interlocuteur unique jusqu'au retour.",
+    title: "On s'occupe de tout",
+    text: "Remise des clés à Beauvais, Gisors ou sur votre lieu de rendez-vous dans l'Oise et l'Eure. Véhicule préparé, nettoyé et contrôlé avant chaque location. Un interlocuteur unique du début à la fin.",
     visualAlt: "Remise de clés et préparation véhicule DreamEffect",
   },
   {
     step: "03",
-    title: "Profitez — ou percevez",
-    text: "Locataires : le véhicule, le temps qu'il vous faut. Propriétaires : vos revenus chaque mois, pendant que nous gérons réservations, entretien et suivi.",
+    title: "Profitez — ou faites travailler le vôtre",
+    text: "Locataires : profitez de votre véhicule le temps qu'il vous faut. Propriétaires : percevez vos revenus chaque mois pendant que nous gérons réservations, entretien et suivi locatif.",
     visualAlt: "Location ou gestion locative avec DreamEffect",
   },
 ] as const;

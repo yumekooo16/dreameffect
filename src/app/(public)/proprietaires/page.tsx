@@ -20,7 +20,7 @@ import { PUBLIC_ROUTES, SITE_URL } from "@/src/lib/public/site";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Confier votre véhicule",
-  description: `Confiez votre véhicule, conservez les revenus (${formatServiceAreaLabel()}). DreamEffect gère réservations, accueil, préparation et suivi.`,
+  description: `Rentabilisez votre véhicule sans vous en occuper (${formatServiceAreaLabel()}). DreamEffect gère réservations, accueil, nettoyage et suivi — vous percevez vos revenus.`,
   path: PUBLIC_ROUTES.owners,
   keywords: [...OWNERS_KEYWORDS],
 });

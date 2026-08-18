@@ -56,7 +56,7 @@ export default function VehicleDetailContent({
     <section className="de-section de-section-compact">
       <div className="de-public-container">
         <Link href={PUBLIC_ROUTES.vehicles} className="de-back-link">
-          ← Retour à la flotte
+          ← Retour au catalogue
         </Link>
 
         <div className="de-vehicle-detail-layout">
@@ -106,7 +106,7 @@ export default function VehicleDetailContent({
 
             {vehicle.description?.trim() && (
               <div className="de-vehicle-detail-description">
-                <h2 className="de-display text-lg">Description</h2>
+                <h2 className="de-display text-lg tracking-tight">Description</h2>
                 <p className="mt-3 whitespace-pre-line text-sm leading-relaxed de-muted">
                   {vehicle.description.trim()}
                 </p>

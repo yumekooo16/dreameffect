@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import HeroSection from "@/src/components/public/hero";
 import HowItWorksSection from "@/src/components/public/how-it-works";
-import HomeOwnersBand from "@/src/components/public/home-owners-band";
 import VehiclesPreview from "@/src/components/public/vehicles-preview";
 import HomeCtaSection from "@/src/components/public/home-cta";
 import HomeFaqSection, { HOME_FAQ_ITEMS } from "@/src/components/public/home-faq";
@@ -30,7 +29,7 @@ export const metadata: Metadata = buildPageMetadata({
 export default async function HomePage() {
   const vehicles = await fetchPublicVehicles();
   const heroImageUrl = resolveHeroImageUrl(vehicles);
-  const narrativeVisuals = pickNarrativeVisuals(vehicles, 3, heroImageUrl);
+  const narrativeVisuals = pickNarrativeVisuals(vehicles);
 
   return (
     <>
@@ -38,7 +37,6 @@ export default async function HomePage() {
       <HeroSection imageUrl={heroImageUrl} />
       <HowItWorksSection visualUrls={narrativeVisuals} />
       <VehiclesPreview vehicles={vehicles} />
-      <HomeOwnersBand />
       <HomeFaqSection />
       <HomeCtaSection />
     </>

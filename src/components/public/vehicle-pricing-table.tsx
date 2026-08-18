@@ -22,14 +22,14 @@ export default function VehiclePricingTable({
     return (
       <div className="de-pricing-table de-pricing-table--empty">
         <p className="de-label">Tarifs</p>
-        <p className="mt-2 text-sm de-muted">Tarifs communiqués sur demande</p>
+        <p className="mt-2 text-sm de-muted">Tarifs sur demande</p>
       </div>
     );
   }
 
   return (
     <div className="de-pricing-table">
-      <h2 className="de-display text-lg">Tarifs</h2>
+      <h2 className="de-display text-lg tracking-tight">Tarifs</h2>
 
       {rentalTiers.length > 0 && (
         <ul className="de-pricing-list">

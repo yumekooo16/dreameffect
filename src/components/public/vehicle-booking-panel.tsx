@@ -114,13 +114,12 @@ export default function VehicleBookingPanel({ vehicle, availability }: Props) {
   return (
     <section className="de-booking-section" aria-labelledby="booking-title">
       <div className="de-booking-header">
-        <p className="de-section-eyebrow">Disponibilités</p>
         <h2 id="booking-title" className="de-display de-booking-title">
           Réserver ce véhicule
         </h2>
         <p className="de-booking-subtitle">
-          Choisissez vos dates, puis adressez votre demande sur WhatsApp.
-          Aucun paiement en ligne — nous finalisons ensuite avec vous.
+          Choisissez vos dates, puis envoyez votre demande via WhatsApp. Aucun
+          paiement en ligne — notre équipe vous recontacte pour finaliser.
         </p>
       </div>
 

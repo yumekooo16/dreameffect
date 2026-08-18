@@ -1,23 +1,23 @@
 const STEPS = [
   {
     step: "01",
-    title: "Vous nous confiez le véhicule",
-    text: "Nous échangeons sur le modèle, vos attentes et les conditions de mise en location.",
+    title: "Vous nous confiez votre véhicule",
+    text: "On échange sur votre modèle, vos attentes et les conditions de mise en location.",
   },
   {
     step: "02",
-    title: "Nous créons l'annonce",
-    text: "Photos, présentation, tarifs et diffusion sur le catalogue — pour attirer les profils adaptés.",
+    title: "Nous créons son annonce et trouvons les locataires",
+    text: "Photos, présentation, tarifs et diffusion sur notre catalogue — nous attirons les bons profils.",
   },
   {
     step: "03",
-    title: "Nous gérons l'exploitation",
-    text: "Réservations, remise des clés, préparation et suivi de chaque location : tout est pris en charge.",
+    title: "Nous gérons l'opérationnel",
+    text: "Réservations, remise des clés, nettoyage et suivi de chaque location : tout est pris en charge.",
   },
   {
     step: "04",
     title: "Vous percevez vos revenus",
-    text: "Chaque mois, l'activité et les revenus de votre véhicule sont consultables, en toute clarté.",
+    text: "Chaque mois, vous consultez vos revenus et l'activité de votre véhicule en toute transparence.",
   },
 ];
 
@@ -26,12 +26,12 @@ export default function OwnersHowItWorks() {
     <section className="de-section" aria-labelledby="owners-how-title">
       <div className="de-public-container">
         <div className="de-section-header">
-          <p className="de-section-eyebrow">Mise en gestion</p>
           <h2 id="owners-how-title" className="de-display de-section-title">
-            Le déroulement
+            Comment ça fonctionne
           </h2>
           <p className="de-section-description">
-            Quatre temps, sans charge opérationnelle de votre côté.
+            Quatre étapes simples pour mettre votre véhicule en location sans
+            charge opérationnelle.
           </p>
         </div>
 
@@ -39,7 +39,7 @@ export default function OwnersHowItWorks() {
           {STEPS.map(({ step, title, text }) => (
             <article key={step} className="de-step-card">
               <span className="de-step-number">{step}</span>
-              <h3 className="de-display mt-4 text-lg">{title}</h3>
+              <h3 className="de-display mt-4 text-lg tracking-tight">{title}</h3>
               <p className="mt-2 text-sm leading-relaxed de-muted">{text}</p>
             </article>
           ))}

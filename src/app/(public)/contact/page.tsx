@@ -11,6 +11,8 @@ import {
   CONTACT_KEYWORDS,
   formatServiceAreaLabel,
 } from "@/src/lib/public/local-seo";
+import { resolveHeroImageUrl } from "@/src/lib/public/hero-image";
+import { fetchPublicVehicles } from "@/src/lib/public/vehicles-data";
 import { PUBLIC_ROUTES } from "@/src/lib/public/site";
 
 export const metadata: Metadata = buildPageMetadata({
@@ -21,6 +23,9 @@ export const metadata: Metadata = buildPageMetadata({
 });
 
 export default async function ContactPage() {
+  const vehicles = await fetchPublicVehicles();
+  const heroImageUrl = resolveHeroImageUrl(vehicles);
+
   return (
     <>
       <JsonLd
@@ -33,9 +38,9 @@ export default async function ContactPage() {
         ]}
       />
       <PageHero
-        eyebrow="Échange"
         title="Contact"
-        description="Une question sur une location, ou sur la gestion de votre véhicule ? WhatsApp le jour même, formulaire sous 24 h."
+        description="Une question sur une location ou sur la gestion de votre véhicule ? Réponse le jour même par WhatsApp, sous 24 h via le formulaire."
+        imageUrl={heroImageUrl}
       />
       <ContactContent />
     </>
