@@ -21,8 +21,8 @@ export const pwaConfig = {
   categories: ["business", "productivity"] as const,
 
   /** Couleurs alignées sur le thème sombre premium (--bg / --blue) */
-  themeColor: "#09090b",
-  backgroundColor: "#09090b",
+  themeColor: "#070708",
+  backgroundColor: "#070708",
 
   /** Version du cache service worker — incrémenter à chaque déploiement majeur */
   cacheVersion: "dreameffect-v3",

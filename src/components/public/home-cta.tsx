@@ -1,54 +1,31 @@
 import Link from "next/link";
-import { ArrowRight, MessageCircle, Phone } from "lucide-react";
-import {
-  CONTACT_PHONE,
-  CONTACT_WHATSAPP_URL,
-} from "@/src/lib/public/contact";
-import { formatServiceAreaLabel } from "@/src/lib/public/local-seo";
+import { CONTACT_PHONE, CONTACT_WHATSAPP_URL } from "@/src/lib/public/contact";
 import { PUBLIC_ROUTES } from "@/src/lib/public/site";
 
 export default function HomeCtaSection() {
   return (
-    <section className="de-section de-home-cta">
+    <section className="de-home-cta-editorial">
       <div className="de-public-container">
-        <div className="de-home-cta-panel">
-          <div className="de-home-cta-content">
-            <p className="de-section-eyebrow">Contact</p>
-            <h2 className="de-display de-home-cta-title">
-              Réservez ou confiez votre véhicule
-            </h2>
-            <p className="de-home-cta-text">
-              Disponibles {formatServiceAreaLabel()}. Réponse le jour même par
-              WhatsApp, sous 24 h via le formulaire. Propriétaires : échangeons
-              sur la gestion locative de votre véhicule.
-            </p>
-          </div>
-
-          <div className="de-home-cta-actions">
-            <Link
-              href={CONTACT_WHATSAPP_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="de-btn de-btn-primary de-btn-lg w-full justify-center sm:w-auto"
-            >
-              <MessageCircle size={18} strokeWidth={2} />
-              Ouvrir WhatsApp
-            </Link>
-            <Link
-              href={`tel:${CONTACT_PHONE.replace(/\s/g, "")}`}
-              className="de-btn de-btn-ghost de-btn-lg w-full justify-center sm:w-auto"
-            >
-              <Phone size={18} strokeWidth={2} />
-              {CONTACT_PHONE}
-            </Link>
-            <Link
-              href={PUBLIC_ROUTES.contact}
-              className="de-link-inline inline-flex items-center gap-1.5 text-sm"
-            >
-              Formulaire de contact
-              <ArrowRight size={14} />
-            </Link>
-          </div>
+        <p className="de-hero-eyebrow">Prendre contact</p>
+        <h2 className="de-display de-home-cta-title">
+          Une location, ou une mise en gestion.{" "}
+          <span className="de-home-cta-title-muted">Quand vous le décidez.</span>
+        </h2>
+        <div className="de-home-cta-editorial-actions">
+          <Link href={PUBLIC_ROUTES.contact} className="de-btn de-btn-primary de-btn-lg">
+            Demander un devis
+          </Link>
+          <Link
+            href={CONTACT_WHATSAPP_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="de-text-link"
+          >
+            WhatsApp
+          </Link>
+          <Link href={`tel:${CONTACT_PHONE.replace(/\s/g, "")}`} className="de-text-link">
+            {CONTACT_PHONE}
+          </Link>
         </div>
       </div>
     </section>

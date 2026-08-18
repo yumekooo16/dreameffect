@@ -1,7 +1,6 @@
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
-import HeroBackground from "@/src/components/public/hero-background";
 import { formatServiceAreaLabel } from "@/src/lib/public/local-seo";
+import HeroBackground from "@/src/components/public/hero-background";
 
 type OwnersHeroProps = {
   imageUrl?: string | null;
@@ -12,30 +11,22 @@ export default function OwnersHero({ imageUrl }: OwnersHeroProps) {
     <section className="de-hero de-hero--photo de-owners-hero">
       <HeroBackground imageUrl={imageUrl} />
 
-      <div className="de-public-container de-hero-content">
-        <p className="de-hero-eyebrow de-hero-location-badge">
-          Propriétaires · {formatServiceAreaLabel()}
-        </p>
-
-        <h1 className="de-display de-hero-title">
-          Rentabilisez votre véhicule sans vous en occuper.
-        </h1>
-
-        <p className="de-hero-subtitle">
-          DreamEffect gère réservations, remises de clés, nettoyage et suivi.
-          Vous percevez vos revenus chaque mois — revenus consultables en ligne,
-          sans charge opérationnelle.
-        </p>
-
-        <div className="de-hero-actions">
-          <Link
-            href="#proprietaire-contact"
-            className="de-btn de-btn-primary de-btn-lg de-hero-btn"
-          >
-            Confier mon véhicule
-            <ArrowRight size={18} strokeWidth={2} />
-          </Link>
+      <div className="de-public-container de-hero-bar">
+        <div className="de-hero-bar-copy">
+          <p className="de-hero-eyebrow">
+            Propriétaires · {formatServiceAreaLabel()}
+          </p>
+          <h1 className="de-display de-hero-title">
+            Rentabilisez, sans vous en occuper.
+          </h1>
+          <p className="de-hero-subtitle">
+            Réservations, clés, nettoyage et suivi. Vos revenus, chaque mois,
+            consultables en ligne.
+          </p>
         </div>
+        <Link href="#proprietaire-contact" className="de-btn de-btn-primary de-btn-lg">
+          Confier mon véhicule
+        </Link>
       </div>
     </section>
   );

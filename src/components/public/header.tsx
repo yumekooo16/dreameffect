@@ -5,7 +5,7 @@ import { createPortal } from "react-dom";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ArrowUpRight, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { PUBLIC_ROUTES } from "@/src/lib/public/site";
 
 const NAV_ITEMS = [
@@ -106,7 +106,6 @@ export default function PublicHeader() {
                   onClick={() => setMenuOpen(false)}
                 >
                   Nous contacter
-                  <ArrowUpRight size={18} strokeWidth={1.75} aria-hidden />
                 </Link>
               </div>
             </nav>
@@ -158,11 +157,10 @@ export default function PublicHeader() {
 
         <div className="de-public-header-actions">
           <Link
-            href={PUBLIC_ROUTES.contact}
+            href={PUBLIC_ROUTES.vehicles}
             className="de-public-nav-cta"
           >
-            Nous contacter
-            <ArrowUpRight size={16} strokeWidth={1.75} aria-hidden />
+            Réserver
           </Link>
 
           <button
