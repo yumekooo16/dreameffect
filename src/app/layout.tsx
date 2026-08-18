@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Bodoni_Moda, Source_Sans_3 } from "next/font/google";
+import { IBM_Plex_Sans, IBM_Plex_Serif } from "next/font/google";
 import { ServiceWorkerRegister } from "@/src/components/pwa/service-worker-register";
 import { StandaloneRedirect } from "@/src/components/pwa/standalone-redirect";
 import { pwaConfig } from "@/src/lib/pwa/config";
@@ -7,22 +7,23 @@ import { DEFAULT_DESCRIPTION, DEFAULT_OG_IMAGE } from "@/src/lib/public/seo";
 import { SITE_NAME, SITE_URL } from "@/src/lib/public/site";
 import "./globals.css";
 
-const display = Bodoni_Moda({
+const display = IBM_Plex_Serif({
   subsets: ["latin", "latin-ext"],
-  variable: "--font-bodoni",
+  weight: ["400", "600"],
+  variable: "--font-plex-serif",
   display: "swap",
-  style: ["normal", "italic"],
 });
 
-const body = Source_Sans_3({
+const body = IBM_Plex_Sans({
   subsets: ["latin", "latin-ext"],
-  variable: "--font-source",
+  weight: ["400", "500", "600"],
+  variable: "--font-plex",
   display: "swap",
 });
 
 export const viewport: Viewport = {
   themeColor: pwaConfig.themeColor,
-  colorScheme: "dark",
+  colorScheme: "light dark",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",

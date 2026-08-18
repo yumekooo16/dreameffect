@@ -13,7 +13,6 @@ export default function HomeCtaSection() {
       <div className="de-public-container">
         <div className="de-home-cta-panel">
           <div className="de-home-cta-content">
-            <p className="de-section-eyebrow">Contact</p>
             <h2 className="de-display de-home-cta-title">
               Parlons de votre projet
             </h2>

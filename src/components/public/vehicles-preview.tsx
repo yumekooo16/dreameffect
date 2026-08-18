@@ -26,7 +26,6 @@ export default function VehiclesPreview({
       <div className="de-public-container">
         <div className="de-section-header de-section-header-row">
           <div>
-            <p className="de-section-eyebrow">Flotte</p>
             <h2 className="de-display de-section-title">La sélection</h2>
             <p className="de-section-description">
               {preview.length} modèle{preview.length > 1 ? "s" : ""} disponible

@@ -17,7 +17,7 @@ export default function PublicFooter() {
                 alt="DreΛm Effect"
                 width={40}
                 height={40}
-                className="rounded-xl object-contain"
+                className="object-contain"
               />
               <div>
                 <p className="de-display de-wordmark text-sm">DreΛm Effect</p>

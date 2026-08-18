@@ -5,7 +5,6 @@ export default function HomeFaqSection() {
     <section className="de-section de-section-alt" aria-labelledby="home-faq-title">
       <div className="de-public-container">
         <div className="de-section-header">
-          <p className="de-section-eyebrow">À savoir</p>
           <h2 id="home-faq-title" className="de-display de-section-title">
             Questions fréquentes
           </h2>

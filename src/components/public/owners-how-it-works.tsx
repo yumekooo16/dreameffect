@@ -26,7 +26,6 @@ export default function OwnersHowItWorks() {
     <section className="de-section" aria-labelledby="owners-how-title">
       <div className="de-public-container">
         <div className="de-section-header">
-          <p className="de-section-eyebrow">Parcours</p>
           <h2 id="owners-how-title" className="de-display de-section-title">
             Le déroulement
           </h2>
