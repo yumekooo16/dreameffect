@@ -15,11 +15,7 @@ export default function PageHero({
 }: PageHeroProps) {
   return (
     <section className={`de-page-hero${imageUrl ? " de-page-hero--photo" : ""}`}>
-      {imageUrl ? (
-        <div className="de-page-hero-media">
-          <HeroBackground imageUrl={imageUrl} />
-        </div>
-      ) : null}
+      {imageUrl ? <HeroBackground imageUrl={imageUrl} /> : null}
       <div className="de-public-container de-page-hero-content">
         {eyebrow ? <p className="de-hero-eyebrow">{eyebrow}</p> : null}
         <h1 className="de-display de-page-hero-title">{title}</h1>

@@ -5,8 +5,9 @@ export default function HomeFaqSection() {
     <section className="de-section de-section-alt" aria-labelledby="home-faq-title">
       <div className="de-public-container">
         <div className="de-section-header">
+          <p className="de-section-eyebrow">Questions fréquentes</p>
           <h2 id="home-faq-title" className="de-display de-section-title">
-            Questions fréquentes
+            L&apos;essentiel
           </h2>
           <p className="de-section-description">
             Location à Beauvais et Gisors, gestion locative dans l&apos;Oise et

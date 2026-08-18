@@ -3,19 +3,19 @@
 export const HOME_PROCESS_STEPS = [
   {
     step: "01",
-    title: "Choisissez le véhicule",
+    title: "Location",
     text: "Berlines, SUV ou sportives : tarifs à la journée, disponibilités à jour. Une demande par WhatsApp ou formulaire, une réponse sous 24 h ouvrées.",
     visualAlt: "Sélection d'un véhicule premium dans la flotte DreamEffect",
   },
   {
     step: "02",
-    title: "Nous préparons tout",
-    text: "Remise des clés à Beauvais, Gisors ou sur le lieu convenu dans l'Oise et l'Eure. Véhicule contrôlé, nettoyé, prêt. Un interlocuteur unique jusqu'au retour.",
+    title: "Remise des clés",
+    text: "À Beauvais, Gisors ou sur le lieu convenu. Véhicule contrôlé, nettoyé, prêt. Un interlocuteur unique jusqu'au retour.",
     visualAlt: "Remise de clés et préparation véhicule DreamEffect",
   },
   {
     step: "03",
-    title: "Profitez — ou percevez",
+    title: "Gestion locative",
     text: "Locataires : le véhicule, le temps qu'il vous faut. Propriétaires : vos revenus chaque mois, pendant que nous gérons réservations, entretien et suivi.",
     visualAlt: "Location ou gestion locative avec DreamEffect",
   },
