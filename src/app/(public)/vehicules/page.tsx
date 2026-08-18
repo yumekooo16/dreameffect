@@ -12,7 +12,6 @@ import {
   fetchPublicVehicles,
   getVehicleDisplayName,
 } from "@/src/lib/public/vehicles-data";
-import { resolveHeroImageUrl } from "@/src/lib/public/hero-image";
 import { PUBLIC_ROUTES } from "@/src/lib/public/site";
 
 export const metadata: Metadata = buildPageMetadata({
@@ -26,7 +25,6 @@ export const dynamic = "force-dynamic";
 
 export default async function VehiclesPage() {
   const vehicles = await fetchPublicVehicles();
-  const heroImageUrl = resolveHeroImageUrl(vehicles);
 
   return (
     <>
@@ -48,7 +46,6 @@ export default async function VehiclesPage() {
         eyebrow="Catalogue"
         title="La flotte"
         description={`Véhicules disponibles à ${formatServiceAreaLabel()} — tarifs affichés, demande par WhatsApp ou formulaire.`}
-        imageUrl={heroImageUrl}
       />
       <section className="de-section de-section-compact">
         <div className="de-public-container">

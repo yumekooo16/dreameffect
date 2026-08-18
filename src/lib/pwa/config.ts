@@ -25,7 +25,7 @@ export const pwaConfig = {
   backgroundColor: "#0b1018",
 
   /** Version du cache service worker — incrémenter à chaque déploiement majeur */
-  cacheVersion: "dreameffect-v6",
+  cacheVersion: "dreameffect-v7",
 
   icons: {
     /** Fichier source — remplacer logo.png puis relancer `npm run generate-pwa-icons` */
