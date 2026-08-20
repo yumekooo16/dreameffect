@@ -2,7 +2,7 @@ export const FUEL_OPTIONS = [
   { value: "essence", label: "Essence" },
   { value: "diesel", label: "Diesel" },
   { value: "electrique", label: "Électrique" },
-  { value: "hybride", label: "Hybride" },
+  { value: "hybride", label: "Hybride-essence" },
   { value: "hybride_rechargeable", label: "Hybride rechargeable" },
 ] as const;
 
