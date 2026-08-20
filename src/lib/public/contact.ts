@@ -28,3 +28,8 @@ export function formatPhoneE164(phone: string): string {
 }
 
 export const CONTACT_PHONE_E164 = formatPhoneE164(CONTACT_PHONE);
+
+/** Lien cliquable tel: — format E.164 pour cohérence schema.org et mobile. */
+export function telHref(phone: string = CONTACT_PHONE): string {
+  return `tel:${formatPhoneE164(phone)}`;
+}

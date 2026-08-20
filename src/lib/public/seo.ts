@@ -1,8 +1,13 @@
 import type { Metadata } from "next";
 import { resolveVehicleImageUrl } from "@/src/lib/image-url";
+import {
+  AREA_SERVED_LABELS,
+  PWA_ICON_512,
+  businessPostalAddressJsonLd,
+  openingHoursSpecificationJsonLd,
+} from "@/src/lib/public/business";
 import { CONTACT_EMAIL, CONTACT_PHONE_E164 } from "@/src/lib/public/contact";
 import {
-  PRIMARY_SERVICE_CITY,
   areaServedJsonLd,
   formatServiceAreaLabel,
 } from "@/src/lib/public/local-seo";
@@ -140,7 +145,6 @@ export function faqPageJsonLd(
 
 export function localBusinessJsonLd() {
   const sameAs = buildSameAsLinks();
-  const streetAddress = process.env.NEXT_PUBLIC_BUSINESS_STREET?.trim();
 
   return {
     "@context": "https://schema.org",
@@ -149,20 +153,14 @@ export function localBusinessJsonLd() {
     name: SITE_NAME,
     description: DEFAULT_DESCRIPTION,
     url: SITE_URL,
-    image: absoluteUrl(DEFAULT_OG_IMAGE),
+    image: absoluteUrl(PWA_ICON_512),
     logo: absoluteUrl(ORGANIZATION_LOGO),
     telephone: CONTACT_PHONE_E164,
     email: CONTACT_EMAIL,
     priceRange: "€€€",
-    address: {
-      "@type": "PostalAddress",
-      ...(streetAddress ? { streetAddress } : {}),
-      addressLocality: process.env.NEXT_PUBLIC_BUSINESS_CITY ?? PRIMARY_SERVICE_CITY,
-      addressRegion: process.env.NEXT_PUBLIC_BUSINESS_REGION ?? "Oise",
-      postalCode: process.env.NEXT_PUBLIC_BUSINESS_POSTAL_CODE ?? "60000",
-      addressCountry: "FR",
-    },
+    address: businessPostalAddressJsonLd(),
     areaServed: areaServedJsonLd(),
+    openingHoursSpecification: openingHoursSpecificationJsonLd(),
     serviceType: [
       "Location de véhicules haut de gamme",
       "Gestion locative automobile",
@@ -173,15 +171,22 @@ export function localBusinessJsonLd() {
 }
 
 export function autoRentalJsonLd() {
+  const sameAs = buildSameAsLinks();
+
   return {
     "@context": "https://schema.org",
     "@type": "AutoRental",
     name: SITE_NAME,
     description: DEFAULT_DESCRIPTION,
+    image: absoluteUrl(PWA_ICON_512),
     url: SITE_URL,
     telephone: CONTACT_PHONE_E164,
-    areaServed: areaServedJsonLd(),
+    priceRange: "€€€",
+    address: businessPostalAddressJsonLd(),
+    areaServed: [...AREA_SERVED_LABELS],
+    openingHoursSpecification: openingHoursSpecificationJsonLd(),
     serviceType: ["Location de véhicules", "Gestion de flotte pour propriétaires"],
+    ...(sameAs.length > 0 ? { sameAs } : {}),
   };
 }
 

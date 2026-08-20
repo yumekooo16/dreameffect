@@ -1,3 +1,4 @@
+import { BUSINESS_ADDRESS } from "@/src/lib/public/business";
 import { CONTACT_EMAIL, CONTACT_PHONE } from "@/src/lib/public/contact";
 import { LEGAL_ROUTES, SITE_NAME, SITE_URL } from "@/src/lib/public/site";
 
@@ -15,11 +16,11 @@ export const LEGAL_ENTITY = {
   rcs: env("NEXT_PUBLIC_LEGAL_RCS"),
   vat: env("NEXT_PUBLIC_LEGAL_VAT"),
   publicationDirector: env("NEXT_PUBLIC_PUBLICATION_DIRECTOR") ?? SITE_NAME,
-  street: env("NEXT_PUBLIC_BUSINESS_STREET"),
-  city: env("NEXT_PUBLIC_BUSINESS_CITY") ?? "Beauvais",
-  postalCode: env("NEXT_PUBLIC_BUSINESS_POSTAL_CODE") ?? "60000",
-  region: env("NEXT_PUBLIC_BUSINESS_REGION") ?? "Oise",
-  country: "France",
+  street: BUSINESS_ADDRESS.street,
+  city: BUSINESS_ADDRESS.city,
+  postalCode: BUSINESS_ADDRESS.postalCode,
+  region: BUSINESS_ADDRESS.region,
+  country: BUSINESS_ADDRESS.countryLabel,
   email: CONTACT_EMAIL,
   phone: CONTACT_PHONE,
 } as const;

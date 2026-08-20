@@ -1,11 +1,19 @@
 import Link from "next/link";
-import { Mail, MapPin, MessageCircle, Phone } from "lucide-react";
+import { ExternalLink, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
 import ContactForm from "@/src/components/public/contact-form";
+import {
+  buildGoogleMapsDirectionsUrl,
+  buildGoogleMapsEmbedUrl,
+  formatBusinessAddressLines,
+  GOOGLE_BUSINESS_URL,
+  OPENING_HOURS,
+} from "@/src/lib/public/business";
 import {
   CONTACT_EMAIL,
   CONTACT_PHONE,
   CONTACT_WHATSAPP_URL,
   SOCIAL_LINKS,
+  telHref,
 } from "@/src/lib/public/contact";
 import { SERVICE_AREAS, formatServiceAreaLabel } from "@/src/lib/public/local-seo";
 
@@ -13,6 +21,8 @@ export default function ContactContent() {
   const socialEntries = Object.entries(SOCIAL_LINKS).filter(
     ([, url]) => url != null
   );
+  const mapsEmbedUrl = buildGoogleMapsEmbedUrl();
+  const addressLines = formatBusinessAddressLines();
 
   return (
     <section className="de-section">
@@ -37,6 +47,42 @@ export default function ContactContent() {
                 <MapPin size={20} strokeWidth={1.75} />
               </span>
               <div>
+                <p className="de-label">Adresse</p>
+                <address className="mt-1 not-italic text-sm leading-relaxed">
+                  {addressLines.map((line) => (
+                    <span key={line} className="block">
+                      {line}
+                    </span>
+                  ))}
+                </address>
+                <a
+                  href={buildGoogleMapsDirectionsUrl()}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="de-link-inline mt-2 inline-flex items-center gap-1 text-sm"
+                >
+                  Itinéraire Google Maps
+                  <ExternalLink size={14} aria-hidden />
+                </a>
+                {GOOGLE_BUSINESS_URL ? (
+                  <a
+                    href={GOOGLE_BUSINESS_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="de-link-inline mt-1 inline-flex items-center gap-1 text-sm"
+                  >
+                    Fiche Google
+                    <ExternalLink size={14} aria-hidden />
+                  </a>
+                ) : null}
+              </div>
+            </div>
+
+            <div className="de-contact-zone-card">
+              <span className="de-contact-icon">
+                <MapPin size={20} strokeWidth={1.75} />
+              </span>
+              <div>
                 <p className="de-label">Zone d&apos;intervention</p>
                 <p className="mt-1 text-sm leading-relaxed">
                   {formatServiceAreaLabel()}
@@ -55,6 +101,11 @@ export default function ContactContent() {
             </div>
 
             <p className="text-sm leading-relaxed de-muted">
+              Horaires : tous les jours de {OPENING_HOURS.opens.replace(":", " h ")} à{" "}
+              {OPENING_HOURS.closes.replace(":", " h ")}.
+            </p>
+
+            <p className="text-sm leading-relaxed de-muted">
               Vous préférez nous joindre directement ? Voici nos coordonnées.
             </p>
 
@@ -66,7 +117,7 @@ export default function ContactContent() {
                 <div>
                   <p className="de-label">Téléphone</p>
                   <a
-                    href={`tel:${CONTACT_PHONE.replace(/\s/g, "")}`}
+                    href={telHref()}
                     className="mt-1 block font-medium transition hover:text-[var(--blue-soft)]"
                   >
                     {CONTACT_PHONE}
@@ -132,6 +183,27 @@ export default function ContactContent() {
             )}
           </aside>
         </div>
+
+        {mapsEmbedUrl ? (
+          <div className="de-contact-map-block">
+            <h2 className="de-display text-xl tracking-tight sm:text-2xl">
+              Nous trouver
+            </h2>
+            <p className="mt-2 text-sm de-muted">
+              Rendez-vous sur place ou convenez d&apos;un lieu de remise des clés dans
+              l&apos;Oise et l&apos;Eure.
+            </p>
+            <div className="de-contact-map-embed">
+              <iframe
+                title="Localisation DreamEffect sur Google Maps"
+                src={mapsEmbedUrl}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                allowFullScreen
+              />
+            </div>
+          </div>
+        ) : null}
       </div>
     </section>
   );

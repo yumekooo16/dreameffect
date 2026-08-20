@@ -28,6 +28,12 @@ export const PUBLIC_ROUTES = {
   contact: "/contact",
 } as const;
 
+/** Pages éditoriales SEO (contenu informatif). */
+export const INFO_ROUTES = {
+  insurance: "/assurance-location-vehicule-premium",
+  ownerManagement: "/gestion-locative-proprietaires",
+} as const;
+
 export const LEGAL_ROUTES = {
   privacy: "/politique-de-confidentialite",
   legal: "/mentions-legales",

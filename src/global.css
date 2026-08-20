@@ -2600,6 +2600,99 @@ button.de-list-item {
   margin: 0;
 }
 
+.de-contact-map-block {
+  margin-top: 3rem;
+}
+
+.de-contact-map-embed {
+  margin-top: 1.25rem;
+  overflow: hidden;
+  border-radius: var(--radius);
+  border: 1px solid var(--blue-border);
+  aspect-ratio: 16 / 9;
+  background: var(--card);
+}
+
+.de-contact-map-embed iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.de-footer-nap a {
+  color: inherit;
+}
+
+/* --- Avis clients (accueil) -------------------------------- */
+.de-reviews-grid {
+  display: grid;
+  gap: 1.25rem;
+  margin-top: 2rem;
+}
+
+@media (min-width: 768px) {
+  .de-reviews-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.de-review-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  padding: 1.25rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--blue-border);
+  background: var(--card);
+}
+
+.de-reviews-stars {
+  display: flex;
+  gap: 0.125rem;
+}
+
+.de-reviews-star {
+  color: var(--text-muted);
+}
+
+.de-reviews-star--filled {
+  color: var(--blue-soft);
+  fill: color-mix(in srgb, var(--blue-soft) 35%, transparent);
+}
+
+.de-review-text {
+  flex: 1;
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+
+.de-review-author {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  color: var(--foreground);
+}
+
+.de-review-date {
+  color: var(--text-muted);
+}
+
+.de-reviews-cta {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: center;
+}
+
+.de-info-cta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
 .de-process-list {
   display: flex;
   flex-direction: column;

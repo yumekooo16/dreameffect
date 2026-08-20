@@ -1,7 +1,15 @@
 import Image from "next/image";
 import Link from "next/link";
 import FooterLegalLinks from "@/src/components/public/footer-legal-links";
-import { PUBLIC_ROUTES } from "@/src/lib/public/site";
+import {
+  formatBusinessAddressLines,
+} from "@/src/lib/public/business";
+import {
+  CONTACT_EMAIL,
+  CONTACT_PHONE,
+  telHref,
+} from "@/src/lib/public/contact";
+import { PUBLIC_ROUTES, SITE_NAME } from "@/src/lib/public/site";
 
 export default function PublicFooter() {
   const year = new Date().getFullYear();
@@ -14,13 +22,13 @@ export default function PublicFooter() {
             <div className="flex items-center gap-3">
               <Image
                 src="/logo.png"
-                alt="DreΛm Effect"
+                alt={SITE_NAME}
                 width={40}
                 height={40}
                 className="rounded-xl object-contain"
               />
               <div>
-                <p className="de-display text-sm tracking-tight">DreΛm Effect</p>
+                <p className="de-display text-sm tracking-tight">{SITE_NAME}</p>
                 <p className="text-xs de-muted">Location & gestion automobile</p>
               </div>
             </div>
@@ -28,6 +36,25 @@ export default function PublicFooter() {
               Mise en location et gestion de véhicules pour propriétaires et
               locataires exigeants.
             </p>
+            <address className="de-footer-nap mt-4 not-italic">
+              {formatBusinessAddressLines().map((line) => (
+                <span key={line} className="block text-sm de-muted">
+                  {line}
+                </span>
+              ))}
+              <a
+                href={telHref()}
+                className="mt-2 block text-sm font-medium transition hover:text-[var(--blue-soft)]"
+              >
+                {CONTACT_PHONE}
+              </a>
+              <a
+                href={`mailto:${CONTACT_EMAIL}`}
+                className="mt-1 block text-sm transition hover:text-[var(--blue-soft)] de-muted"
+              >
+                {CONTACT_EMAIL}
+              </a>
+            </address>
           </div>
 
           <nav aria-label="Navigation footer">

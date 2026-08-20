@@ -3,6 +3,7 @@ import { ArrowRight, MessageCircle, Phone } from "lucide-react";
 import {
   CONTACT_PHONE,
   CONTACT_WHATSAPP_URL,
+  telHref,
 } from "@/src/lib/public/contact";
 import { formatServiceAreaLabel } from "@/src/lib/public/local-seo";
 import { PUBLIC_ROUTES } from "@/src/lib/public/site";
@@ -35,7 +36,7 @@ export default function HomeCtaSection() {
               Ouvrir WhatsApp
             </Link>
             <Link
-              href={`tel:${CONTACT_PHONE.replace(/\s/g, "")}`}
+              href={telHref()}
               className="de-btn de-btn-ghost de-btn-lg w-full justify-center sm:w-auto"
             >
               <Phone size={18} strokeWidth={2} />

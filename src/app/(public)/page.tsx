@@ -4,6 +4,7 @@ import HowItWorksSection from "@/src/components/public/how-it-works";
 import VehiclesPreview from "@/src/components/public/vehicles-preview";
 import HomeCtaSection from "@/src/components/public/home-cta";
 import HomeFaqSection, { HOME_FAQ_ITEMS } from "@/src/components/public/home-faq";
+import HomeReviewsSection from "@/src/components/public/home-reviews";
 import JsonLd from "@/src/components/public/json-ld";
 import { fetchPublicVehicles } from "@/src/lib/public/vehicles-data";
 import { HOME_KEYWORDS, formatServiceAreaLabel } from "@/src/lib/public/local-seo";
@@ -37,6 +38,7 @@ export default async function HomePage() {
       <HeroSection imageUrl={heroImageUrl} />
       <HowItWorksSection visualUrls={narrativeVisuals} />
       <VehiclesPreview vehicles={vehicles} />
+      <HomeReviewsSection />
       <HomeFaqSection />
       <HomeCtaSection />
     </>

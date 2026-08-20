@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ArrowUpRight, Menu, X } from "lucide-react";
-import { PUBLIC_ROUTES } from "@/src/lib/public/site";
+import { PUBLIC_ROUTES, SITE_NAME } from "@/src/lib/public/site";
 
 const NAV_ITEMS = [
   { href: PUBLIC_ROUTES.home, label: "Accueil", exact: true, index: "01" },
@@ -127,13 +127,13 @@ export default function PublicHeader() {
             <Link href={PUBLIC_ROUTES.home} className="de-public-header-brand">
               <Image
                 src="/logo.png"
-                alt="DreΛm Effect"
+                alt={SITE_NAME}
                 width={34}
                 height={34}
                 className="de-public-header-logo"
                 priority
               />
-              <span className="de-public-header-name">DreΛm Effect</span>
+              <span className="de-public-header-name">{SITE_NAME}</span>
             </Link>
           )}
 
