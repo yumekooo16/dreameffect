@@ -8,27 +8,54 @@ type HeroSectionProps = {
   imageUrl?: string | null;
 };
 
+const TICKER_ITEMS = [
+  "Beauvais",
+  "Gisors",
+  "Oise",
+  "Eure",
+  "Flotte entretenue",
+  "Tarifs affichés",
+  "WhatsApp",
+  "Gestion locative",
+];
+
+function Ticker() {
+  const sequence = [...TICKER_ITEMS, ...TICKER_ITEMS];
+
+  return (
+    <div className="de-ticker" aria-hidden>
+      <div className="de-ticker-track">
+        {sequence.map((item, index) => (
+          <span key={`${item}-${index}`}>{item}</span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function HeroSection({ imageUrl }: HeroSectionProps) {
   return (
-    <section className="de-hero de-hero--split">
-      <div className="de-hero-copy">
-        <div className="de-hero-copy-inner">
-          <p className="de-hero-kicker">Beauvais · Gisors</p>
-          <h1 className="de-display de-hero-title">
-            La location haut de gamme,
-            <em> sans le spectacle.</em>
+    <section className="de-exhibit de-exhibit--hero" aria-labelledby="home-hero-title">
+      <div className="de-exhibit-watermark" aria-hidden>
+        DE
+      </div>
+
+      <div className="de-public-container de-exhibit-grid">
+        <div className="de-exhibit-copy">
+          <p className="de-mono-label">Beauvais · Gisors · Oise · Eure</p>
+          <h1 id="home-hero-title" className="de-exhibit-title">
+            <span>La location</span>
+            <span className="de-exhibit-title-outline">haut de gamme</span>
+            <span>sans le spectacle</span>
           </h1>
-          <p className="de-hero-subtitle">
+          <p className="de-exhibit-lead">
             Véhicules préparés, tarifs affichés, remise des clés sous 24 h.
             Propriétaires : nous gérons tout, vous percevez vos revenus.
           </p>
-          <div className="de-hero-actions">
-            <Link
-              href={PUBLIC_ROUTES.vehicles}
-              className="de-btn de-btn-primary de-btn-lg"
-            >
-              La flotte
-              <ArrowRight size={18} strokeWidth={1.75} />
+          <div className="de-exhibit-actions">
+            <Link href={PUBLIC_ROUTES.vehicles} className="de-btn de-btn-primary de-btn-lg">
+              Explorer la collection
+              <ArrowRight size={18} strokeWidth={1.75} aria-hidden />
             </Link>
             <Link href={PUBLIC_ROUTES.owners} className="de-text-cta">
               Confier mon véhicule
@@ -45,12 +72,16 @@ export default function HeroSection({ imageUrl }: HeroSectionProps) {
             </Link>
           </div>
         </div>
+
+        <div className="de-exhibit-frame">
+          <div className="de-exhibit-frame-inner">
+            <HeroBackground imageUrl={imageUrl} />
+          </div>
+          <span className="de-exhibit-tag">Collection · Oise &amp; Eure</span>
+        </div>
       </div>
 
-      <div className="de-hero-media">
-        <HeroBackground imageUrl={imageUrl} />
-        <p className="de-hero-media-caption">Flotte entretenue · Oise &amp; Eure</p>
-      </div>
+      <Ticker />
     </section>
   );
 }

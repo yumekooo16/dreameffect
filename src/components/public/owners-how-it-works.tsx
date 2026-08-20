@@ -23,30 +23,35 @@ const STEPS = [
 
 export default function OwnersHowItWorks() {
   return (
-    <section className="de-section de-process" aria-labelledby="owners-how-title">
+    <section className="de-section" aria-labelledby="owners-how-title">
       <div className="de-public-container">
-        <div className="de-section-masthead">
-          <p className="de-section-eyebrow">Parcours</p>
-          <h2 id="owners-how-title" className="de-display de-section-title">
-            Comment ça fonctionne
-          </h2>
-          <p className="de-section-lede">
+        <header className="de-exhibit-head">
+          <p className="de-exhibit-head-num" aria-hidden>
+            01
+          </p>
+          <div>
+            <p className="de-mono-label">Parcours</p>
+            <h2 id="owners-how-title" className="de-display de-exhibit-head-title">
+              Comment ça fonctionne
+            </h2>
+          </div>
+          <p className="de-exhibit-head-lede">
             Quatre temps pour mettre votre véhicule en location, sans charge
             opérationnelle.
           </p>
-        </div>
+        </header>
 
-        <div className="de-timeline de-timeline--four">
+        <ol className="de-manifest-list">
           {STEPS.map(({ step, title, text }) => (
-            <article key={step} className="de-timeline-step">
-              <span className="de-timeline-index" aria-hidden>
-                {step}
-              </span>
-              <h3 className="de-display de-timeline-title">{title}</h3>
-              <p className="de-timeline-text">{text}</p>
-            </article>
+            <li key={step}>
+              <span className="de-mono-label">{step}</span>
+              <div>
+                <h3 className="de-display">{title}</h3>
+                <p>{text}</p>
+              </div>
+            </li>
           ))}
-        </div>
+        </ol>
       </div>
     </section>
   );

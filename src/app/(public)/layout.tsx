@@ -9,14 +9,18 @@ export default function PublicLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="de-page de-landing">
+    <div className="de-page de-landing de-atelier">
       <a href="#main-content" className="de-skip-link">
         Aller au contenu
       </a>
       <JsonLd data={globalPublicJsonLd()} />
-      <PublicHeader />
-      <main id="main-content">{children}</main>
-      <PublicFooter />
+      <div className="de-atelier-shell">
+        <PublicHeader />
+        <div className="de-atelier-stage">
+          <main id="main-content">{children}</main>
+          <PublicFooter />
+        </div>
+      </div>
     </div>
   );
 }

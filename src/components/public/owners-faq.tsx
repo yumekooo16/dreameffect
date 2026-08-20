@@ -28,29 +28,29 @@ const FAQ_ITEMS = [
 
 export default function OwnersFaq() {
   return (
-    <section className="de-section de-faq-section" aria-labelledby="owners-faq-title">
-      <div className="de-public-container de-faq-layout">
-        <div className="de-faq-intro">
-          <p className="de-section-eyebrow">Propriétaires</p>
-          <h2 id="owners-faq-title" className="de-display de-section-title">
+    <section className="de-section de-section-alt" aria-labelledby="owners-faq-title">
+      <div className="de-public-container de-faq-manifest">
+        <div>
+          <p className="de-mono-label">Propriétaires</p>
+          <h2 id="owners-faq-title" className="de-display de-exhibit-head-title">
             Ce qu&apos;il faut savoir
           </h2>
-          <p className="de-section-lede">
-            Les questions avant de confier votre véhicule — distinctes de la
-            FAQ locataire.
+          <p className="de-exhibit-head-lede" style={{ marginTop: "1rem" }}>
+            Les questions avant de confier votre véhicule — distinctes de la FAQ
+            locataire.
           </p>
         </div>
 
-        <div className="de-faq-editorial">
+        <div>
           {FAQ_ITEMS.map(({ question, answer }, index) => (
-            <details key={question} className="de-faq-row">
-              <summary className="de-faq-summary">
-                <span className="de-faq-num" aria-hidden>
+            <details key={question} className="de-faq-item">
+              <summary>
+                <span className="de-mono-label" aria-hidden>
                   {String(index + 1).padStart(2, "0")}
                 </span>
-                <span className="de-faq-q de-display">{question}</span>
+                <span className="de-faq-item-q">{question}</span>
               </summary>
-              <p className="de-faq-a">{answer}</p>
+              <p className="de-faq-item-a">{answer}</p>
             </details>
           ))}
         </div>

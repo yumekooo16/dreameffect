@@ -10,25 +10,30 @@ type OwnersHeroProps = {
 
 export default function OwnersHero({ imageUrl }: OwnersHeroProps) {
   return (
-    <section className="de-hero de-hero--split de-owners-hero">
-      <div className="de-hero-copy">
-        <div className="de-hero-copy-inner">
-          <p className="de-hero-kicker">Propriétaires · Beauvais · Gisors</p>
-          <h1 className="de-display de-hero-title">
-            Votre véhicule travaille.
-            <em> Vous n’avez plus à le gérer.</em>
+    <section className="de-exhibit de-exhibit--hero de-owners-hero" aria-labelledby="owners-hero-title">
+      <div className="de-exhibit-watermark" aria-hidden>
+        PR
+      </div>
+
+      <div className="de-public-container de-exhibit-grid">
+        <div className="de-exhibit-copy">
+          <p className="de-mono-label">Propriétaires · Beauvais · Gisors</p>
+          <h1 id="owners-hero-title" className="de-exhibit-title">
+            <span>Votre véhicule</span>
+            <span className="de-exhibit-title-outline">travaille</span>
+            <span>pour vous</span>
           </h1>
-          <p className="de-hero-subtitle">
-            Réservations, remises de clés, nettoyage et suivi. Revenus
-            consultables chaque mois, sans charge opérationnelle.
+          <p className="de-exhibit-lead">
+            Réservations, remises de clés, nettoyage et suivi. Revenus consultables
+            chaque mois, sans charge opérationnelle.
           </p>
-          <div className="de-hero-actions">
+          <div className="de-exhibit-actions">
             <Link
               href="#proprietaire-contact"
               className="de-btn de-btn-primary de-btn-lg"
             >
               Confier mon véhicule
-              <ArrowRight size={18} strokeWidth={1.75} />
+              <ArrowRight size={18} strokeWidth={1.75} aria-hidden />
             </Link>
             <Link href={PUBLIC_ROUTES.contact} className="de-text-cta">
               Échanger d&apos;abord
@@ -36,9 +41,13 @@ export default function OwnersHero({ imageUrl }: OwnersHeroProps) {
           </div>
           <OwnersFigures />
         </div>
-      </div>
-      <div className="de-hero-media">
-        <HeroBackground imageUrl={imageUrl} />
+
+        <div className="de-exhibit-frame">
+          <div className="de-exhibit-frame-inner">
+            <HeroBackground imageUrl={imageUrl} />
+          </div>
+          <span className="de-exhibit-tag">Gestion locative</span>
+        </div>
       </div>
     </section>
   );

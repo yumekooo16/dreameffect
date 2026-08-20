@@ -25,32 +25,36 @@ export default function ContactContent() {
   const hoursLabel = `Tous les jours, ${OPENING_HOURS.opens.replace(":", " h ")} – ${OPENING_HOURS.closes.replace(":", " h ")}`;
 
   return (
-    <section className="de-section de-contact-section">
+    <section className="de-section">
       <div className="de-public-container">
-        <div className="de-contact-points">
+        <div className="de-locale-row">
           {SERVICE_POINTS.map((point) => (
-            <address key={point.city} className="de-contact-point not-italic">
-              <p className="de-contact-point-city de-display">{point.city}</p>
-              <p className="de-contact-point-code">{point.postalCode}</p>
-              <p className="de-contact-point-region">{point.region}</p>
+            <address key={point.city} className="de-locale-cell not-italic">
+              <p className="de-locale-city de-display">{point.city}</p>
+              <p className="de-locale-code">{point.postalCode}</p>
+              <p className="de-mono-label" style={{ marginTop: "0.35rem" }}>
+                {point.region}
+              </p>
             </address>
           ))}
         </div>
 
-        <div className="de-contact-page-layout">
-          <div className="de-contact-form-block">
-            <h2 className="de-display de-contact-form-title">Écrivez-nous</h2>
-            <p className="de-contact-form-lede">
-              Formulaire ci-dessous — réponse sous 24 h ouvrées.
+        <div className="de-contact-split">
+          <div>
+            <p className="de-mono-label">Formulaire</p>
+            <h2 className="de-display de-exhibit-head-title">Écrivez-nous</h2>
+            <p className="de-exhibit-head-lede" style={{ marginTop: "0.75rem" }}>
+              Réponse sous 24 h ouvrées.
             </p>
             <div className="mt-8">
               <ContactForm />
             </div>
           </div>
 
-          <aside className="de-contact-sidebar">
-            <p className="de-contact-hours">{hoursLabel}</p>
-            <p className="de-contact-aside-note">
+          <aside>
+            <p className="de-mono-label">Direct</p>
+            <p className="de-exhibit-head-lede">{hoursLabel}</p>
+            <p className="de-exhibit-head-lede" style={{ marginTop: "0.75rem" }}>
               Remise des clés à Beauvais, Gisors, ou sur rendez-vous dans
               l&apos;Oise et l&apos;Eure.
             </p>
@@ -113,7 +117,7 @@ export default function ContactContent() {
 
             {socialEntries.length > 0 && (
               <div className="de-contact-social-block">
-                <p className="de-label">Réseaux</p>
+                <p className="de-mono-label">Réseaux</p>
                 <div className="mt-3 flex flex-wrap gap-2">
                   {socialEntries.map(([network, url]) => (
                     <Link
@@ -133,8 +137,8 @@ export default function ContactContent() {
         </div>
 
         {mapsEmbedUrl ? (
-          <div className="de-contact-map-block">
-            <h2 className="de-display de-contact-map-title">Nous trouver</h2>
+          <div className="de-contact-map-block" style={{ marginTop: "3rem" }}>
+            <h2 className="de-display de-exhibit-head-title">Nous trouver</h2>
             <div className="de-contact-map-embed">
               <iframe
                 title="Localisation DreamEffect sur Google Maps"

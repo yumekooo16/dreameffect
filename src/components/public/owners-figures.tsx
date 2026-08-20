@@ -15,11 +15,11 @@ const FIGURES = [
 
 export default function OwnersFigures() {
   return (
-    <div className="de-figures de-owners-figures" aria-label="Repères propriétaires">
+    <div className="de-stats-band" style={{ marginTop: "2.5rem", borderTop: "1px solid var(--line)" }} aria-label="Repères propriétaires">
       {FIGURES.map((item) => (
-        <article key={item.value} className="de-figure">
-          <p className="de-figure-value de-display">{item.value}</p>
-          <p className="de-figure-label">{item.label}</p>
+        <article key={item.value} className="de-stat-cell">
+          <p className="de-stat-value de-display">{item.value}</p>
+          <p className="de-stat-label">{item.label}</p>
         </article>
       ))}
     </div>

@@ -246,9 +246,13 @@ export default function VehicleCatalog({ vehicles }: VehicleCatalogProps) {
                 </p>
               </div>
 
-              <div className="de-vehicles-grid">
-                {brandVehicles.map((vehicle) => (
-                  <PublicVehicleCard key={vehicle.id} vehicle={vehicle} />
+              <div className="de-lot-strip" role="list">
+                {brandVehicles.map((vehicle, index) => (
+                  <PublicVehicleCard
+                    key={vehicle.id}
+                    vehicle={vehicle}
+                    index={index + 1}
+                  />
                 ))}
               </div>
             </section>

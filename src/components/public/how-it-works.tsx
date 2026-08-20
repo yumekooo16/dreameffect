@@ -13,51 +13,60 @@ export default function HowItWorksSection({
   visualUrls = [],
 }: HowItWorksSectionProps) {
   return (
-    <section className="de-section de-process" aria-labelledby="home-process-title">
+    <section className="de-section" aria-labelledby="home-process-title">
       <div className="de-public-container">
-        <div className="de-section-masthead">
-          <p className="de-section-eyebrow">Parcours</p>
-          <h2 id="home-process-title" className="de-display de-section-title">
-            Comment ça marche
-          </h2>
-          <p className="de-section-lede">
-            Trois temps, un interlocuteur — que vous louiez ou que vous
-            confiiez le vôtre.
+        <header className="de-exhibit-head">
+          <p className="de-exhibit-head-num" aria-hidden>
+            02
           </p>
-        </div>
+          <div>
+            <p className="de-mono-label">Parcours</p>
+            <h2 id="home-process-title" className="de-display de-exhibit-head-title">
+              Comment ça marche
+            </h2>
+          </div>
+          <p className="de-exhibit-head-lede">
+            Trois temps, un interlocuteur — que vous louiez ou que vous confiiez
+            le vôtre.
+          </p>
+        </header>
 
-        <div className="de-timeline">
+        <div className="de-spine">
           {HOME_PROCESS_STEPS.map(({ step, title, text, visualAlt }, index) => {
             const imageUrl = resolveVehicleImageUrl(visualUrls[index]);
+            const flip = index % 2 === 1;
 
             return (
-              <article key={step} className="de-timeline-step">
-                <span className="de-timeline-index" aria-hidden>
-                  {step}
-                </span>
-                <div className="de-timeline-visual">
+              <article
+                key={step}
+                className={`de-spine-step${flip ? " de-spine-step--flip" : ""}`}
+              >
+                <div className="de-spine-visual">
                   {imageUrl ? (
                     <Image
                       src={imageUrl}
                       alt={visualAlt}
                       fill
                       className="object-cover"
-                      sizes="(max-width: 1024px) 100vw, 32vw"
+                      sizes="(max-width: 900px) 100vw, 45vw"
                     />
                   ) : (
                     <div className="de-timeline-fallback" />
                   )}
                 </div>
-                <h3 className="de-display de-timeline-title">{title}</h3>
-                <p className="de-timeline-text">{text}</p>
+                <div className="de-spine-copy">
+                  <span className="de-spine-num">{step}</span>
+                  <h3 className="de-display de-spine-title">{title}</h3>
+                  <p className="de-spine-text">{text}</p>
+                </div>
               </article>
             );
           })}
         </div>
 
-        <Link href={PUBLIC_ROUTES.contact} className="de-text-cta de-process-cta">
+        <Link href={PUBLIC_ROUTES.contact} className="de-text-cta" style={{ marginTop: "2.5rem" }}>
           Une question avant de commencer ?
-          <ArrowRight size={16} />
+          <ArrowRight size={16} aria-hidden />
         </Link>
       </div>
     </section>

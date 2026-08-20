@@ -13,7 +13,6 @@ import {
 } from "@/src/lib/public/vehicle-status";
 import { getLowestRentalPrice, formatPrice } from "@/src/lib/vehicles/pricing";
 import { buildVehicleImageAlt } from "@/src/lib/public/local-seo";
-import { getVehicleDisplayName } from "@/src/lib/public/vehicles-data";
 import type { PublicVehicleDetail } from "@/src/lib/public/vehicles-types";
 import type { VehicleAvailability } from "@/src/lib/public/availability-data";
 import { PUBLIC_ROUTES } from "@/src/lib/public/site";
@@ -42,7 +41,6 @@ export default function VehicleDetailContent({
   vehicle: PublicVehicleDetail;
   availability: VehicleAvailability;
 }) {
-  const displayName = getVehicleDisplayName(vehicle);
   const imageAlt = buildVehicleImageAlt({
     brand: vehicle.brand,
     model: vehicle.model,

@@ -1,0 +1,1257 @@
+/* ============================================================
+   DREAMEFFECT ATELIER — direction galerie / catalogue atypique
+   ============================================================ */
+
+.de-atelier {
+  --bg: #050505;
+  --bg-warm: #0c0a08;
+  --surface: #111010;
+  --surface-alt: #161412;
+  --line: rgba(237, 232, 220, 0.11);
+  --line-strong: rgba(193, 127, 74, 0.45);
+  --text: #ede8dc;
+  --text-muted: #9a9288;
+  --text-subtle: #6b6560;
+  --copper: #c17f4a;
+  --copper-bright: #d4955f;
+  --copper-dim: #7a4f2c;
+  --background: var(--bg);
+  --foreground: var(--text);
+  --card: var(--surface);
+  --card-foreground: var(--text);
+  --border: var(--line);
+  --border-raw: var(--line);
+  --border-subtle: var(--line-strong);
+  --muted-foreground: var(--text-muted);
+  --blue: var(--copper);
+  --blue-soft: var(--copper-bright);
+  --blue-border: var(--line-strong);
+  --blue-glow: color-mix(in srgb, var(--copper) 12%, transparent);
+  --silver: var(--text);
+  --radius: 0;
+  --rail-width: 5.25rem;
+  --stage-pad: clamp(1.25rem, 4vw, 3rem);
+}
+
+.de-atelier.de-page {
+  padding-top: 0;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.de-atelier :focus-visible {
+  outline-color: var(--copper-bright);
+}
+
+.de-atelier-shell {
+  min-height: 100dvh;
+}
+
+@media (min-width: 1024px) {
+  .de-atelier-shell {
+    display: grid;
+    grid-template-columns: var(--rail-width) minmax(0, 1fr);
+  }
+}
+
+.de-atelier-stage {
+  min-width: 0;
+}
+
+@media (max-width: 1023px) {
+  .de-atelier-stage {
+    padding-top: calc(var(--safe-top) + 3.75rem);
+  }
+}
+
+/* --- Rail navigation ---------------------------------------- */
+.de-rail {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .de-rail {
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 0;
+    z-index: 90;
+    height: 100dvh;
+    padding:
+      calc(var(--safe-top) + 1.25rem)
+      0
+      calc(var(--safe-bottom) + 1.25rem);
+    border-right: 1px solid var(--line);
+    background: var(--bg);
+  }
+}
+
+.de-rail-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding-inline: 0.75rem;
+  color: var(--text);
+}
+
+.de-rail-brand:hover {
+  color: var(--copper-bright);
+}
+
+.de-rail-logo {
+  border-radius: 0;
+  filter: grayscale(0.2);
+}
+
+.de-rail-name {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-family: var(--font-display);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.de-rail-nav {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.35rem;
+  padding-block: 2rem;
+}
+
+.de-rail-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 3.5rem;
+  padding: 0.65rem 0.5rem;
+  font-family: var(--font-body);
+  font-size: 0.5625rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-subtle);
+  transition: color 0.2s, background 0.2s;
+}
+
+.de-rail-link:hover,
+.de-rail-link--active {
+  color: var(--text);
+  background: color-mix(in srgb, var(--copper) 8%, transparent);
+}
+
+.de-rail-link--active {
+  box-shadow: inset 2px 0 0 var(--copper);
+}
+
+.de-rail-num {
+  font-size: 1.125rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--copper);
+  line-height: 1;
+}
+
+.de-rail-foot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding-inline: 0.5rem;
+}
+
+.de-rail-contact {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-family: var(--font-body);
+  font-size: 0.5625rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 0.5rem;
+  border: 1px solid var(--line);
+  min-height: 5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.de-rail-contact:hover {
+  border-color: var(--copper);
+  color: var(--copper-bright);
+}
+
+/* --- Mobile bar --------------------------------------------- */
+.de-mobile-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 95;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 3.75rem;
+  padding:
+    calc(var(--safe-top) + 0.65rem)
+    calc(1rem + var(--safe-right))
+    0.65rem
+    calc(1rem + var(--safe-left));
+  border-bottom: 1px solid var(--line);
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
+  backdrop-filter: blur(10px);
+}
+
+@media (min-width: 1024px) {
+  .de-mobile-bar {
+    display: none;
+  }
+}
+
+.de-mobile-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.de-mobile-menu-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 48px;
+  min-width: 48px;
+  padding: 0 0.75rem;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 0.625rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.de-mobile-menu-btn:hover {
+  border-color: var(--copper);
+  color: var(--copper-bright);
+}
+
+.de-mobile-menu-btn.is-open {
+  border-color: var(--copper);
+  background: color-mix(in srgb, var(--copper) 10%, transparent);
+}
+
+.de-menu-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: 18px;
+}
+
+.de-menu-lines span {
+  display: block;
+  height: 1px;
+  background: currentColor;
+  transition: transform 0.25s ease, opacity 0.2s;
+}
+
+.de-mobile-menu-btn.is-open .de-menu-lines span:first-child {
+  transform: translateY(3px) rotate(45deg);
+}
+
+.de-mobile-menu-btn.is-open .de-menu-lines span:last-child {
+  transform: translateY(-3px) rotate(-45deg);
+}
+
+/* --- Mobile overlay ----------------------------------------- */
+.de-atelier-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  background: color-mix(in srgb, var(--bg) 94%, var(--copper-dim));
+}
+
+.de-atelier-overlay-backdrop {
+  position: absolute;
+  inset: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.de-atelier-drawer {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding:
+    calc(var(--safe-top) + 5rem)
+    calc(1.5rem + var(--safe-right))
+    calc(1.5rem + var(--safe-bottom))
+    calc(1.5rem + var(--safe-left));
+}
+
+.de-atelier-drawer-link {
+  display: grid;
+  grid-template-columns: 3rem 1fr;
+  align-items: baseline;
+  gap: 0.75rem;
+  min-height: 3.25rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--line);
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 8vw, 3rem);
+  font-weight: 500;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  color: var(--text);
+  opacity: 0;
+  transform: translateX(-1rem);
+  animation: de-drawer-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.de-atelier-drawer-link:nth-child(1) { animation-delay: 0.05s; }
+.de-atelier-drawer-link:nth-child(2) { animation-delay: 0.1s; }
+.de-atelier-drawer-link:nth-child(3) { animation-delay: 0.15s; }
+.de-atelier-drawer-link:nth-child(4) { animation-delay: 0.2s; }
+
+.de-atelier-drawer-link:hover,
+.de-atelier-drawer-link--active {
+  color: var(--copper-bright);
+}
+
+.de-atelier-drawer-num {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  color: var(--copper);
+  padding-top: 0.5rem;
+}
+
+.de-atelier-drawer-foot {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-top: 2rem;
+}
+
+@keyframes de-drawer-in {
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* --- Typo utilitaires --------------------------------------- */
+.de-mono-label {
+  font-family: var(--font-body);
+  font-size: 0.6875rem;
+  font-weight: 400;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--copper);
+}
+
+.de-atelier .de-display {
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+}
+
+.de-atelier .de-public-container {
+  max-width: 78rem;
+  padding-inline: var(--stage-pad);
+}
+
+/* --- Exhibit hero ------------------------------------------- */
+.de-exhibit {
+  position: relative;
+  padding-block: clamp(2.5rem, 8vh, 5rem);
+  border-bottom: 1px solid var(--line);
+  overflow: clip;
+}
+
+.de-exhibit-watermark {
+  position: absolute;
+  top: -0.15em;
+  right: var(--stage-pad);
+  font-family: var(--font-display);
+  font-size: clamp(8rem, 22vw, 18rem);
+  font-weight: 600;
+  line-height: 0.85;
+  letter-spacing: -0.05em;
+  color: transparent;
+  -webkit-text-stroke: 1px color-mix(in srgb, var(--line) 80%, transparent);
+  pointer-events: none;
+  user-select: none;
+}
+
+.de-exhibit-grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 2.5rem;
+  align-items: end;
+}
+
+@media (min-width: 960px) {
+  .de-exhibit-grid {
+    grid-template-columns: 1.05fr 0.95fr;
+    gap: clamp(2rem, 5vw, 4rem);
+    min-height: calc(100dvh - var(--rail-width));
+  }
+
+  .de-exhibit-grid--page {
+    min-height: auto;
+    align-items: start;
+  }
+}
+
+.de-exhibit-title {
+  margin-top: 1rem;
+  font-family: var(--font-display);
+  font-size: clamp(2.75rem, 7.5vw, 5.5rem);
+  font-weight: 500;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+}
+
+.de-exhibit-title span {
+  display: block;
+}
+
+.de-exhibit-title-outline {
+  color: transparent;
+  -webkit-text-stroke: 1px var(--text-muted);
+}
+
+.de-exhibit-lead {
+  margin-top: 1.5rem;
+  max-width: 28rem;
+  font-size: 1rem;
+  line-height: 1.75;
+  color: var(--text-muted);
+}
+
+.de-exhibit-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem 1.75rem;
+  margin-top: 2rem;
+}
+
+.de-exhibit-frame {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  max-height: 72vh;
+  margin-left: auto;
+  width: min(100%, 28rem);
+}
+
+.de-exhibit-frame::before {
+  content: "";
+  position: absolute;
+  inset: -0.75rem -0.75rem 0.75rem 0.75rem;
+  border: 1px solid var(--copper-dim);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.de-exhibit-frame-inner {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.de-exhibit-frame-inner .de-hero-visual {
+  position: absolute;
+  inset: 0;
+}
+
+.de-exhibit-frame-inner .de-hero-visual-overlay {
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--bg) 75%, transparent),
+    transparent 50%
+  );
+}
+
+.de-exhibit-tag {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  z-index: 3;
+  padding: 0.5rem 0.75rem;
+  background: var(--bg);
+  border-top: 1px solid var(--copper);
+  border-right: 1px solid var(--line);
+  font-family: var(--font-body);
+  font-size: 0.625rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* --- Ticker ------------------------------------------------- */
+.de-ticker {
+  margin-top: 2.5rem;
+  border-block: 1px solid var(--line);
+  overflow: hidden;
+  background: var(--surface-alt);
+}
+
+.de-ticker-track {
+  display: flex;
+  width: max-content;
+  gap: 2.5rem;
+  padding: 0.85rem 0;
+  font-family: var(--font-body);
+  font-size: 0.6875rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-subtle);
+  animation: de-ticker 28s linear infinite;
+}
+
+.de-ticker-track span:nth-child(odd) {
+  color: var(--copper);
+}
+
+@keyframes de-ticker {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .de-ticker-track {
+    animation: none;
+    flex-wrap: wrap;
+    width: auto;
+    justify-content: center;
+    padding-inline: 1rem;
+  }
+}
+
+/* --- Sections ----------------------------------------------- */
+.de-atelier .de-section {
+  padding-block: clamp(4rem, 10vh, 7rem);
+  border-bottom: 1px solid var(--line);
+}
+
+.de-atelier .de-section-alt {
+  background: var(--surface-alt);
+  border-block: 1px solid var(--line);
+}
+
+.de-exhibit-head {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: clamp(2.5rem, 6vw, 4rem);
+}
+
+@media (min-width: 768px) {
+  .de-exhibit-head {
+    grid-template-columns: auto 1fr;
+    align-items: end;
+    gap: 2rem 4rem;
+  }
+
+  .de-exhibit-head-num {
+    font-family: var(--font-display);
+    font-size: clamp(4rem, 10vw, 7rem);
+    line-height: 0.85;
+    color: transparent;
+    -webkit-text-stroke: 1px var(--copper-dim);
+  }
+}
+
+.de-exhibit-head-title {
+  font-size: clamp(2rem, 4vw, 3.25rem);
+  line-height: 1.05;
+}
+
+.de-exhibit-head-lede {
+  grid-column: 1 / -1;
+  max-width: 36rem;
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+
+@media (min-width: 768px) {
+  .de-exhibit-head-lede {
+    grid-column: 2;
+    margin-top: -1rem;
+  }
+}
+
+/* --- Stats band --------------------------------------------- */
+.de-stats-band {
+  display: grid;
+  border-block: 1px solid var(--line);
+}
+
+@media (min-width: 768px) {
+  .de-stats-band {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.de-stat-cell {
+  padding: 1.75rem var(--stage-pad);
+  border-bottom: 1px solid var(--line);
+}
+
+@media (min-width: 768px) {
+  .de-stat-cell {
+    border-bottom: none;
+    border-right: 1px solid var(--line);
+  }
+
+  .de-stat-cell:last-child {
+    border-right: none;
+  }
+}
+
+.de-stat-value {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4vw, 2.75rem);
+  line-height: 1;
+  color: var(--copper-bright);
+}
+
+.de-stat-label {
+  margin-top: 0.65rem;
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+
+/* --- Audience split ----------------------------------------- */
+.de-audience-grid {
+  display: grid;
+  gap: 0;
+  border-top: 1px solid var(--line);
+}
+
+@media (min-width: 900px) {
+  .de-audience-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.de-audience-panel {
+  padding: clamp(2rem, 5vw, 3.5rem) var(--stage-pad);
+  border-bottom: 1px solid var(--line);
+}
+
+@media (min-width: 900px) {
+  .de-audience-panel:first-child {
+    border-right: 1px solid var(--line);
+    border-bottom: none;
+  }
+}
+
+.de-audience-panel h2 {
+  margin-top: 0.75rem;
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  line-height: 1.1;
+}
+
+.de-audience-panel p {
+  margin-top: 1rem;
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+
+/* --- Spine process ------------------------------------------ */
+.de-spine {
+  position: relative;
+  display: grid;
+  gap: 0;
+}
+
+@media (min-width: 900px) {
+  .de-spine::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 1px;
+    background: var(--line);
+    transform: translateX(-50%);
+  }
+}
+
+.de-spine-step {
+  display: grid;
+  gap: 1.25rem;
+  padding: 2rem 0;
+  border-bottom: 1px solid var(--line);
+}
+
+@media (min-width: 900px) {
+  .de-spine-step {
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    padding: 3rem 0;
+    align-items: center;
+  }
+
+  .de-spine-step--flip .de-spine-visual {
+    order: 2;
+  }
+
+  .de-spine-step--flip .de-spine-copy {
+    order: 1;
+    text-align: right;
+  }
+}
+
+.de-spine-num {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  color: var(--copper);
+  letter-spacing: 0.12em;
+}
+
+.de-spine-visual {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  border: 1px solid var(--line);
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.de-spine-title {
+  margin-top: 0.5rem;
+  font-size: clamp(1.35rem, 2.5vw, 1.85rem);
+  line-height: 1.2;
+}
+
+.de-spine-text {
+  margin-top: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.7;
+  font-size: 0.9375rem;
+}
+
+/* --- Lot catalog (fleet) ------------------------------------ */
+.de-lot-strip {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--line);
+}
+
+.de-lot {
+  display: grid;
+  grid-template-columns: 3.5rem 7rem 1fr auto;
+  gap: 1rem 1.25rem;
+  align-items: center;
+  padding: 1.25rem 0;
+  border-bottom: 1px solid var(--line);
+  color: inherit;
+  text-decoration: none;
+  transition: background 0.25s;
+}
+
+.de-lot:hover {
+  background: color-mix(in srgb, var(--copper) 6%, transparent);
+}
+
+@media (max-width: 640px) {
+  .de-lot {
+    grid-template-columns: 2.5rem 1fr;
+    grid-template-rows: auto auto auto;
+  }
+
+  .de-lot-media {
+    grid-column: 1 / -1;
+    aspect-ratio: 16 / 9;
+  }
+
+  .de-lot-index {
+    grid-row: 2;
+  }
+
+  .de-lot-info {
+    grid-column: 2 / -1;
+    grid-row: 2;
+  }
+
+  .de-lot-price {
+    grid-column: 1 / -1;
+    grid-row: 3;
+    text-align: left;
+  }
+}
+
+.de-lot-index {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  color: var(--copper-dim);
+  line-height: 1;
+}
+
+.de-lot-media {
+  position: relative;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.de-lot-media img,
+.de-lot-media .de-fleet-card-image {
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.de-lot:hover .de-lot-media img,
+.de-lot:hover .de-lot-media .de-fleet-card-image {
+  transform: scale(1.04);
+}
+
+.de-lot-brand {
+  font-family: var(--font-body);
+  font-size: 0.625rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--copper);
+}
+
+.de-lot-model {
+  margin-top: 0.2rem;
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  line-height: 1.15;
+}
+
+.de-lot-specs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.75rem;
+  margin-top: 0.5rem;
+  font-family: var(--font-body);
+  font-size: 0.625rem;
+  letter-spacing: 0.06em;
+  color: var(--text-subtle);
+}
+
+.de-lot-price {
+  text-align: right;
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  white-space: nowrap;
+}
+
+.de-lot-price small {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 0.5625rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-subtle);
+  margin-bottom: 0.15rem;
+}
+
+.de-lot-badge {
+  position: absolute;
+  top: 0.35rem;
+  right: 0.35rem;
+  z-index: 2;
+  font-size: 0.5625rem;
+}
+
+/* --- FAQ manifest ------------------------------------------- */
+.de-faq-manifest {
+  display: grid;
+  gap: 0;
+}
+
+@media (min-width: 960px) {
+  .de-faq-manifest {
+    grid-template-columns: minmax(14rem, 0.65fr) minmax(0, 1.35fr);
+    gap: 4rem;
+  }
+}
+
+.de-faq-item {
+  border-top: 1px solid var(--line);
+}
+
+.de-faq-item:last-child {
+  border-bottom: 1px solid var(--line);
+}
+
+.de-faq-item summary {
+  display: grid;
+  grid-template-columns: 2.75rem 1fr;
+  gap: 0.75rem;
+  align-items: start;
+  padding: 1.35rem 0;
+  cursor: pointer;
+  list-style: none;
+}
+
+.de-faq-item summary::-webkit-details-marker {
+  display: none;
+}
+
+.de-faq-item[open] summary {
+  color: var(--copper-bright);
+}
+
+.de-faq-item-q {
+  font-family: var(--font-display);
+  font-size: clamp(1.1rem, 2vw, 1.35rem);
+  line-height: 1.35;
+}
+
+.de-faq-item-a {
+  padding: 0 0 1.35rem 3.5rem;
+  max-width: 38rem;
+  color: var(--text-muted);
+  line-height: 1.75;
+  font-size: 0.9375rem;
+}
+
+/* --- Reviews wall ------------------------------------------- */
+.de-review-wall {
+  display: grid;
+  gap: 0;
+  border-top: 1px solid var(--line);
+}
+
+@media (min-width: 900px) {
+  .de-review-wall {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.de-review-cell {
+  padding: 2rem var(--stage-pad);
+  border-bottom: 1px solid var(--line);
+}
+
+@media (min-width: 900px) {
+  .de-review-cell {
+    border-bottom: none;
+    border-right: 1px solid var(--line);
+    padding: 2rem 1.75rem;
+  }
+
+  .de-review-cell:last-child {
+    border-right: none;
+  }
+}
+
+.de-review-cell blockquote {
+  margin: 0;
+}
+
+.de-review-mark {
+  font-family: var(--font-display);
+  font-size: 3rem;
+  line-height: 0.5;
+  color: var(--copper-dim);
+}
+
+.de-review-text {
+  margin-top: 0.75rem;
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  line-height: 1.45;
+}
+
+.de-review-author {
+  margin-top: 1rem;
+  font-family: var(--font-body);
+  font-size: 0.6875rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-subtle);
+}
+
+/* --- Close CTA ---------------------------------------------- */
+.de-manifest-cta {
+  padding-block: clamp(5rem, 12vh, 8rem);
+  background:
+    radial-gradient(
+      ellipse 60% 50% at 0% 100%,
+      color-mix(in srgb, var(--copper) 12%, transparent),
+      transparent 55%
+    ),
+    var(--bg);
+}
+
+.de-manifest-cta-title {
+  font-size: clamp(2.5rem, 7vw, 5rem);
+  line-height: 0.95;
+  max-width: 12ch;
+}
+
+.de-manifest-cta-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.85rem;
+  margin-top: 2.5rem;
+}
+
+@media (min-width: 768px) {
+  .de-manifest-cta-inner {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    align-items: end;
+    gap: 3rem;
+  }
+
+  .de-manifest-cta-actions {
+    margin-top: 0;
+    align-items: flex-end;
+  }
+}
+
+/* --- Page hero interior ------------------------------------- */
+.de-exhibit--page {
+  padding-block: clamp(3rem, 8vh, 5rem);
+}
+
+.de-exhibit--page .de-exhibit-watermark {
+  font-size: clamp(5rem, 14vw, 10rem);
+}
+
+/* --- Contact ------------------------------------------------ */
+.de-locale-row {
+  display: grid;
+  gap: 0;
+  border: 1px solid var(--line);
+  margin-bottom: 3rem;
+}
+
+@media (min-width: 640px) {
+  .de-locale-row {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.de-locale-cell {
+  padding: 2rem;
+  border-bottom: 1px solid var(--line);
+}
+
+@media (min-width: 640px) {
+  .de-locale-cell:first-child {
+    border-right: 1px solid var(--line);
+    border-bottom: none;
+  }
+}
+
+.de-locale-city {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1;
+}
+
+.de-locale-code {
+  margin-top: 0.35rem;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--copper);
+}
+
+.de-contact-split {
+  display: grid;
+  gap: 3rem;
+}
+
+@media (min-width: 960px) {
+  .de-contact-split {
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 4rem;
+    align-items: start;
+  }
+}
+
+/* --- Owners manifest list ----------------------------------- */
+.de-manifest-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border-top: 1px solid var(--line);
+}
+
+.de-manifest-list li {
+  display: grid;
+  grid-template-columns: 3rem 1fr;
+  gap: 1rem;
+  padding: 1.35rem 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.de-manifest-list h3 {
+  font-size: 1.15rem;
+}
+
+.de-manifest-list p {
+  margin-top: 0.35rem;
+  color: var(--text-muted);
+  line-height: 1.65;
+  font-size: 0.9375rem;
+}
+
+/* --- Footer ------------------------------------------------- */
+.de-atelier .de-public-footer {
+  padding-block: clamp(4rem, 8vh, 6rem) 2.5rem;
+  border-top: 1px solid var(--line);
+  background: var(--bg);
+  box-shadow: none;
+}
+
+.de-atelier .de-footer-wordmark {
+  font-size: clamp(3rem, 12vw, 8rem);
+  line-height: 0.9;
+  color: transparent;
+  -webkit-text-stroke: 1px color-mix(in srgb, var(--text) 35%, transparent);
+}
+
+.de-atelier .de-footer-tagline {
+  margin-top: 1rem;
+  font-family: var(--font-body);
+  font-size: 0.6875rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-subtle);
+}
+
+.de-atelier .de-footer-editorial {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--line);
+}
+
+.de-atelier .de-footer-col-label {
+  color: var(--copper);
+  font-family: var(--font-body);
+}
+
+.de-atelier .de-public-footer-bottom {
+  margin-top: 2.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--line);
+  font-family: var(--font-body);
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  color: var(--text-subtle);
+}
+
+/* --- Buttons & links ---------------------------------------- */
+.de-atelier .de-btn {
+  border-radius: 0;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.de-atelier .de-btn-primary {
+  background: var(--copper);
+  color: var(--bg);
+  border: 1px solid var(--copper);
+}
+
+.de-atelier .de-btn-primary:hover {
+  background: var(--copper-bright);
+  border-color: var(--copper-bright);
+}
+
+.de-atelier .de-btn-ghost {
+  border-color: var(--line);
+  color: var(--text-muted);
+}
+
+.de-atelier .de-btn-ghost:hover {
+  border-color: var(--copper);
+  color: var(--text);
+}
+
+.de-atelier .de-text-cta {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border-bottom-color: var(--copper-dim);
+  color: var(--text-muted);
+}
+
+.de-atelier .de-text-cta:hover {
+  color: var(--copper-bright);
+  border-color: var(--copper-bright);
+}
+
+.de-atelier .de-skip-link {
+  border-radius: 0;
+  border-color: var(--copper);
+}
+
+/* --- Forms & catalog overrides ------------------------------ */
+.de-atelier .de-input,
+.de-atelier .de-select {
+  border-radius: 0;
+  border-color: var(--line);
+  background: var(--surface);
+}
+
+.de-atelier .de-catalog-filters {
+  border-radius: 0;
+  box-shadow: none;
+  border: 1px solid var(--line);
+  background: var(--surface-alt);
+}
+
+.de-atelier .de-vehicle-gallery-main {
+  border-radius: 0;
+  border-color: var(--line);
+}
+
+.de-atelier .de-booking-summary-card,
+.de-atelier .de-booking-calendar-wrap {
+  border-radius: 0;
+  border-color: var(--line);
+  background: var(--surface-alt);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .de-lot:hover .de-lot-media img,
+  .de-lot:hover .de-lot-media .de-fleet-card-image {
+    transform: none;
+  }
+
+  .de-atelier-drawer-link {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.de-section-after {
+  margin-top: 2rem;
+}
+
+.de-section-after-lg {
+  margin-top: 2.5rem;
+}

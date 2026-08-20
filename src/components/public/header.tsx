@@ -28,17 +28,6 @@ function isActive(pathname: string, href: string, exact: boolean) {
 export default function PublicHeader() {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    function onScroll() {
-      setScrolled(window.scrollY > 16);
-    }
-
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
@@ -60,49 +49,47 @@ export default function PublicHeader() {
     return () => window.removeEventListener("keydown", onKey);
   }, [menuOpen]);
 
-  const mobileMenu =
+  const overlay =
     menuOpen && typeof document !== "undefined"
       ? createPortal(
-          <div className="de-public-mobile-menu">
+          <div className="de-atelier-overlay">
             <button
               type="button"
-              className="de-public-mobile-overlay"
+              className="de-atelier-overlay-backdrop"
               aria-label="Fermer le menu"
               tabIndex={-1}
               onClick={() => setMenuOpen(false)}
             />
             <nav
               id="public-mobile-drawer"
-              className="de-public-mobile-drawer"
+              className="de-atelier-drawer"
               aria-label="Navigation mobile"
             >
-              <div className="de-public-mobile-drawer-links">
-                {NAV_ITEMS.map(({ href, label, exact, index }) => {
-                  const active = isActive(pathname, href, exact);
+              {NAV_ITEMS.map(({ href, label, exact, index }) => {
+                const active = isActive(pathname, href, exact);
 
-                  return (
-                    <Link
-                      key={href}
-                      href={href}
-                      className={`de-public-mobile-drawer-link${
-                        active ? " de-public-mobile-drawer-link--active" : ""
-                      }`}
-                      onClick={() => setMenuOpen(false)}
-                      aria-current={active ? "page" : undefined}
-                    >
-                      <span className="de-public-mobile-drawer-index">{index}</span>
-                      <span>{label}</span>
-                    </Link>
-                  );
-                })}
-              </div>
+                return (
+                  <Link
+                    key={href}
+                    href={href}
+                    className={`de-atelier-drawer-link${
+                      active ? " de-atelier-drawer-link--active" : ""
+                    }`}
+                    onClick={() => setMenuOpen(false)}
+                    aria-current={active ? "page" : undefined}
+                  >
+                    <span className="de-atelier-drawer-num">{index}</span>
+                    <span>{label}</span>
+                  </Link>
+                );
+              })}
 
-              <div className="de-public-mobile-drawer-footer">
+              <div className="de-atelier-drawer-foot">
                 <Link
                   href={CONTACT_WHATSAPP_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="de-btn de-btn-primary de-public-mobile-drawer-cta"
+                  className="de-btn de-btn-primary"
                   onClick={() => setMenuOpen(false)}
                   aria-label="Ouvrir WhatsApp"
                 >
@@ -111,7 +98,7 @@ export default function PublicHeader() {
                 </Link>
                 <Link
                   href={telHref()}
-                  className="de-btn de-btn-ghost de-public-mobile-drawer-cta"
+                  className="de-btn de-btn-ghost"
                   onClick={() => setMenuOpen(false)}
                   aria-label={`Appeler le ${CONTACT_PHONE}`}
                 >
@@ -127,75 +114,75 @@ export default function PublicHeader() {
 
   return (
     <>
-      <header
-        className={`de-public-header${scrolled ? " de-public-header--scrolled" : ""}${
-          menuOpen ? " de-public-header--menu-open" : ""
-        }`}
-      >
-        <div className="de-public-header-bar de-public-container">
-          <Link href={PUBLIC_ROUTES.home} className="de-public-header-brand">
-            <Image
-              src="/logo.png"
-              alt={SITE_NAME}
-              width={34}
-              height={34}
-              className="de-public-header-logo"
-              priority
-            />
-            <span className="de-public-header-name">{SITE_NAME}</span>
+      <aside className="de-rail" aria-label="Navigation principale">
+        <Link href={PUBLIC_ROUTES.home} className="de-rail-brand">
+          <Image
+            src="/logo.png"
+            alt={SITE_NAME}
+            width={36}
+            height={36}
+            className="de-rail-logo"
+            priority
+          />
+          <span className="de-rail-name">{SITE_NAME}</span>
+        </Link>
+
+        <nav className="de-rail-nav">
+          {NAV_ITEMS.map(({ href, label, exact, index }) => {
+            const active = isActive(pathname, href, exact);
+
+            return (
+              <Link
+                key={href}
+                href={href}
+                className={`de-rail-link${active ? " de-rail-link--active" : ""}`}
+                aria-current={active ? "page" : undefined}
+                title={label}
+              >
+                <span className="de-rail-num">{index}</span>
+                <span>{label}</span>
+              </Link>
+            );
+          })}
+        </nav>
+
+        <div className="de-rail-foot">
+          <Link href={PUBLIC_ROUTES.contact} className="de-rail-contact">
+            Contact
           </Link>
-
-          <nav className="de-public-nav-desktop" aria-label="Navigation principale">
-            {NAV_ITEMS.map(({ href, label, exact, index }) => {
-              const active = isActive(pathname, href, exact);
-
-              return (
-                <Link
-                  key={href}
-                  href={href}
-                  className={`de-public-nav-link${
-                    active ? " de-public-nav-link--active" : ""
-                  }`}
-                  aria-current={active ? "page" : undefined}
-                >
-                  <span className="de-public-nav-index" aria-hidden>
-                    {index}
-                  </span>
-                  {label}
-                </Link>
-              );
-            })}
-          </nav>
-
-          <div className="de-public-header-actions">
-            <a
-              href={telHref()}
-              className="de-public-nav-phone"
-              aria-label={`Appeler le ${CONTACT_PHONE}`}
-            >
-              {CONTACT_PHONE}
-            </a>
-            <Link href={PUBLIC_ROUTES.contact} className="de-public-nav-cta">
-              Rendez-vous
-            </Link>
-
-            <button
-              type="button"
-              className={`de-public-nav-toggle${menuOpen ? " is-open" : ""}`}
-              onClick={() => setMenuOpen((open) => !open)}
-              aria-expanded={menuOpen}
-              aria-controls="public-mobile-drawer"
-              aria-label={menuOpen ? "Fermer le menu" : "Ouvrir le menu"}
-            >
-              <span className="de-burger" aria-hidden>
-                <span />
-                <span />
-              </span>
-            </button>
-          </div>
         </div>
-      </header>
-      {mobileMenu}
+      </aside>
+
+      <div className="de-mobile-bar">
+        <Link href={PUBLIC_ROUTES.home} className="de-mobile-brand">
+          <Image
+            src="/logo.png"
+            alt={SITE_NAME}
+            width={28}
+            height={28}
+            className="de-rail-logo"
+            priority
+          />
+          <span>{SITE_NAME}</span>
+        </Link>
+
+        <button
+          type="button"
+          className={`de-mobile-menu-btn${menuOpen ? " is-open" : ""}`}
+          onClick={() => setMenuOpen((open) => !open)}
+          aria-expanded={menuOpen}
+          aria-controls="public-mobile-drawer"
+          aria-label={menuOpen ? "Fermer le menu" : "Ouvrir le menu"}
+        >
+          <span className="de-menu-lines" aria-hidden>
+            <span />
+            <span />
+          </span>
+          Menu
+        </button>
+      </div>
+
+      {overlay}
     </>
   );
 }
