@@ -43,29 +43,37 @@ export const OPENING_HOURS = {
 
 export const AREA_SERVED_LABELS = ["Beauvais", "Gisors", "Oise", "Eure"] as const;
 
+/** Points d'accueil / remise des clés — Beauvais et Gisors. */
+export const SERVICE_POINTS = [
+  { postalCode: "60000", city: "Beauvais", region: "Oise" },
+  { postalCode: "27140", city: "Gisors", region: "Eure" },
+] as const;
+
 export const PWA_ICON_512 = "/icons/icon-512x512.png";
 
-/** Adresse sur une ligne (footer, contact, JSON-LD). */
+/** Adresse sur une ligne (footer, JSON-LD). */
 export function formatBusinessAddressLine(): string {
-  const { street, postalCode, city, countryLabel } = BUSINESS_ADDRESS;
+  const { street, countryLabel } = BUSINESS_ADDRESS;
+  const cities = SERVICE_POINTS.map((point) => `${point.postalCode} ${point.city}`).join(
+    " · "
+  );
 
-  if (street) {
-    return `${street}, ${postalCode} ${city}, ${countryLabel}`;
-  }
-
-  return `${postalCode} ${city}, ${countryLabel}`;
+  return [street, cities, countryLabel].filter(Boolean).join(", ");
 }
 
 /** Adresse sur plusieurs lignes pour affichage bloc. */
 export function formatBusinessAddressLines(): string[] {
-  const { street, postalCode, city, countryLabel } = BUSINESS_ADDRESS;
+  const { street, countryLabel } = BUSINESS_ADDRESS;
   const lines: string[] = [];
 
   if (street) {
     lines.push(street);
   }
 
-  lines.push(`${postalCode} ${city}`);
+  for (const point of SERVICE_POINTS) {
+    lines.push(`${point.postalCode} ${point.city}`);
+  }
+
   lines.push(countryLabel);
 
   return lines;

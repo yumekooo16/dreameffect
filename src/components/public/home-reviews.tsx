@@ -11,8 +11,8 @@ function StarRow({ rating }: { rating: number }) {
       {Array.from({ length: 5 }, (_, index) => (
         <Star
           key={index}
-          size={14}
-          strokeWidth={1.75}
+          size={13}
+          strokeWidth={1.5}
           className={
             index < rating ? "de-reviews-star de-reviews-star--filled" : "de-reviews-star"
           }
@@ -32,46 +32,37 @@ export default function HomeReviewsSection() {
   }
 
   return (
-    <section className="de-section de-section-alt" aria-labelledby="home-reviews-title">
+    <section className="de-section" aria-labelledby="home-reviews-title">
       <div className="de-public-container">
-        <div className="de-section-header">
-          <p className="de-section-eyebrow">Avis clients</p>
+        <div className="de-section-masthead">
+          <p className="de-section-eyebrow">Confiance</p>
           <h2 id="home-reviews-title" className="de-display de-section-title">
-            Ce que disent nos clients
+            Ce que l&apos;on nous dit
           </h2>
-          <p className="de-section-description">
-            Retours de locataires et propriétaires — la même exigence que sur notre
-            fiche Google.
-          </p>
         </div>
 
-        <div className="de-reviews-grid">
+        <div className="de-reviews-editorial">
           {reviews.map((review) => (
-            <article key={`${review.author}-${review.text.slice(0, 24)}`} className="de-review-card">
+            <blockquote key={`${review.author}-${review.text.slice(0, 24)}`} className="de-review-quote">
               <StarRow rating={review.rating} />
-              <blockquote className="de-review-text">&ldquo;{review.text}&rdquo;</blockquote>
-              <footer className="de-review-author">
+              <p className="de-display">&ldquo;{review.text}&rdquo;</p>
+              <footer>
                 <cite className="not-italic">{review.author}</cite>
-                {review.date ? (
-                  <span className="de-review-date">{review.date}</span>
-                ) : null}
               </footer>
-            </article>
+            </blockquote>
           ))}
         </div>
 
         {googleUrl ? (
-          <div className="de-reviews-cta">
-            <Link
-              href={googleUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="de-btn de-btn-ghost"
-            >
-              Voir et laisser un avis sur Google
-              <ExternalLink size={16} aria-hidden />
-            </Link>
-          </div>
+          <Link
+            href={googleUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="de-text-cta de-reviews-cta-link"
+          >
+            Voir et laisser un avis sur Google
+            <ExternalLink size={14} aria-hidden />
+          </Link>
         ) : null}
       </div>
     </section>

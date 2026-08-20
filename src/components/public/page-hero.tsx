@@ -1,4 +1,3 @@
-import HeroBackground from "@/src/components/public/hero-background";
 import { formatServiceAreaLabel } from "@/src/lib/public/local-seo";
 
 type PageHeroProps = {
@@ -12,19 +11,17 @@ export default function PageHero({
   title,
   description,
   eyebrow,
-  imageUrl,
 }: PageHeroProps) {
   return (
-    <section className={`de-page-hero${imageUrl ? " de-page-hero--photo" : ""}`}>
-      {imageUrl ? <HeroBackground imageUrl={imageUrl} /> : null}
-      <div className="de-public-container de-page-hero-content">
-        <p className="de-hero-eyebrow">
+    <section className="de-page-hero de-page-hero--split">
+      <div className="de-public-container de-page-hero-grid">
+        <p className="de-hero-kicker">
           {eyebrow ?? formatServiceAreaLabel()}
         </p>
         <h1 className="de-display de-page-hero-title">{title}</h1>
-        {description && (
+        {description ? (
           <p className="de-page-hero-description">{description}</p>
-        )}
+        ) : null}
       </div>
     </section>
   );

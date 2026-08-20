@@ -13,65 +13,52 @@ export default function HowItWorksSection({
   visualUrls = [],
 }: HowItWorksSectionProps) {
   return (
-    <section className="de-section" aria-labelledby="home-process-title">
+    <section className="de-section de-process" aria-labelledby="home-process-title">
       <div className="de-public-container">
-        <div className="de-section-header">
-          <p className="de-section-eyebrow">Processus</p>
+        <div className="de-section-masthead">
+          <p className="de-section-eyebrow">Parcours</p>
           <h2 id="home-process-title" className="de-display de-section-title">
             Comment ça marche
           </h2>
-          <p className="de-section-description">
-            Trois étapes, un seul interlocuteur — que vous louiez un véhicule
-            ou que vous confiiez le vôtre.
+          <p className="de-section-lede">
+            Trois temps, un interlocuteur — que vous louiez ou que vous
+            confiiez le vôtre.
           </p>
         </div>
 
-        <div className="de-narrative-steps">
+        <div className="de-timeline">
           {HOME_PROCESS_STEPS.map(({ step, title, text, visualAlt }, index) => {
             const imageUrl = resolveVehicleImageUrl(visualUrls[index]);
-            const reverse = index % 2 === 1;
 
             return (
-              <article
-                key={step}
-                className={`de-narrative-step${reverse ? " de-narrative-step--reverse" : ""}`}
-              >
-                <div className="de-narrative-step-visual">
+              <article key={step} className="de-timeline-step">
+                <span className="de-timeline-index" aria-hidden>
+                  {step}
+                </span>
+                <div className="de-timeline-visual">
                   {imageUrl ? (
                     <Image
                       src={imageUrl}
                       alt={visualAlt}
                       fill
                       className="object-cover"
-                      sizes="(max-width: 1024px) 100vw, 50vw"
+                      sizes="(max-width: 1024px) 100vw, 32vw"
                     />
                   ) : (
-                    <div className="de-narrative-step-visual-fallback">
-                      <span className="de-narrative-step-number-large">{step}</span>
-                    </div>
+                    <div className="de-timeline-fallback" />
                   )}
-                  <div className="de-narrative-step-visual-overlay" />
-                  <span className="de-narrative-step-number">{step}</span>
                 </div>
-
-                <div className="de-narrative-step-content">
-                  <h3 className="de-display de-narrative-step-title">{title}</h3>
-                  <p className="de-narrative-step-text">{text}</p>
-                </div>
+                <h3 className="de-display de-timeline-title">{title}</h3>
+                <p className="de-timeline-text">{text}</p>
               </article>
             );
           })}
         </div>
 
-        <div className="mt-12">
-          <Link
-            href={PUBLIC_ROUTES.contact}
-            className="de-btn de-btn-ghost inline-flex items-center gap-2"
-          >
-            Une question avant de commencer ?
-            <ArrowRight size={16} />
-          </Link>
-        </div>
+        <Link href={PUBLIC_ROUTES.contact} className="de-text-cta de-process-cta">
+          Une question avant de commencer ?
+          <ArrowRight size={16} />
+        </Link>
       </div>
     </section>
   );

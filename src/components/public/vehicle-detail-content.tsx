@@ -28,9 +28,9 @@ function SpecItem({
   if (!value) return null;
 
   return (
-    <div className="de-vehicle-detail-spec">
-      <p className="de-label">{label}</p>
-      <p className="mt-1 font-medium">{value}</p>
+    <div className="de-fleet-spec">
+      <dt>{label}</dt>
+      <dd>{value}</dd>
     </div>
   );
 }
@@ -84,13 +84,13 @@ export default function VehicleDetailContent({
             {fromPrice && (
               <div className="de-vehicle-detail-price-block">
                 <p className="de-public-vehicle-price-label">À partir de</p>
-                <p className="de-vehicle-detail-price">{fromPrice}</p>
+                <p className="de-display de-vehicle-detail-price">{fromPrice}</p>
               </div>
             )}
 
             <VehiclePricingTable pricing={vehicle.pricing} />
 
-            <div className="de-vehicle-detail-specs-grid">
+            <dl className="de-fleet-specs de-vehicle-detail-specs">
               <SpecItem label="Carburant" value={getFuelLabel(vehicle.fuel)} />
               <SpecItem
                 label="Boîte de vitesses"
@@ -102,7 +102,7 @@ export default function VehicleDetailContent({
                 label="Année"
                 value={vehicle.year ? String(vehicle.year) : undefined}
               />
-            </div>
+            </dl>
 
             {vehicle.description?.trim() && (
               <div className="de-vehicle-detail-description">

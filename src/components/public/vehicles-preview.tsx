@@ -23,26 +23,22 @@ export default function VehiclesPreview({
   return (
     <section className="de-section de-section-alt">
       <div className="de-public-container">
-        <div className="de-section-header de-section-header-row">
+        <div className="de-section-masthead de-section-masthead--row">
           <div>
             <p className="de-section-eyebrow">Flotte</p>
-            <h2 className="de-display de-section-title">Nos véhicules</h2>
-            <p className="de-section-description">
-              {preview.length} modèle{preview.length > 1 ? "s" : ""} disponible
-              {preview.length > 1 ? "s" : ""} — tarifs à la journée, réservation
-              par WhatsApp ou formulaire.
+            <h2 className="de-display de-section-title">À disposition</h2>
+            <p className="de-section-lede">
+              {preview.length} modèle{preview.length > 1 ? "s" : ""} — tarifs à
+              la journée, réservation par WhatsApp.
             </p>
           </div>
-          <Link
-            href={PUBLIC_ROUTES.vehicles}
-            className="de-btn de-btn-ghost shrink-0 self-start"
-          >
+          <Link href={PUBLIC_ROUTES.vehicles} className="de-text-cta">
             Tout voir
             <ArrowRight size={16} />
           </Link>
         </div>
 
-        <div className="de-vehicles-grid de-vehicles-grid--editorial">
+        <div className="de-fleet-grid">
           {preview.map((vehicle) => (
             <PublicVehicleCard key={vehicle.id} vehicle={vehicle} />
           ))}

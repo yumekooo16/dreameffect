@@ -5,7 +5,7 @@ import { createPortal } from "react-dom";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ArrowUpRight, MessageCircle, Phone } from "lucide-react";
+import { MessageCircle, Phone } from "lucide-react";
 import {
   CONTACT_PHONE,
   CONTACT_WHATSAPP_URL,
@@ -150,7 +150,7 @@ export default function PublicHeader() {
           </Link>
 
           <nav className="de-public-nav-desktop" aria-label="Navigation principale">
-            {NAV_ITEMS.map(({ href, label, exact }) => {
+            {NAV_ITEMS.map(({ href, label, exact, index }) => {
               const active = isActive(pathname, href, exact);
 
               return (
@@ -162,6 +162,9 @@ export default function PublicHeader() {
                   }`}
                   aria-current={active ? "page" : undefined}
                 >
+                  <span className="de-public-nav-index" aria-hidden>
+                    {index}
+                  </span>
                   {label}
                 </Link>
               );
@@ -169,9 +172,15 @@ export default function PublicHeader() {
           </nav>
 
           <div className="de-public-header-actions">
+            <a
+              href={telHref()}
+              className="de-public-nav-phone"
+              aria-label={`Appeler le ${CONTACT_PHONE}`}
+            >
+              {CONTACT_PHONE}
+            </a>
             <Link href={PUBLIC_ROUTES.contact} className="de-public-nav-cta">
-              Nous contacter
-              <ArrowUpRight size={16} strokeWidth={1.75} aria-hidden />
+              Rendez-vous
             </Link>
 
             <button

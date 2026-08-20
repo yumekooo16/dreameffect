@@ -10,7 +10,7 @@ export default function HeroBackground({ imageUrl }: HeroBackgroundProps) {
   const resolved = resolveVehicleImageUrl(imageUrl);
 
   return (
-    <div className="de-hero-visual" aria-hidden>
+    <div className="de-hero-visual">
       {resolved ? (
         <Image
           src={resolved}

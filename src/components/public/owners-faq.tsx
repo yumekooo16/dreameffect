@@ -28,28 +28,31 @@ const FAQ_ITEMS = [
 
 export default function OwnersFaq() {
   return (
-    <section className="de-section" aria-labelledby="owners-faq-title">
-      <div className="de-public-container">
-        <div className="de-owners-know-layout">
-          <div className="de-section-header de-section-header--flush">
-            <p className="de-section-eyebrow">Propriétaires</p>
-            <h2 id="owners-faq-title" className="de-display de-section-title">
-              Ce qu&apos;il faut savoir
-            </h2>
-            <p className="de-section-description">
-              Les questions que se posent les propriétaires avant de confier
-              leur véhicule — distinctes de la FAQ locataire.
-            </p>
-          </div>
+    <section className="de-section de-faq-section" aria-labelledby="owners-faq-title">
+      <div className="de-public-container de-faq-layout">
+        <div className="de-faq-intro">
+          <p className="de-section-eyebrow">Propriétaires</p>
+          <h2 id="owners-faq-title" className="de-display de-section-title">
+            Ce qu&apos;il faut savoir
+          </h2>
+          <p className="de-section-lede">
+            Les questions avant de confier votre véhicule — distinctes de la
+            FAQ locataire.
+          </p>
+        </div>
 
-          <div className="de-owners-faq-list">
-            {FAQ_ITEMS.map(({ question, answer }) => (
-              <details key={question} className="de-faq-item">
-                <summary className="de-faq-question">{question}</summary>
-                <p className="de-faq-answer">{answer}</p>
-              </details>
-            ))}
-          </div>
+        <div className="de-faq-editorial">
+          {FAQ_ITEMS.map(({ question, answer }, index) => (
+            <details key={question} className="de-faq-row">
+              <summary className="de-faq-summary">
+                <span className="de-faq-num" aria-hidden>
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <span className="de-faq-q de-display">{question}</span>
+              </summary>
+              <p className="de-faq-a">{answer}</p>
+            </details>
+          ))}
         </div>
       </div>
     </section>

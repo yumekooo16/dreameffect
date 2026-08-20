@@ -18,7 +18,7 @@ export default function OwnersFigures() {
     <div className="de-figures de-owners-figures" aria-label="Repères propriétaires">
       {FIGURES.map((item) => (
         <article key={item.value} className="de-figure">
-          <p className="de-figure-value">{item.value}</p>
+          <p className="de-figure-value de-display">{item.value}</p>
           <p className="de-figure-label">{item.label}</p>
         </article>
       ))}

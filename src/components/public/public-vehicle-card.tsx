@@ -17,14 +17,14 @@ import { buildVehicleImageAlt } from "@/src/lib/public/local-seo";
 import type { PublicVehicle } from "@/src/lib/public/vehicles-types";
 import { PUBLIC_ROUTES } from "@/src/lib/public/site";
 
-function SpecLine({ label, value }: { label: string; value: string | null }) {
+function SpecCell({ label, value }: { label: string; value: string | null }) {
   if (!value) return null;
 
   return (
-    <span className="de-vehicle-spec">
-      <span className="de-vehicle-spec-label">{label}</span>
-      {value}
-    </span>
+    <div className="de-fleet-spec">
+      <dt>{label}</dt>
+      <dd>{value}</dd>
+    </div>
   );
 }
 
@@ -33,8 +33,8 @@ export default function PublicVehicleCard({ vehicle }: { vehicle: PublicVehicle 
   const fromPrice = formatPrice(getLowestRentalPrice(vehicle.pricing));
 
   return (
-    <Link href={href} className="de-public-vehicle-card group">
-      <div className="de-public-vehicle-card-image">
+    <Link href={href} className="de-fleet-card">
+      <div className="de-fleet-card-media">
         <VehicleImage
           src={vehicle.image_url}
           alt={buildVehicleImageAlt({
@@ -44,39 +44,31 @@ export default function PublicVehicleCard({ vehicle }: { vehicle: PublicVehicle 
             year: vehicle.year,
             location: vehicle.location,
           })}
-          className="object-cover transition duration-500 group-hover:scale-[1.02]"
+          className="object-cover de-fleet-card-image"
         />
-        <div className="de-public-vehicle-card-gradient" />
         <span
-          className={`de-badge de-public-vehicle-card-badge ${getPublicVehicleStatusBadgeClass(vehicle.status)}`}
+          className={`de-badge de-fleet-card-badge ${getPublicVehicleStatusBadgeClass(vehicle.status)}`}
         >
           {getPublicVehicleStatusLabel(vehicle.status)}
         </span>
+        <div className="de-fleet-card-price">
+          <span>À partir de</span>
+          <strong className="de-display">{fromPrice ?? "Sur demande"}</strong>
+        </div>
       </div>
 
-      <div className="de-public-vehicle-card-body">
-        <div className="de-public-vehicle-card-top">
-          <div>
-            <p className="de-public-vehicle-brand">{vehicle.brand}</p>
-            <h3 className="de-display de-public-vehicle-model">
-              {vehicle.model}
-              {vehicle.version ? ` ${vehicle.version}` : ""}
-            </h3>
-          </div>
-          <div className="de-public-vehicle-price">
-            <p className="de-public-vehicle-price-label">À partir de</p>
-            <p className="de-public-vehicle-price-value">
-              {fromPrice ?? "Sur demande"}
-            </p>
-          </div>
-        </div>
-
-        <div className="de-public-vehicle-specs">
-          <SpecLine label="Année" value={vehicle.year ? String(vehicle.year) : null} />
-          <SpecLine label="Carburant" value={getFuelLabel(vehicle.fuel)} />
-          <SpecLine label="Boîte" value={getTransmissionLabel(vehicle.transmission)} />
-          <SpecLine label="Puissance" value={formatPower(vehicle.power)} />
-        </div>
+      <div className="de-fleet-card-body">
+        <p className="de-fleet-card-brand">{vehicle.brand}</p>
+        <h3 className="de-display de-fleet-card-model">
+          {vehicle.model}
+          {vehicle.version ? ` ${vehicle.version}` : ""}
+        </h3>
+        <dl className="de-fleet-specs">
+          <SpecCell label="Année" value={vehicle.year ? String(vehicle.year) : null} />
+          <SpecCell label="Carburant" value={getFuelLabel(vehicle.fuel)} />
+          <SpecCell label="Boîte" value={getTransmissionLabel(vehicle.transmission)} />
+          <SpecCell label="Puissance" value={formatPower(vehicle.power)} />
+        </dl>
       </div>
     </Link>
   );
