@@ -2,8 +2,6 @@ import Link from "next/link";
 import { ExternalLink, Mail, MessageCircle, Phone } from "lucide-react";
 import ContactForm from "@/src/components/public/contact-form";
 import {
-  buildGoogleMapsDirectionsUrl,
-  buildGoogleMapsEmbedUrl,
   GOOGLE_BUSINESS_URL,
   GOOGLE_REVIEWS_URL,
   OPENING_HOURS,
@@ -21,7 +19,6 @@ export default function ContactContent() {
   const socialEntries = Object.entries(SOCIAL_LINKS).filter(
     ([, url]) => url != null
   );
-  const mapsEmbedUrl = buildGoogleMapsEmbedUrl();
   const hoursLabel = `Tous les jours, ${OPENING_HOURS.opens.replace(":", " h ")} – ${OPENING_HOURS.closes.replace(":", " h ")}`;
 
   return (
@@ -87,15 +84,6 @@ export default function ContactContent() {
 
             <div className="de-contact-links">
               <a
-                href={buildGoogleMapsDirectionsUrl()}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="de-text-cta"
-              >
-                Itinéraire
-                <ExternalLink size={14} aria-hidden />
-              </a>
-              <a
                 href={GOOGLE_BUSINESS_URL}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -135,21 +123,6 @@ export default function ContactContent() {
             )}
           </aside>
         </div>
-
-        {mapsEmbedUrl ? (
-          <div className="de-contact-map-block" style={{ marginTop: "3rem" }}>
-            <h2 className="de-display de-exhibit-head-title">Nous trouver</h2>
-            <div className="de-contact-map-embed">
-              <iframe
-                title="Localisation DreamEffect sur Google Maps"
-                src={mapsEmbedUrl}
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                allowFullScreen
-              />
-            </div>
-          </div>
-        ) : null}
       </div>
     </section>
   );
