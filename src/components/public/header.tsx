@@ -1,7 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { createPortal } from "react-dom";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -20,43 +18,29 @@ function isActive(pathname: string, href: string, exact: boolean) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-function TopHeader() {
-  return (
-    <header className="de-maison-header">
-      <div className="de-maison-header-inner">
-        <Link
-          href={PUBLIC_ROUTES.home}
-          className="de-maison-header-brand"
-          aria-label={`${SITE_NAME} — Accueil`}
-        >
-          <Image
-            src="/logo.png"
-            alt=""
-            width={40}
-            height={40}
-            className="de-maison-header-logo"
-            priority
-          />
-        </Link>
-      </div>
-    </header>
-  );
-}
-
 export default function PublicHeader() {
   const pathname = usePathname();
-  const [portalRoot, setPortalRoot] = useState<HTMLElement | null>(null);
-
-  useEffect(() => {
-    setPortalRoot(document.body);
-  }, []);
-
-  const header = <TopHeader />;
 
   return (
     <>
-      {/* Header sur body = position:fixed ancrée au viewport, hors scroll page */}
-      {portalRoot ? createPortal(header, portalRoot) : header}
+      <header className="de-maison-header">
+        <div className="de-maison-header-inner">
+          <Link
+            href={PUBLIC_ROUTES.home}
+            className="de-maison-header-brand"
+            aria-label={`${SITE_NAME} — Accueil`}
+          >
+            <Image
+              src="/logo.png"
+              alt=""
+              width={40}
+              height={40}
+              className="de-maison-header-logo"
+              priority
+            />
+          </Link>
+        </div>
+      </header>
 
       <nav className="de-dock" aria-label="Navigation principale">
         <div className="de-dock-inner">

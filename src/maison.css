@@ -38,17 +38,12 @@
 }
 
 .de-maison-shell.de-page {
+  padding-top: 0;
   padding-bottom: calc(var(--dock-h) + var(--safe-bottom) + 1rem);
   background: var(--bg);
   color: var(--text);
 }
 
-/* Écart sous le header fixe (spécificité > .de-page.de-landing { padding-top: 0 }) */
-.de-page.de-landing.de-maison-shell {
-  padding-top: calc(var(--header-h) + var(--safe-top) + 0.75rem);
-}
-
-/* Contenu scrollable — pas d’overflow sur le shell (casse le fixed) */
 .de-maison-shell.de-landing {
   overflow-x: visible;
 }
@@ -71,18 +66,16 @@
   letter-spacing: -0.02em;
 }
 
-/* --- Header fixe (logo) — peut être portailé hors .de-maison -- */
+/* --- Header sticky : dans le flux = écart naturel, reste en haut au scroll -- */
 .de-maison-header {
-  position: fixed;
+  position: sticky;
   top: 0;
   left: 0;
   right: 0;
   z-index: 200;
   padding-top: env(safe-area-inset-top, 0px);
-  height: calc(var(--header-h, 4.25rem) + env(safe-area-inset-top, 0px));
-  box-sizing: border-box;
-  background: color-mix(in srgb, #0b1524 94%, transparent);
-  border-bottom: 1px solid rgba(238, 242, 247, 0.14);
+  background: color-mix(in srgb, var(--bg) 94%, transparent);
+  border-bottom: 1px solid var(--line);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
 }
@@ -90,11 +83,11 @@
 .de-maison-header-inner {
   display: flex;
   align-items: center;
-  height: var(--header-h, 4.25rem);
-  max-width: 68rem;
+  min-height: var(--header-h);
+  max-width: var(--max);
   margin-inline: auto;
   padding-block: 0.85rem;
-  padding-inline: clamp(1.35rem, 4.5vw, 2.75rem);
+  padding-inline: var(--pad);
   box-sizing: border-box;
 }
 
@@ -202,7 +195,7 @@
 @media (min-width: 960px) {
   .de-keys-hero {
     grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
-    min-height: calc(100dvh - var(--header-h) - var(--safe-top) - 1px);
+    min-height: calc(100dvh - var(--header-h) - 1px);
   }
 }
 
@@ -210,7 +203,7 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding: clamp(2.5rem, 6vh, 4rem) var(--pad) clamp(2.5rem, 5vh, 3.5rem);
+  padding: clamp(1.75rem, 5vh, 3.25rem) var(--pad) clamp(2.5rem, 5vh, 3.5rem);
   background:
     radial-gradient(
       ellipse 70% 50% at 0% 100%,
