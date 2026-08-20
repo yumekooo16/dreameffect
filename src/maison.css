@@ -33,12 +33,11 @@
   --radius: 0.125rem;
   --pad: clamp(1.25rem, 4vw, 2.75rem);
   --dock-h: 4.25rem;
-  --header-h: 3.75rem;
   --max: 68rem;
 }
 
 .de-maison-shell.de-page {
-  padding-top: calc(var(--header-h) + var(--safe-top));
+  padding-top: 0;
   padding-bottom: calc(var(--dock-h) + var(--safe-bottom) + 1rem);
   background: var(--bg);
   color: var(--text);
@@ -65,49 +64,6 @@
   font-family: var(--font-display);
   font-weight: 500;
   letter-spacing: -0.02em;
-}
-
-/* --- Header haut (logo fixe) -------------------------------- */
-.de-maison-header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 110;
-  padding-top: var(--safe-top);
-  background: color-mix(in srgb, var(--bg) 92%, transparent);
-  border-bottom: 1px solid var(--line);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-}
-
-.de-maison-header-inner {
-  display: flex;
-  align-items: center;
-  height: var(--header-h);
-  max-width: var(--max);
-  margin-inline: auto;
-  padding-inline: var(--pad);
-}
-
-.de-maison-header-brand {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
-  color: var(--text);
-}
-
-.de-maison-header-brand:hover {
-  opacity: 0.88;
-}
-
-.de-maison-header-logo {
-  display: block;
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 0.25rem;
-  object-fit: contain;
 }
 
 /* --- Dock navigation (barre basse) -------------------------- */
@@ -192,7 +148,7 @@
 @media (min-width: 960px) {
   .de-keys-hero {
     grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
-    min-height: calc(100dvh - var(--header-h) - var(--safe-top) - 1px);
+    min-height: calc(100dvh - 1px);
   }
 }
 
