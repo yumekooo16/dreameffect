@@ -10,7 +10,6 @@ export default function PublicLayout({
 }) {
   return (
     <div className="de-maison">
-      {/* Logo + dock hors du conteneur overflow pour rester vraiment fixed */}
       <PublicHeader />
       <div className="de-page de-landing de-maison-shell">
         <a href="#main-content" className="de-skip-link">
