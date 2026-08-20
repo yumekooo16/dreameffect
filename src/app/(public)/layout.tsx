@@ -9,7 +9,7 @@ export default function PublicLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="de-page de-landing de-motion">
+    <div className="de-page de-landing de-maison">
       <a href="#main-content" className="de-skip-link">
         Aller au contenu
       </a>

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import HeroSection from "@/src/components/public/hero";
 import HomeCitiesSection from "@/src/components/public/home-cities";
-import HomeServicesSection from "@/src/components/public/home-services";
 import HowItWorksSection from "@/src/components/public/how-it-works";
 import VehiclesPreview from "@/src/components/public/vehicles-preview";
 import HomeReviewsSection from "@/src/components/public/home-reviews";
@@ -35,7 +34,6 @@ export default async function HomePage() {
       <JsonLd data={faqPageJsonLd([...HOME_FAQ_ITEMS])} />
       <HeroSection imageUrl={heroImageUrl} />
       <HomeCitiesSection />
-      <HomeServicesSection />
       <HomeFigures />
       <VehiclesPreview vehicles={vehicles} />
       <HowItWorksSection visualUrls={narrativeVisuals} />

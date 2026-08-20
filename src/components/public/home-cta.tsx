@@ -9,14 +9,14 @@ import { PUBLIC_ROUTES } from "@/src/lib/public/site";
 
 export default function HomeCtaSection() {
   return (
-    <section className="de-manifest-cta">
-      <div className="de-public-container de-manifest-cta-inner">
-        <h2 className="de-display de-manifest-cta-title">
+    <section className="de-keys-close">
+      <div className="de-public-container de-keys-close-inner">
+        <h2 className="de-keys-close-title">
           Réservez,
           <br />
           ou confiez le vôtre.
         </h2>
-        <div className="de-manifest-cta-actions">
+        <div className="de-keys-close-actions">
           <Link
             href={CONTACT_WHATSAPP_URL}
             target="_blank"
@@ -29,13 +29,14 @@ export default function HomeCtaSection() {
           </Link>
           <Link
             href={telHref()}
-            className="de-text-cta"
+            className="de-keys-link"
+            style={{ marginTop: 0 }}
             aria-label={`Appeler le ${CONTACT_PHONE}`}
           >
             <Phone size={16} strokeWidth={1.75} aria-hidden />
             {CONTACT_PHONE}
           </Link>
-          <Link href={PUBLIC_ROUTES.contact} className="de-text-cta">
+          <Link href={PUBLIC_ROUTES.contact} className="de-keys-link" style={{ marginTop: 0 }}>
             Formulaire
             <ArrowRight size={14} aria-hidden />
           </Link>

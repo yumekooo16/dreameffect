@@ -23,29 +23,21 @@ const SERVICES = [
 
 export default function OwnersServices() {
   return (
-    <section className="de-section de-section-alt" aria-labelledby="owners-services-title">
+    <section className="de-keys-section de-keys-section--paper" aria-labelledby="owners-services-title">
       <div className="de-public-container">
-        <header className="de-exhibit-head">
-          <p className="de-exhibit-head-num" aria-hidden>
-            02
-          </p>
-          <div>
-            <p className="de-mono-label">Prise en charge</p>
-            <h2 id="owners-services-title" className="de-display de-exhibit-head-title">
-              Ce que nous gérons
-            </h2>
-          </div>
-          <p className="de-exhibit-head-lede">
-            Vous conservez la propriété. Nous opérons au quotidien.
-          </p>
-        </header>
-
-        <ol className="de-manifest-list">
+        <p className="de-keys-eyebrow">Prise en charge</p>
+        <h2 id="owners-services-title" className="de-keys-h2">
+          Ce que nous gérons
+        </h2>
+        <p className="de-keys-lede">
+          Vous conservez la propriété. Nous opérons au quotidien.
+        </p>
+        <ol className="de-keys-manifest">
           {SERVICES.map(({ title, text }, index) => (
             <li key={title}>
-              <span className="de-mono-label">{String(index + 1).padStart(2, "0")}</span>
+              <span className="de-keys-eyebrow">{String(index + 1).padStart(2, "0")}</span>
               <div>
-                <h3 className="de-display">{title}</h3>
+                <h3>{title}</h3>
                 <p>{text}</p>
               </div>
             </li>

@@ -5,7 +5,7 @@ import HeroBackground from "@/src/components/public/hero-background";
 import OwnersFigures from "@/src/components/public/owners-figures";
 import { resolveVehicleImageUrl } from "@/src/lib/image-url";
 import type { PublicVehicle } from "@/src/lib/public/vehicles-types";
-import { PUBLIC_ROUTES } from "@/src/lib/public/site";
+import { PUBLIC_ROUTES, SITE_NAME } from "@/src/lib/public/site";
 
 type OwnersHeroProps = {
   imageUrl?: string | null;
@@ -20,21 +20,22 @@ export default function OwnersHero({ imageUrl, vehicles = [] }: OwnersHeroProps)
 
   return (
     <>
-      <section className="de-motion-hero de-motion-owners-hero" aria-labelledby="owners-hero-title">
-        <div className="de-motion-hero-bg">
-          <HeroBackground imageUrl={imageUrl} />
-        </div>
-        <div className="de-motion-hero-content de-public-container">
-          <p className="de-motion-hero-zone">Propriétaires · Beauvais · Gisors</p>
-          <h1 id="owners-hero-title" className="de-motion-hero-title">
-            Gestion locative
+      <section className="de-keys-hero" aria-labelledby="owners-hero-title">
+        <div className="de-keys-hero-copy">
+          <p className="de-keys-kicker">Propriétaires · Beauvais · Gisors</p>
+          <h1 id="owners-hero-title" className="de-keys-title">
+            Votre véhicule travaille.
+            <em> Vous n&apos;avez plus à le gérer.</em>
           </h1>
-          <p className="de-motion-hero-lead">
-            Votre véhicule travaille. Réservations, remises de clés, nettoyage et
-            suivi — revenus consultables chaque mois, sans charge opérationnelle.
+          <p className="de-keys-lead">
+            Réservations, remises de clés, nettoyage et suivi. Revenus consultables
+            chaque mois, sans charge opérationnelle.
           </p>
-          <div className="de-motion-hero-actions">
-            <Link href="#proprietaire-contact" className="de-btn de-btn-primary de-btn-lg">
+          <div className="de-keys-actions">
+            <Link
+              href="#proprietaire-contact"
+              className="de-btn de-btn-primary de-btn-lg"
+            >
               Confier mon véhicule
               <ArrowRight size={18} strokeWidth={1.75} aria-hidden />
             </Link>
@@ -43,18 +44,23 @@ export default function OwnersHero({ imageUrl, vehicles = [] }: OwnersHeroProps)
             </Link>
           </div>
           <OwnersFigures />
+          <p className="de-keys-sign">{SITE_NAME}</p>
+        </div>
+        <div className="de-keys-media">
+          <HeroBackground imageUrl={imageUrl} />
+          <p className="de-keys-media-cap">Gestion locative · Clé en main</p>
         </div>
       </section>
 
-      {stripUrls.length > 0 && (
-        <div className="de-motion-owners-strip" aria-hidden>
-          {stripUrls.map((url, index) => (
-            <div key={url} className="de-motion-owners-strip-item">
+      {stripUrls.length > 0 ? (
+        <div className="de-keys-strip" aria-hidden>
+          {stripUrls.map((url) => (
+            <div key={url} className="de-keys-strip-item">
               <Image src={url} alt="" fill className="object-cover" sizes="33vw" />
             </div>
           ))}
         </div>
-      )}
+      ) : null}
     </>
   );
 }

@@ -13,15 +13,13 @@ export default function PageHero({
   eyebrow,
 }: PageHeroProps) {
   return (
-    <section className="de-motion-page-hero" aria-labelledby="page-hero-title">
+    <section className="de-keys-page-hero" aria-labelledby="page-hero-title">
       <div className="de-public-container">
-        <p className="de-motion-eyebrow">{eyebrow ?? formatServiceAreaLabel()}</p>
-        <h1 id="page-hero-title" className="de-motion-page-title">
+        <p className="de-keys-kicker">{eyebrow ?? formatServiceAreaLabel()}</p>
+        <h1 id="page-hero-title" className="de-keys-page-title">
           {title}
         </h1>
-        {description ? (
-          <p className="de-motion-page-lead">{description}</p>
-        ) : null}
+        {description ? <p className="de-keys-page-lead">{description}</p> : null}
       </div>
     </section>
   );

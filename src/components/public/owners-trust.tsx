@@ -27,26 +27,18 @@ const TRUST_POINTS = [
 
 export default function OwnersTrust() {
   return (
-    <section className="de-section" aria-labelledby="owners-trust-title">
+    <section className="de-keys-section" aria-labelledby="owners-trust-title">
       <div className="de-public-container">
-        <header className="de-exhibit-head">
-          <p className="de-exhibit-head-num" aria-hidden>
-            03
-          </p>
-          <div>
-            <p className="de-mono-label">Confiance</p>
-            <h2 id="owners-trust-title" className="de-display de-exhibit-head-title">
-              Pourquoi nous faire confiance
-            </h2>
-          </div>
-        </header>
-
-        <ol className="de-manifest-list">
+        <p className="de-keys-eyebrow">Confiance</p>
+        <h2 id="owners-trust-title" className="de-keys-h2">
+          Pourquoi nous faire confiance
+        </h2>
+        <ol className="de-keys-manifest">
           {TRUST_POINTS.map(({ title, text }, index) => (
             <li key={title}>
-              <span className="de-mono-label">{String(index + 1).padStart(2, "0")}</span>
+              <span className="de-keys-eyebrow">{String(index + 1).padStart(2, "0")}</span>
               <div>
-                <h3 className="de-display">{title}</h3>
+                <h3>{title}</h3>
                 <p>{text}</p>
               </div>
             </li>

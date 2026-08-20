@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@import "./motion.css";
+@import "./maison.css";
 
 /* ============================================================
    DREAMEFFECT — thème sobre noir / gris / blanc
@@ -56,8 +56,8 @@
 
   --radius: 0.375rem;
 
-  --font-display: "Fraunces", ui-serif, Georgia, serif;
-  --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Newsreader", ui-serif, Georgia, serif;
+  --font-body: "Source Sans 3", ui-sans-serif, system-ui, sans-serif;
   --font-mono: ui-monospace, monospace;
 
   /* Zones sûres — iPhone encoche / PWA standalone */

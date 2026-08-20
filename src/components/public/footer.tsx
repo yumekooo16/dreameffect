@@ -14,12 +14,14 @@ export default function PublicFooter() {
   return (
     <footer className="de-public-footer">
       <div className="de-public-container">
-        <p className="de-footer-wordmark de-display">{SITE_NAME}</p>
-        <p className="de-footer-tagline">Location et gestion de véhicules haut de gamme</p>
+        <p className="de-footer-wordmark">{SITE_NAME}</p>
+        <p className="de-footer-tagline">
+          Location et gestion de véhicules haut de gamme — Beauvais &amp; Gisors
+        </p>
 
         <div className="de-footer-editorial">
           <div>
-            <p className="de-footer-col-label">Accueil</p>
+            <p className="de-footer-col-label">Maison</p>
             <address className="de-footer-points not-italic">
               {SERVICE_POINTS.map((point) => (
                 <span key={point.city} className="block">
@@ -42,7 +44,7 @@ export default function PublicFooter() {
                 <Link href={PUBLIC_ROUTES.home}>Accueil</Link>
               </li>
               <li>
-                <Link href={PUBLIC_ROUTES.vehicles}>Véhicules</Link>
+                <Link href={PUBLIC_ROUTES.vehicles}>Flotte</Link>
               </li>
               <li>
                 <Link href={PUBLIC_ROUTES.owners}>Propriétaires</Link>
@@ -72,7 +74,9 @@ export default function PublicFooter() {
         </div>
 
         <div className="de-public-footer-bottom">
-          <p>© {year} {SITE_NAME}</p>
+          <p>
+            © {year} {SITE_NAME}
+          </p>
           <p>
             Site réalisé par <span>Wyatt</span>
           </p>

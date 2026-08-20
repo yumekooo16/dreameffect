@@ -10,23 +10,19 @@ type HeroSectionProps = {
 
 export default function HeroSection({ imageUrl }: HeroSectionProps) {
   return (
-    <section className="de-motion-hero" aria-labelledby="home-hero-title">
-      <div className="de-motion-hero-bg">
-        <HeroBackground imageUrl={imageUrl} />
-      </div>
-
-      <div className="de-motion-hero-content de-public-container">
-        <p className="de-motion-hero-zone">
-          Beauvais · Gisors · Oise · Eure · Réponse sous 24 h
-        </p>
-        <h1 id="home-hero-title" className="de-motion-hero-title">
-          {SITE_NAME}
+    <section className="de-keys-hero" aria-labelledby="home-hero-title">
+      <div className="de-keys-hero-copy">
+        <p className="de-keys-kicker">Beauvais · Gisors · Oise · Eure</p>
+        <h1 id="home-hero-title" className="de-keys-title">
+          Confiez. Louez.
+          <em> On s&apos;occupe du reste.</em>
         </h1>
-        <p className="de-motion-hero-lead">
-          Location et gestion de véhicules haut de gamme. Flotte entretenue,
-          tarifs affichés, remise des clés sur rendez-vous.
+        <p className="de-keys-lead">
+          Location et gestion de véhicules haut de gamme. Flotte préparée, tarifs
+          affichés, remise des clés sur rendez-vous — pour locataires et
+          propriétaires.
         </p>
-        <div className="de-motion-hero-actions">
+        <div className="de-keys-actions">
           <Link href={PUBLIC_ROUTES.vehicles} className="de-btn de-btn-primary de-btn-lg">
             Voir la flotte
             <ArrowRight size={18} strokeWidth={1.75} aria-hidden />
@@ -38,17 +34,20 @@ export default function HeroSection({ imageUrl }: HeroSectionProps) {
             href={CONTACT_WHATSAPP_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="de-motion-hero-wa"
+            className="de-keys-link"
             aria-label="Ouvrir WhatsApp"
+            style={{ marginTop: 0 }}
           >
             <MessageCircle size={16} strokeWidth={1.75} aria-hidden />
             WhatsApp
           </Link>
         </div>
+        <p className="de-keys-sign">{SITE_NAME}</p>
       </div>
 
-      <div className="de-motion-hero-scroll" aria-hidden>
-        <span>Défiler</span>
+      <div className="de-keys-media">
+        <HeroBackground imageUrl={imageUrl} />
+        <p className="de-keys-media-cap">Flotte entretenue · Remise sous 24 h</p>
       </div>
     </section>
   );

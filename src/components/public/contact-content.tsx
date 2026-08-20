@@ -22,48 +22,46 @@ export default function ContactContent() {
   const hoursLabel = `Tous les jours, ${OPENING_HOURS.opens.replace(":", " h ")} – ${OPENING_HOURS.closes.replace(":", " h ")}`;
 
   return (
-    <section className="de-section">
+    <section className="de-keys-section">
       <div className="de-public-container">
-        <div className="de-locale-row">
+        <div className="de-keys-locales">
           {SERVICE_POINTS.map((point) => (
-            <address key={point.city} className="de-locale-cell not-italic">
-              <p className="de-locale-city de-display">{point.city}</p>
-              <p className="de-locale-code">{point.postalCode}</p>
-              <p className="de-mono-label" style={{ marginTop: "0.35rem" }}>
+            <address key={point.city} className="de-keys-locale not-italic">
+              <p className="de-keys-locale-city">{point.city}</p>
+              <p className="de-keys-locale-code">{point.postalCode}</p>
+              <p className="de-keys-eyebrow" style={{ marginTop: "0.4rem" }}>
                 {point.region}
               </p>
             </address>
           ))}
         </div>
 
-        <div className="de-contact-split">
+        <div className="de-keys-contact-grid">
           <div>
-            <p className="de-mono-label">Formulaire</p>
-            <h2 className="de-display de-exhibit-head-title">Écrivez-nous</h2>
-            <p className="de-exhibit-head-lede" style={{ marginTop: "0.75rem" }}>
-              Réponse sous 24 h ouvrées.
-            </p>
+            <p className="de-keys-eyebrow">Formulaire</p>
+            <h2 className="de-keys-h2">Écrivez-nous</h2>
+            <p className="de-keys-lede">Réponse sous 24 h ouvrées.</p>
             <div className="mt-8">
               <ContactForm />
             </div>
           </div>
 
           <aside>
-            <p className="de-mono-label">Direct</p>
-            <p className="de-exhibit-head-lede">{hoursLabel}</p>
-            <p className="de-exhibit-head-lede" style={{ marginTop: "0.75rem" }}>
+            <p className="de-keys-eyebrow">Direct</p>
+            <p className="de-keys-lede">{hoursLabel}</p>
+            <p className="de-keys-lede">
               Remise des clés à Beauvais, Gisors, ou sur rendez-vous dans
               l&apos;Oise et l&apos;Eure.
             </p>
 
-            <a href={telHref()} className="de-contact-direct">
+            <a href={telHref()} className="de-keys-direct">
               <Phone size={18} strokeWidth={1.75} aria-hidden />
               <span>
                 <span className="de-label">Téléphone</span>
                 {CONTACT_PHONE}
               </span>
             </a>
-            <a href={`mailto:${CONTACT_EMAIL}`} className="de-contact-direct">
+            <a href={`mailto:${CONTACT_EMAIL}`} className="de-keys-direct">
               <Mail size={18} strokeWidth={1.75} aria-hidden />
               <span>
                 <span className="de-label">Email</span>
@@ -75,19 +73,21 @@ export default function ContactContent() {
               href={CONTACT_WHATSAPP_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="de-btn de-btn-primary de-contact-whatsapp"
+              className="de-btn de-btn-primary"
+              style={{ marginTop: "1.5rem", width: "100%" }}
               aria-label="Ouvrir WhatsApp"
             >
               <MessageCircle size={18} strokeWidth={1.75} aria-hidden />
               WhatsApp
             </Link>
 
-            <div className="de-contact-links">
+            <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem", marginTop: "1.5rem" }}>
               <a
                 href={GOOGLE_BUSINESS_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="de-text-cta"
+                className="de-keys-link"
+                style={{ marginTop: 0 }}
               >
                 Fiche Google
                 <ExternalLink size={14} aria-hidden />
@@ -96,7 +96,8 @@ export default function ContactContent() {
                 href={GOOGLE_REVIEWS_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="de-text-cta"
+                className="de-keys-link"
+                style={{ marginTop: 0 }}
               >
                 Avis Google
                 <ExternalLink size={14} aria-hidden />
@@ -104,8 +105,8 @@ export default function ContactContent() {
             </div>
 
             {socialEntries.length > 0 && (
-              <div className="de-contact-social-block">
-                <p className="de-mono-label">Réseaux</p>
+              <div style={{ marginTop: "1.5rem" }}>
+                <p className="de-keys-eyebrow">Réseaux</p>
                 <div className="mt-3 flex flex-wrap gap-2">
                   {socialEntries.map(([network, url]) => (
                     <Link
@@ -113,7 +114,8 @@ export default function ContactContent() {
                       href={url!}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="de-text-cta capitalize"
+                      className="de-keys-link capitalize"
+                      style={{ marginTop: 0 }}
                     >
                       {network}
                     </Link>
