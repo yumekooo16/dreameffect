@@ -41,6 +41,8 @@
   padding-bottom: calc(var(--dock-h) + var(--safe-bottom) + 1rem);
   background: var(--bg);
   color: var(--text);
+  /* Évite que overflow-x: clip sur .de-landing « emprisonne » le logo fixed */
+  overflow-x: visible;
 }
 
 .de-maison :focus-visible {
@@ -133,17 +135,20 @@
   }
 }
 
-/* --- Brand haut gauche -------------------------------------- */
+/* --- Brand haut gauche (logo seul, fixe au scroll) ---------- */
 .de-maison-brandbar {
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 95;
+  z-index: 110;
   padding:
     calc(var(--safe-top) + 0.85rem)
     var(--pad)
     0.75rem;
   pointer-events: none;
+  /* Composeur GPU : reste ancré au viewport au scroll */
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
 }
 
 .de-maison-brandbar-link {
@@ -161,8 +166,11 @@
 
 .de-maison-brandbar-logo {
   flex-shrink: 0;
+  width: 2.5rem;
+  height: 2.5rem;
   border-radius: 0.25rem;
   display: block;
+  object-fit: contain;
 }
 
 /* --- Hero maison -------------------------------------------- */
