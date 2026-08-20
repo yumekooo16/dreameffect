@@ -58,14 +58,14 @@ export default function ContactContent() {
               <Phone size={18} strokeWidth={1.75} aria-hidden />
               <span>
                 <span className="de-label">Téléphone</span>
-                {CONTACT_PHONE}
+                <span className="de-keys-direct-value">{CONTACT_PHONE}</span>
               </span>
             </a>
             <a href={`mailto:${CONTACT_EMAIL}`} className="de-keys-direct">
               <Mail size={18} strokeWidth={1.75} aria-hidden />
               <span>
                 <span className="de-label">Email</span>
-                {CONTACT_EMAIL}
+                <span className="de-keys-direct-value">{CONTACT_EMAIL}</span>
               </span>
             </a>
 

@@ -36,13 +36,16 @@
   --max: 68rem;
 }
 
-.de-maison.de-page {
+.de-maison-shell.de-page {
   padding-top: 0;
   padding-bottom: calc(var(--dock-h) + var(--safe-bottom) + 1rem);
   background: var(--bg);
   color: var(--text);
-  /* Évite que overflow-x: clip sur .de-landing « emprisonne » le logo fixed */
-  overflow-x: visible;
+}
+
+/* Contenu scrollable : clip horizontal sans affecter le logo fixed (frère) */
+.de-maison-shell.de-landing {
+  overflow-x: clip;
 }
 
 .de-maison :focus-visible {
@@ -146,9 +149,6 @@
     var(--pad)
     0.75rem;
   pointer-events: none;
-  /* Composeur GPU : reste ancré au viewport au scroll */
-  transform: translate3d(0, 0, 0);
-  backface-visibility: hidden;
 }
 
 .de-maison-brandbar-link {
@@ -812,8 +812,15 @@
 
 /* --- Page hero intérieur ------------------------------------ */
 .de-keys-page-hero {
-  padding-block: clamp(3.5rem, 10vh, 5.5rem) 2.5rem;
+  /* Place sous le logo fixed (évite collision + impression de mouvement) */
+  padding-block: calc(var(--safe-top) + 4.75rem) 2.5rem;
   border-bottom: 1px solid var(--line);
+}
+
+@media (min-width: 960px) {
+  .de-keys-page-hero {
+    padding-block: calc(var(--safe-top) + 5.25rem) 2.75rem;
+  }
 }
 
 .de-keys-page-title {
@@ -886,8 +893,31 @@
   display: flex;
   align-items: flex-start;
   gap: 0.85rem;
-  margin-top: 1.15rem;
+  margin-top: 1.75rem;
   color: inherit;
+  text-decoration: none;
+}
+
+.de-keys-direct + .de-keys-direct {
+  margin-top: 1.35rem;
+}
+
+.de-keys-direct .de-label {
+  display: block;
+  margin-bottom: 0.4rem;
+}
+
+.de-keys-direct-value {
+  display: block;
+  font-size: 1.0625rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--text);
+  line-height: 1.4;
+}
+
+.de-keys-direct:hover .de-keys-direct-value {
+  color: var(--brass-soft);
 }
 
 /* --- Owners ------------------------------------------------- */
