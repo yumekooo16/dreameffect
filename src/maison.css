@@ -78,7 +78,7 @@
 .de-dock-inner {
   display: flex;
   align-items: stretch;
-  justify-content: space-between;
+  justify-content: space-around;
   gap: 0.25rem;
   max-width: var(--max);
   margin-inline: auto;
@@ -117,48 +117,58 @@
   color: var(--brass-soft);
 }
 
-.de-dock-brand {
-  display: flex;
-  align-items: center;
-  gap: 0.55rem;
-  padding: 0 0.65rem 0 0.25rem;
-  margin-right: 0.15rem;
-  color: var(--text);
-  font-family: var(--font-display);
-  font-size: 0.95rem;
-  font-weight: 500;
-  letter-spacing: -0.02em;
-  flex: 0 0 auto;
-  max-width: 7.5rem;
-}
-
-.de-dock-brand span {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 @media (min-width: 900px) {
   .de-dock-inner {
+    justify-content: center;
     padding-inline: var(--pad);
     gap: 0.5rem;
-  }
-
-  .de-dock-brand {
-    max-width: none;
-    padding-right: 1rem;
-    margin-right: 0.5rem;
-    border-right: 1px solid var(--line);
-    font-size: 1.05rem;
   }
 
   .de-dock-link {
     flex: 0 1 auto;
     flex-direction: row;
     gap: 0.5rem;
-    padding-inline: 1rem;
+    padding-inline: 1.15rem;
     font-size: 0.75rem;
   }
+}
+
+/* --- Brand haut gauche -------------------------------------- */
+.de-maison-brandbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 95;
+  padding:
+    calc(var(--safe-top) + 0.85rem)
+    var(--pad)
+    0.75rem;
+  pointer-events: none;
+}
+
+.de-maison-brandbar-link {
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.de-maison-brandbar-link:hover {
+  color: var(--brass-soft);
+}
+
+.de-maison-brandbar-logo {
+  flex-shrink: 0;
+  border-radius: 0.25rem;
+}
+
+.de-maison-brandbar-name {
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 500;
+  letter-spacing: -0.02em;
 }
 
 /* --- Hero maison -------------------------------------------- */

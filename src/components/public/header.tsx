@@ -22,37 +22,48 @@ export default function PublicHeader() {
   const pathname = usePathname();
 
   return (
-    <nav className="de-dock" aria-label="Navigation principale">
-      <div className="de-dock-inner">
-        <Link href={PUBLIC_ROUTES.home} className="de-dock-brand">
-          <Image src="/logo.png" alt={SITE_NAME} width={26} height={26} priority />
-          <span>{SITE_NAME}</span>
-        </Link>
-
-        {NAV_ITEMS.map(({ href, label, exact }) => {
-          const active = isActive(pathname, href, exact);
-          return (
-            <Link
-              key={href}
-              href={href}
-              className={`de-dock-link${active ? " de-dock-link--active" : ""}`}
-              aria-current={active ? "page" : undefined}
-            >
-              {label}
-            </Link>
-          );
-        })}
-
-        <Link
-          href={CONTACT_WHATSAPP_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="de-dock-link de-dock-link--cta"
-          aria-label="Ouvrir WhatsApp"
-        >
-          WhatsApp
+    <>
+      <div className="de-maison-brandbar">
+        <Link href={PUBLIC_ROUTES.home} className="de-maison-brandbar-link">
+          <Image
+            src="/logo.png"
+            alt={SITE_NAME}
+            width={32}
+            height={32}
+            className="de-maison-brandbar-logo"
+            priority
+          />
+          <span className="de-maison-brandbar-name">{SITE_NAME}</span>
         </Link>
       </div>
-    </nav>
+
+      <nav className="de-dock" aria-label="Navigation principale">
+        <div className="de-dock-inner">
+          {NAV_ITEMS.map(({ href, label, exact }) => {
+            const active = isActive(pathname, href, exact);
+            return (
+              <Link
+                key={href}
+                href={href}
+                className={`de-dock-link${active ? " de-dock-link--active" : ""}`}
+                aria-current={active ? "page" : undefined}
+              >
+                {label}
+              </Link>
+            );
+          })}
+
+          <Link
+            href={CONTACT_WHATSAPP_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="de-dock-link de-dock-link--cta"
+            aria-label="Ouvrir WhatsApp"
+          >
+            WhatsApp
+          </Link>
+        </div>
+      </nav>
+    </>
   );
 }
