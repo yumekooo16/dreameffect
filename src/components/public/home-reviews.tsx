@@ -68,7 +68,7 @@ export default function HomeReviewsSection() {
               rel="noopener noreferrer"
               className="de-btn de-btn-ghost"
             >
-              Voir tous nos avis sur Google
+              Voir et laisser un avis sur Google
               <ExternalLink size={16} aria-hidden />
             </Link>
           </div>

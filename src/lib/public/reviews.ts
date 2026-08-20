@@ -1,6 +1,6 @@
 /** Avis clients — alignés sur la fiche Google Business Profile (configurables via env). */
 
-import { GOOGLE_BUSINESS_URL } from "@/src/lib/public/business";
+import { GOOGLE_REVIEWS_URL } from "@/src/lib/public/business";
 
 export type CustomerReview = {
   author: string;
@@ -52,6 +52,6 @@ export function getCustomerReviews(): CustomerReview[] {
   return fromEnv && fromEnv.length > 0 ? fromEnv : DEFAULT_REVIEWS;
 }
 
-export function getGoogleReviewsUrl(): string | null {
-  return GOOGLE_BUSINESS_URL;
+export function getGoogleReviewsUrl(): string {
+  return GOOGLE_REVIEWS_URL;
 }

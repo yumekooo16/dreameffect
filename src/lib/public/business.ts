@@ -15,7 +15,17 @@ export const BUSINESS_ADDRESS = {
   countryLabel: "France",
 };
 
-export const GOOGLE_BUSINESS_URL = env("NEXT_PUBLIC_GOOGLE_BUSINESS_URL");
+export const GOOGLE_PLACE_ID = "ChIJE4q-pQuHwWgR8ZRbz5eUDsE";
+
+/** Fiche Google Business Profile (sameAs JSON-LD, lien Contact). */
+export const GOOGLE_BUSINESS_URL =
+  env("NEXT_PUBLIC_GOOGLE_BUSINESS_URL") ??
+  "https://g.page/r/CfGUW8-XlA7BEBI";
+
+/** Lien pour lire / déposer un avis Google. */
+export const GOOGLE_REVIEWS_URL =
+  env("NEXT_PUBLIC_GOOGLE_REVIEWS_URL") ??
+  "https://g.page/r/CfGUW8-XlA7BEBI/review";
 
 export const OPENING_HOURS = {
   opens: "09:00",
@@ -85,23 +95,18 @@ export function openingHoursSpecificationJsonLd() {
   ];
 }
 
-/** URL d'embed Google Maps — personnalisable ou dérivée de l'adresse. */
+/** URL d'embed Google Maps — personnalisable ou dérivée de la fiche GBP. */
 export function buildGoogleMapsEmbedUrl(): string | null {
   const custom = env("NEXT_PUBLIC_GOOGLE_MAPS_EMBED_URL");
   if (custom) return custom;
 
-  const { street, postalCode, city } = BUSINESS_ADDRESS;
-  const query = street
-    ? `${street}, ${postalCode} ${city}, France`
-    : `${postalCode} ${city}, France`;
-
-  return `https://maps.google.com/maps?q=${encodeURIComponent(query)}&output=embed`;
+  return `https://www.google.com/maps?q=place_id:${GOOGLE_PLACE_ID}&output=embed`;
 }
 
-/** Lien « itinéraire » Google Maps. */
+/** Lien « itinéraire » Google Maps — pointe vers la fiche GBP. */
 export function buildGoogleMapsDirectionsUrl(): string {
   const custom = env("NEXT_PUBLIC_GOOGLE_MAPS_DIRECTIONS_URL");
   if (custom) return custom;
 
-  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(formatBusinessAddressLine())}`;
+  return `https://www.google.com/maps/search/?api=1&query_place_id=${GOOGLE_PLACE_ID}`;
 }

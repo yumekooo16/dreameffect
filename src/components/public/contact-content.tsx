@@ -6,6 +6,7 @@ import {
   buildGoogleMapsEmbedUrl,
   formatBusinessAddressLines,
   GOOGLE_BUSINESS_URL,
+  GOOGLE_REVIEWS_URL,
   OPENING_HOURS,
 } from "@/src/lib/public/business";
 import {
@@ -75,6 +76,15 @@ export default function ContactContent() {
                     <ExternalLink size={14} aria-hidden />
                   </a>
                 ) : null}
+                <a
+                  href={GOOGLE_REVIEWS_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="de-link-inline mt-1 inline-flex items-center gap-1 text-sm"
+                >
+                  Avis Google
+                  <ExternalLink size={14} aria-hidden />
+                </a>
               </div>
             </div>
 
