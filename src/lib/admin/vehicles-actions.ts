@@ -331,62 +331,77 @@ export async function uploadVehiclePhoto(
   vehicleId: string,
   formData: FormData
 ): Promise<ActionResult> {
-  await requireAdmin();
+  try {
+    await requireAdmin();
 
-  const file = formData.get("file");
+    const file = formData.get("file");
 
-  if (!(file instanceof File) || file.size === 0) {
-    return { success: false, error: "Fichier invalide" };
-  }
+    if (!(file instanceof File) || file.size === 0) {
+      return { success: false, error: "Fichier invalide" };
+    }
 
-  const admin = createAdminClient();
-  const supabase = await createClient();
+    if (file.size > 10 * 1024 * 1024) {
+      return { success: false, error: "Photo trop lourde (maximum 10 Mo)" };
+    }
 
-  const extension = file.name.split(".").pop()?.toLowerCase() || "jpg";
-  const storagePath = `${vehicleId}/${Date.now()}.${extension}`;
-  const buffer = Buffer.from(await file.arrayBuffer());
+    const admin = createAdminClient();
+    const supabase = await createClient();
 
-  const { error: uploadError } = await admin.storage
-    .from(BUCKET)
-    .upload(storagePath, buffer, {
-      contentType: file.type || "image/jpeg",
-      upsert: false,
+    const extension = file.name.split(".").pop()?.toLowerCase() || "jpg";
+    const storagePath = `${vehicleId}/${Date.now()}.${extension}`;
+    const buffer = Buffer.from(await file.arrayBuffer());
+
+    const { error: uploadError } = await admin.storage
+      .from(BUCKET)
+      .upload(storagePath, buffer, {
+        contentType: file.type || "image/jpeg",
+        upsert: false,
+      });
+
+    if (uploadError) {
+      return { success: false, error: uploadError.message };
+    }
+
+    const { data: existing } = await supabase
+      .from("vehicle_images")
+      .select("id")
+      .eq("vehicle_id", vehicleId);
+
+    const isFirst = !existing?.length;
+
+    const { error: insertError } = await supabase.from("vehicle_images").insert({
+      vehicle_id: vehicleId,
+      image_url: storagePath,
+      is_primary: isFirst,
     });
 
-  if (uploadError) {
-    return { success: false, error: uploadError.message };
+    if (insertError) {
+      await admin.storage.from(BUCKET).remove([storagePath]);
+      return { success: false, error: insertError.message };
+    }
+
+    if (isFirst) {
+      await supabase
+        .from("vehicles")
+        .update({
+          image_url: storagePath,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", vehicleId);
+    }
+
+    revalidateVehiclePaths(vehicleId);
+    return { success: true };
+  } catch (error) {
+    console.error("[uploadVehiclePhoto]", error);
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : "Impossible d'ajouter la photo pour le moment",
+    };
   }
-
-  const { data: existing } = await supabase
-    .from("vehicle_images")
-    .select("id")
-    .eq("vehicle_id", vehicleId);
-
-  const isFirst = !existing?.length;
-
-  const { error: insertError } = await supabase.from("vehicle_images").insert({
-    vehicle_id: vehicleId,
-    image_url: storagePath,
-    is_primary: isFirst,
-  });
-
-  if (insertError) {
-    await admin.storage.from(BUCKET).remove([storagePath]);
-    return { success: false, error: insertError.message };
-  }
-
-  if (isFirst) {
-    await supabase
-      .from("vehicles")
-      .update({
-        image_url: storagePath,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", vehicleId);
-  }
-
-  revalidateVehiclePaths(vehicleId);
-  return { success: true };
 }
 
 export async function setVehiclePrimaryPhoto(
@@ -554,65 +569,80 @@ export async function uploadVehicleHeroImage(
   vehicleId: string,
   formData: FormData
 ): Promise<ActionResult> {
-  await requireAdmin();
+  try {
+    await requireAdmin();
 
-  const file = formData.get("file");
+    const file = formData.get("file");
 
-  if (!(file instanceof File) || file.size === 0) {
-    return { success: false, error: "Fichier invalide" };
-  }
-
-  const admin = createAdminClient();
-  const supabase = await createClient();
-
-  const extension = file.name.split(".").pop()?.toLowerCase() || "png";
-  const storagePath = `${vehicleId}/hero-${Date.now()}.${extension}`;
-  const buffer = Buffer.from(await file.arrayBuffer());
-
-  const { data: existingVehicle } = await supabase
-    .from("vehicles")
-    .select("hero_image_url")
-    .eq("id", vehicleId)
-    .maybeSingle();
-
-  const { error: uploadError } = await admin.storage
-    .from(BUCKET)
-    .upload(storagePath, buffer, {
-      contentType: file.type || "image/png",
-      upsert: false,
-    });
-
-  if (uploadError) {
-    return { success: false, error: uploadError.message };
-  }
-
-  const { error: updateError } = await supabase
-    .from("vehicles")
-    .update({
-      hero_image_url: storagePath,
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", vehicleId);
-
-  if (updateError) {
-    await admin.storage.from(BUCKET).remove([storagePath]);
-    if (isMissingColumnError(updateError.message)) {
-      return {
-        success: false,
-        error:
-          "Colonne hero_image_url absente — exécutez la migration SQL 20260731200000_vehicle_hero_image.sql",
-      };
+    if (!(file instanceof File) || file.size === 0) {
+      return { success: false, error: "Fichier invalide" };
     }
-    return { success: false, error: updateError.message };
-  }
 
-  const previousPath = existingVehicle?.hero_image_url?.trim();
-  if (previousPath && previousPath !== storagePath) {
-    await admin.storage.from(BUCKET).remove([previousPath]);
-  }
+    if (file.size > 10 * 1024 * 1024) {
+      return { success: false, error: "Image trop lourde (maximum 10 Mo)" };
+    }
 
-  revalidateVehiclePaths(vehicleId);
-  return { success: true };
+    const admin = createAdminClient();
+    const supabase = await createClient();
+
+    const extension = file.name.split(".").pop()?.toLowerCase() || "png";
+    const storagePath = `${vehicleId}/hero-${Date.now()}.${extension}`;
+    const buffer = Buffer.from(await file.arrayBuffer());
+
+    const { data: existingVehicle } = await supabase
+      .from("vehicles")
+      .select("hero_image_url")
+      .eq("id", vehicleId)
+      .maybeSingle();
+
+    const { error: uploadError } = await admin.storage
+      .from(BUCKET)
+      .upload(storagePath, buffer, {
+        contentType: file.type || "image/png",
+        upsert: false,
+      });
+
+    if (uploadError) {
+      return { success: false, error: uploadError.message };
+    }
+
+    const { error: updateError } = await supabase
+      .from("vehicles")
+      .update({
+        hero_image_url: storagePath,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", vehicleId);
+
+    if (updateError) {
+      await admin.storage.from(BUCKET).remove([storagePath]);
+      if (isMissingColumnError(updateError.message)) {
+        return {
+          success: false,
+          error:
+            "Colonne hero_image_url absente — exécutez la migration SQL 20260731200000_vehicle_hero_image.sql",
+        };
+      }
+      return { success: false, error: updateError.message };
+    }
+
+    const previousPath = existingVehicle?.hero_image_url?.trim();
+    if (previousPath && previousPath !== storagePath) {
+      await admin.storage.from(BUCKET).remove([previousPath]);
+    }
+
+    revalidateVehiclePaths(vehicleId);
+    return { success: true };
+  } catch (error) {
+    console.error("[uploadVehicleHeroImage]", error);
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : "Impossible d'ajouter l'image pour le moment",
+    };
+  }
 }
 
 export async function deleteVehicleHeroImage(
