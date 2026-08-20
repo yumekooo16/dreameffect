@@ -11,6 +11,7 @@ export type ContactLeadInput = {
   topic: string;
   topicLabel: string;
   message: string;
+  gdprConsent: boolean;
 };
 
 export type ContactLeadResult =
@@ -91,6 +92,13 @@ export async function submitContactLead(
 
   if (!message || message.length < 20) {
     return { ok: false, error: "Message trop court (minimum 20 caractères)." };
+  }
+
+  if (!input.gdprConsent) {
+    return {
+      ok: false,
+      error: "Veuillez accepter le traitement de vos données personnelles.",
+    };
   }
 
   try {

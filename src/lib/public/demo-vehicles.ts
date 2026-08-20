@@ -130,5 +130,10 @@ export const DEMO_VEHICLES: PublicVehicle[] = [
 ];
 
 export function withDemoFleetFallback(vehicles: PublicVehicle[]): PublicVehicle[] {
-  return vehicles.length > 0 ? vehicles : DEMO_VEHICLES;
+  if (vehicles.length > 0) return vehicles;
+  // Jamais en production — uniquement en preview / local pour le design
+  if (process.env.NODE_ENV === "production" && process.env.VERCEL_ENV === "production") {
+    return [];
+  }
+  return DEMO_VEHICLES;
 }

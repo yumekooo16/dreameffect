@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, startTransition } from "react";
 import Image from "next/image";
 import { createClient } from "@/src/lib/supabase/client";
 import { useRouter } from "next/navigation";
@@ -12,9 +12,9 @@ import {
 
 function setRememberMePreference(enabled: boolean) {
   if (enabled) {
-    document.cookie = `${REMEMBER_ME_COOKIE}=1; path=/; max-age=${REMEMBER_ME_MAX_AGE}; SameSite=Lax`;
+    document.cookie = `${REMEMBER_ME_COOKIE}=1; path=/; max-age=${REMEMBER_ME_MAX_AGE}; SameSite=Lax; Secure`;
   } else {
-    document.cookie = `${REMEMBER_ME_COOKIE}=; path=/; max-age=0; SameSite=Lax`;
+    document.cookie = `${REMEMBER_ME_COOKIE}=; path=/; max-age=0; SameSite=Lax; Secure`;
   }
 }
 
@@ -42,8 +42,10 @@ export default function LoginPage() {
   useEffect(() => {
     const savedEmail = localStorage.getItem(REMEMBER_EMAIL_KEY);
     const hasRememberCookie = document.cookie.includes(`${REMEMBER_ME_COOKIE}=1`);
-    if (savedEmail) setEmail(savedEmail);
-    setRememberMe(hasRememberCookie || Boolean(savedEmail));
+    startTransition(() => {
+      if (savedEmail) setEmail(savedEmail);
+      setRememberMe(hasRememberCookie || Boolean(savedEmail));
+    });
   }, []);
 
   async function handleLogin(e: React.FormEvent) {

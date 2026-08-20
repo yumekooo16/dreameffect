@@ -118,6 +118,7 @@ export default function ContactForm() {
       topic: form.topic,
       topicLabel: topicLabel(form.topic),
       message: form.message,
+      gdprConsent: form.gdprConsent,
     });
 
     setSubmitting(false);

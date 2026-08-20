@@ -1,9 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import {
-  accrueAllConfirmedReservations,
-  accrueReservationDailyRevenue,
-  type ReservationForDailyLedger,
-} from "@/src/lib/revenue/daily-ledger";
+import { accrueAllConfirmedReservations } from "@/src/lib/revenue/daily-ledger";
 
 export async function wasAutomationSentToday(
   supabase: SupabaseClient,

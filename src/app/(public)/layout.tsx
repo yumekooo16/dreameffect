@@ -10,11 +10,11 @@ export default function PublicLayout({
 }) {
   return (
     <div className="de-maison">
+      <a href="#main-content" className="de-skip-link">
+        Aller au contenu
+      </a>
       <PublicHeader />
       <div className="de-page de-landing de-maison-shell">
-        <a href="#main-content" className="de-skip-link">
-          Aller au contenu
-        </a>
         <JsonLd data={globalPublicJsonLd()} />
         <main id="main-content">{children}</main>
         <PublicFooter />

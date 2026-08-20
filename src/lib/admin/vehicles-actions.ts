@@ -315,6 +315,7 @@ export async function deactivateVehicle(vehicleId: string): Promise<ActionResult
     .from("vehicles")
     .update({
       status: "unavailable",
+      is_published: false,
       updated_at: new Date().toISOString(),
     })
     .eq("id", vehicleId);
@@ -339,17 +340,38 @@ export async function uploadVehiclePhoto(
     return { success: false, error: "Fichier invalide" };
   }
 
+  const allowedTypes = new Set([
+    "image/jpeg",
+    "image/jpg",
+    "image/png",
+    "image/webp",
+  ]);
+  const maxBytes = 8 * 1024 * 1024;
+
+  if (!allowedTypes.has(file.type)) {
+    return { success: false, error: "Format image non supporté (JPEG, PNG, WebP)" };
+  }
+
+  if (file.size > maxBytes) {
+    return { success: false, error: "Image trop lourde (max. 8 Mo)" };
+  }
+
   const admin = createAdminClient();
   const supabase = await createClient();
 
-  const extension = file.name.split(".").pop()?.toLowerCase() || "jpg";
+  const extension =
+    file.type === "image/png"
+      ? "png"
+      : file.type === "image/webp"
+        ? "webp"
+        : "jpg";
   const storagePath = `${vehicleId}/${Date.now()}.${extension}`;
   const buffer = Buffer.from(await file.arrayBuffer());
 
   const { error: uploadError } = await admin.storage
     .from(BUCKET)
     .upload(storagePath, buffer, {
-      contentType: file.type || "image/jpeg",
+      contentType: file.type,
       upsert: false,
     });
 
@@ -562,10 +584,31 @@ export async function uploadVehicleHeroImage(
     return { success: false, error: "Fichier invalide" };
   }
 
+  const allowedTypes = new Set([
+    "image/jpeg",
+    "image/jpg",
+    "image/png",
+    "image/webp",
+  ]);
+  const maxBytes = 8 * 1024 * 1024;
+
+  if (!allowedTypes.has(file.type)) {
+    return { success: false, error: "Format image non supporté (JPEG, PNG, WebP)" };
+  }
+
+  if (file.size > maxBytes) {
+    return { success: false, error: "Image trop lourde (max. 8 Mo)" };
+  }
+
   const admin = createAdminClient();
   const supabase = await createClient();
 
-  const extension = file.name.split(".").pop()?.toLowerCase() || "png";
+  const extension =
+    file.type === "image/png"
+      ? "png"
+      : file.type === "image/webp"
+        ? "webp"
+        : "jpg";
   const storagePath = `${vehicleId}/hero-${Date.now()}.${extension}`;
   const buffer = Buffer.from(await file.arrayBuffer());
 
@@ -578,7 +621,7 @@ export async function uploadVehicleHeroImage(
   const { error: uploadError } = await admin.storage
     .from(BUCKET)
     .upload(storagePath, buffer, {
-      contentType: file.type || "image/png",
+      contentType: file.type,
       upsert: false,
     });
 

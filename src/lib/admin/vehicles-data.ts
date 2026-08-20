@@ -66,10 +66,6 @@ export async function fetchVehiclesList(): Promise<VehicleListItem[]> {
     (ownersRes.data ?? []).map((owner) => [owner.id, owner])
   );
 
-  const createdAtMap = new Map(
-    vehicles.map((vehicle) => [vehicle.id, vehicle.created_at])
-  );
-
   const dashboardMap = new Map(dashboard.map((row) => [row.vehicle_id, row]));
 
   return vehicles.map((vehicle) => {

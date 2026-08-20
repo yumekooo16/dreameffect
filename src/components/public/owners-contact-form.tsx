@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Send, CheckCircle2 } from "lucide-react";
 import GdprConsentField from "@/src/components/gdpr/gdpr-consent-field";
 import { buildWhatsAppUrl, WHATSAPP_NUMBER } from "@/src/lib/constants";
+import { submitContactLead } from "@/src/lib/public/contact-actions";
 
 type FormState = {
   firstName: string;
@@ -80,6 +81,8 @@ export default function OwnersContactForm() {
   const [form, setForm] = useState<FormState>(INITIAL);
   const [errors, setErrors] = useState<FormErrors>({});
   const [sent, setSent] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   function updateField<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -92,13 +95,46 @@ export default function OwnersContactForm() {
     }
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSent(false);
+    setSubmitError(null);
 
     const nextErrors = validate(form);
     if (Object.keys(nextErrors).length > 0) {
       setErrors(nextErrors);
+      return;
+    }
+
+    setSubmitting(true);
+
+    const messageBody = [
+      `Véhicule : ${form.vehicle.trim()}`,
+      "",
+      form.message.trim(),
+    ].join("\n");
+
+    // Server action exige min. 20 caractères
+    const paddedMessage =
+      messageBody.length >= 20
+        ? messageBody
+        : `${messageBody}\n\n(Demande de gestion locative)`;
+
+    const result = await submitContactLead({
+      firstName: form.firstName,
+      lastName: form.lastName,
+      email: form.email,
+      phone: form.phone,
+      topic: "owner",
+      topicLabel: "Gestion locative — propriétaire",
+      message: paddedMessage,
+      gdprConsent: form.gdprConsent,
+    });
+
+    setSubmitting(false);
+
+    if (!result.ok) {
+      setSubmitError(result.error);
       return;
     }
 
@@ -114,11 +150,12 @@ export default function OwnersContactForm() {
       <div className="de-contact-form-success">
         <CheckCircle2 size={28} strokeWidth={1.75} className="text-[var(--blue-soft)]" />
         <h3 className="de-display mt-4 text-xl">
-          Demande prête à envoyer
+          Demande enregistrée
         </h3>
         <p className="mt-2 text-sm leading-relaxed de-muted">
-          WhatsApp s&apos;est ouvert avec votre message. Il reste à appuyer
-          sur Envoyer pour nous joindre.
+          Vos coordonnées sont enregistrées côté DreamEffect. WhatsApp
+          s&apos;est ouvert avec votre message — il reste à appuyer sur
+          Envoyer.
         </p>
         <button
           type="button"
@@ -244,14 +281,24 @@ export default function OwnersContactForm() {
         error={errors.gdprConsent}
       />
 
+      {submitError ? (
+        <p className="de-form-error" role="alert">
+          {submitError}
+        </p>
+      ) : null}
+
       <div className="de-form-actions">
-        <button type="submit" className="de-btn de-btn-primary de-btn-lg">
+        <button
+          type="submit"
+          className="de-btn de-btn-primary de-btn-lg"
+          disabled={submitting}
+        >
           <Send size={18} strokeWidth={2} />
-          Envoyer ma demande via WhatsApp
+          {submitting ? "Envoi…" : "Envoyer ma demande"}
         </button>
         <p className="de-form-note">
-          Aucune donnée n&apos;est enregistrée — votre message s&apos;ouvre
-          directement dans WhatsApp.
+          La demande est enregistrée côté DreamEffect, puis WhatsApp s&apos;ouvre
+          pour finaliser l&apos;échange.
         </p>
       </div>
     </form>

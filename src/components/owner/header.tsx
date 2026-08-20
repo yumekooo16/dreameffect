@@ -48,7 +48,7 @@ export default function OwnerHeader() {
             <User size={18} strokeWidth={1.75} />
           </Link>
           <NotificationsBell />
-          <SignOutButton className="de-btn de-btn-ghost hidden text-xs sm:inline-flex" />
+          <SignOutButton className="de-btn de-btn-ghost text-xs" />
         </div>
       </div>
     </header>

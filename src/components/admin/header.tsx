@@ -99,7 +99,7 @@ export default function AdminHeader() {
             <Shield size={14} strokeWidth={1.75} />
             Admin
           </span>
-          <SignOutButton className="de-btn de-btn-ghost hidden text-xs sm:inline-flex" />
+          <SignOutButton className="de-btn de-btn-ghost text-xs" />
           <NotificationsBell />
         </div>
       </div>

@@ -13,7 +13,6 @@ import {
   ownerPortalContractMileage,
 } from "@/src/lib/owner/vehicles-data";
 import {
-  computeRevenueSummary,
   resolveReservationSplit,
 } from "@/src/lib/revenue/split";
 import { getVehicleStatusLabel } from "@/src/lib/vehicles/status";
@@ -81,10 +80,6 @@ export default async function VehiclePage({
       (sum, r) => sum + resolveReservationSplit(r).ownerAmount,
       0
     );
-
-  const revenueSummary = computeRevenueSummary(finishedReservations, {
-    finishedOnly: false,
-  });
 
   return (
     <div className="space-y-8">
@@ -184,7 +179,6 @@ export default async function VehiclePage({
         calendarReservations={allReservations}
         calendarMaintenances={maintenance}
         revenueProps={{
-          totalRevenue: revenueSummary.totalRevenue,
           monthlyRevenue,
           totalRentals: finishedReservations.length,
           reservations: allReservations,
