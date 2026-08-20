@@ -1270,8 +1270,9 @@ button.de-list-item {
     );
 }
 
-/* Gagne sur .de-page:not(.de-dashboard) — pas de padding top sur le public */
-.de-page.de-landing {
+/* Gagne sur .de-page:not(.de-dashboard) — pas de padding top sur le public
+   (sauf shell Maison qui réserve la place du header fixe) */
+.de-page.de-landing:not(.de-maison-shell) {
   padding-top: 0;
 }
 

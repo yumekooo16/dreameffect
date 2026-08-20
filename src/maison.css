@@ -38,10 +38,14 @@
 }
 
 .de-maison-shell.de-page {
-  padding-top: calc(var(--header-h) + var(--safe-top));
   padding-bottom: calc(var(--dock-h) + var(--safe-bottom) + 1rem);
   background: var(--bg);
   color: var(--text);
+}
+
+/* Écart sous le header fixe (spécificité > .de-page.de-landing { padding-top: 0 }) */
+.de-page.de-landing.de-maison-shell {
+  padding-top: calc(var(--header-h) + var(--safe-top) + 0.75rem);
 }
 
 /* Contenu scrollable — pas d’overflow sur le shell (casse le fixed) */
