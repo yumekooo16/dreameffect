@@ -30,6 +30,7 @@ export default function VehicleImage({
       className={className}
       sizes="(max-width: 768px) 100vw, 896px"
       priority={priority}
+      unoptimized={imageUrl.includes("supabase.co")}
     />
   );
 }

@@ -1,10 +1,9 @@
 "use client";
 
-import Image from "next/image";
-import { useRef, useState, useTransition } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Globe, Star, Trash2, Upload } from "lucide-react";
-import { resolveVehicleImageUrl } from "@/src/lib/image-url";
+import StorageImage from "@/src/components/admin/storage-image";
 import {
   clearVehiclePublicPhoto,
   deleteVehiclePhoto,
@@ -13,6 +12,8 @@ import {
   uploadVehiclePhoto,
 } from "@/src/lib/admin/vehicles-actions";
 import type { VehicleImageRow } from "@/src/lib/admin/vehicles-types";
+
+const MAX_FILE_SIZE_MB = 10;
 
 export default function VehiclePhotosManager({
   vehicleId,
@@ -30,103 +31,76 @@ export default function VehiclePhotosManager({
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [pending, startTransition] = useTransition();
+  const [pending, setPending] = useState(false);
 
-  function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
+  async function runAction(action: () => Promise<{ success: boolean; error?: string }>) {
+    setMessage(null);
+    setError(null);
+    setPending(true);
+
+    try {
+      const result = await action();
+
+      if (result.success) {
+        router.refresh();
+        return true;
+      }
+
+      setError(result.error ?? "Une erreur est survenue");
+      return false;
+    } catch {
+      setError("Impossible de traiter la demande. Réessayez.");
+      return false;
+    } finally {
+      setPending(false);
+    }
+  }
+
+  async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setMessage(null);
-    setError(null);
+    if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+      setError(`Photo trop lourde (max ${MAX_FILE_SIZE_MB} Mo).`);
+      if (inputRef.current) inputRef.current.value = "";
+      return;
+    }
 
     const formData = new FormData();
     formData.append("file", file);
 
-    startTransition(async () => {
-      const result = await uploadVehiclePhoto(vehicleId, formData);
-
-      if (result.success) {
-        setMessage("Photo ajoutée.");
-        router.refresh();
-      } else {
-        setError(result.error ?? "Échec de l'upload");
-      }
-
-      if (inputRef.current) inputRef.current.value = "";
-    });
+    const ok = await runAction(() => uploadVehiclePhoto(vehicleId, formData));
+    if (ok) setMessage("Photo ajoutée.");
+    if (inputRef.current) inputRef.current.value = "";
   }
 
-  function handleSetPrimary(image: VehicleImageRow) {
-    setMessage(null);
-    setError(null);
-
-    startTransition(async () => {
-      const result = await setVehiclePrimaryPhoto(
-        vehicleId,
-        image.id,
-        image.image_url
-      );
-
-      if (result.success) {
-        setMessage("Photo principale mise à jour.");
-        router.refresh();
-      } else {
-        setError(result.error ?? "Échec de la mise à jour");
-      }
-    });
+  async function handleSetPrimary(image: VehicleImageRow) {
+    const ok = await runAction(() =>
+      setVehiclePrimaryPhoto(vehicleId, image.id, image.image_url)
+    );
+    if (ok) setMessage("Photo principale mise à jour.");
   }
 
-  function handleDelete(image: VehicleImageRow) {
-    setMessage(null);
-    setError(null);
-
-    startTransition(async () => {
-      const result = await deleteVehiclePhoto(
-        vehicleId,
-        image.id,
-        image.image_url
-      );
-
-      if (result.success) {
-        setMessage("Photo supprimée.");
-        setDeletingId(null);
-        router.refresh();
-      } else {
-        setError(result.error ?? "Échec de la suppression");
-      }
-    });
+  async function handleDelete(image: VehicleImageRow) {
+    const ok = await runAction(() =>
+      deleteVehiclePhoto(vehicleId, image.id, image.image_url)
+    );
+    if (ok) {
+      setMessage("Photo supprimée.");
+      setDeletingId(null);
+    }
   }
 
-  function handleSetPublic(image: VehicleImageRow) {
-    setMessage(null);
-    setError(null);
-
-    startTransition(async () => {
-      const result = await setVehiclePublicPhoto(vehicleId, image.image_url);
-
-      if (result.success) {
-        setMessage("Image site web mise à jour.");
-        router.refresh();
-      } else {
-        setError(result.error ?? "Échec de la mise à jour");
-      }
-    });
+  async function handleSetPublic(image: VehicleImageRow) {
+    const ok = await runAction(() =>
+      setVehiclePublicPhoto(vehicleId, image.image_url)
+    );
+    if (ok) setMessage("Image site web mise à jour.");
   }
 
-  function handleClearPublic() {
-    setMessage(null);
-    setError(null);
-
-    startTransition(async () => {
-      const result = await clearVehiclePublicPhoto(vehicleId);
-
-      if (result.success) {
-        setMessage("Image site web réinitialisée (photo principale).");
-        router.refresh();
-      } else {
-        setError(result.error ?? "Échec de la mise à jour");
-      }
-    });
+  async function handleClearPublic() {
+    const ok = await runAction(() => clearVehiclePublicPhoto(vehicleId));
+    if (ok) setMessage("Image site web réinitialisée (photo principale).");
   }
 
   const activePublicImage = publicImageUrl?.trim() || primaryImageUrl?.trim() || null;
@@ -145,11 +119,10 @@ export default function VehiclePhotosManager({
       {activePublicImage && (
         <div className="de-card-inner flex flex-wrap items-center gap-4 p-3">
           <div className="relative h-16 w-24 overflow-hidden rounded-md bg-muted">
-            <Image
-              src={resolveVehicleImageUrl(activePublicImage) ?? activePublicImage}
+            <StorageImage
+              src={activePublicImage}
               alt="Aperçu site web"
               fill
-              className="object-cover"
               sizes="96px"
             />
           </div>
@@ -198,26 +171,18 @@ export default function VehiclePhotosManager({
       ) : (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {images.map((image) => {
-            const url = resolveVehicleImageUrl(image.image_url);
             const isDeleting = deletingId === image.id;
             const isPublicCover = image.image_url === activePublicImage;
 
             return (
               <div key={image.id} className="de-card-inner overflow-hidden p-0">
                 <div className="relative h-36 bg-muted">
-                  {url ? (
-                    <Image
-                      src={url}
-                      alt="Photo véhicule"
-                      fill
-                      className="object-cover"
-                      sizes="240px"
-                    />
-                  ) : (
-                    <div className="flex h-full items-center justify-center text-xs de-muted">
-                      Image indisponible
-                    </div>
-                  )}
+                  <StorageImage
+                    src={image.image_url}
+                    alt="Photo véhicule"
+                    fill
+                    sizes="240px"
+                  />
                   {image.is_primary && (
                     <span className="absolute left-2 top-2 de-badge de-badge--confirmed">
                       Principale
@@ -267,25 +232,25 @@ export default function VehiclePhotosManager({
                         </button>
                       )}
                       <div className="flex gap-2">
-                      {!image.is_primary && (
+                        {!image.is_primary && (
+                          <button
+                            type="button"
+                            disabled={pending}
+                            onClick={() => handleSetPrimary(image)}
+                            className="de-btn de-btn-ghost flex-1 text-xs"
+                          >
+                            <Star size={14} className="mr-1 inline" />
+                            Principale
+                          </button>
+                        )}
                         <button
                           type="button"
                           disabled={pending}
-                          onClick={() => handleSetPrimary(image)}
-                          className="de-btn de-btn-ghost flex-1 text-xs"
+                          onClick={() => setDeletingId(image.id)}
+                          className="de-btn de-btn-ghost text-xs text-destructive"
                         >
-                          <Star size={14} className="mr-1 inline" />
-                          Principale
+                          <Trash2 size={14} />
                         </button>
-                      )}
-                      <button
-                        type="button"
-                        disabled={pending}
-                        onClick={() => setDeletingId(image.id)}
-                        className="de-btn de-btn-ghost text-xs text-destructive"
-                      >
-                        <Trash2 size={14} />
-                      </button>
                       </div>
                     </div>
                   )}

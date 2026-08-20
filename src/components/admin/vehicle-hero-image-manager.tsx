@@ -1,14 +1,15 @@
 "use client";
 
-import Image from "next/image";
-import { useRef, useState, useTransition } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Trash2, Upload } from "lucide-react";
-import { resolveVehicleImageUrl } from "@/src/lib/image-url";
+import StorageImage from "@/src/components/admin/storage-image";
 import {
   deleteVehicleHeroImage,
   uploadVehicleHeroImage,
 } from "@/src/lib/admin/vehicles-actions";
+
+const MAX_FILE_SIZE_MB = 10;
 
 export default function VehicleHeroImageManager({
   vehicleId,
@@ -22,49 +23,55 @@ export default function VehicleHeroImageManager({
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [pending, startTransition] = useTransition();
+  const [pending, setPending] = useState(false);
 
-  const previewUrl = resolveVehicleImageUrl(heroImageUrl);
+  async function runAction(action: () => Promise<{ success: boolean; error?: string }>) {
+    setMessage(null);
+    setError(null);
+    setPending(true);
 
-  function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    try {
+      const result = await action();
+
+      if (result.success) {
+        router.refresh();
+        return true;
+      }
+
+      setError(result.error ?? "Une erreur est survenue");
+      return false;
+    } catch {
+      setError("Impossible de traiter la demande. Réessayez.");
+      return false;
+    } finally {
+      setPending(false);
+    }
+  }
+
+  async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setMessage(null);
-    setError(null);
+    if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+      setError(`Image trop lourde (max ${MAX_FILE_SIZE_MB} Mo).`);
+      if (inputRef.current) inputRef.current.value = "";
+      return;
+    }
 
     const formData = new FormData();
     formData.append("file", file);
 
-    startTransition(async () => {
-      const result = await uploadVehicleHeroImage(vehicleId, formData);
-
-      if (result.success) {
-        setMessage("Image hero premium enregistrée.");
-        router.refresh();
-      } else {
-        setError(result.error ?? "Échec de l'upload");
-      }
-
-      if (inputRef.current) inputRef.current.value = "";
-    });
+    const ok = await runAction(() => uploadVehicleHeroImage(vehicleId, formData));
+    if (ok) setMessage("Image hero premium enregistrée.");
+    if (inputRef.current) inputRef.current.value = "";
   }
 
-  function handleDelete() {
-    setMessage(null);
-    setError(null);
-
-    startTransition(async () => {
-      const result = await deleteVehicleHeroImage(vehicleId);
-
-      if (result.success) {
-        setMessage("Image hero supprimée.");
-        setConfirmDelete(false);
-        router.refresh();
-      } else {
-        setError(result.error ?? "Échec de la suppression");
-      }
-    });
+  async function handleDelete() {
+    const ok = await runAction(() => deleteVehicleHeroImage(vehicleId));
+    if (ok) {
+      setMessage("Image hero supprimée.");
+      setConfirmDelete(false);
+    }
   }
 
   return (
@@ -76,9 +83,9 @@ export default function VehicleHeroImageManager({
 
       <div className="de-card-inner overflow-hidden p-0">
         <div className="relative flex min-h-[12rem] items-center justify-center bg-[radial-gradient(ellipse_at_center,color-mix(in_srgb,var(--blue)_18%,transparent),transparent_70%)] sm:min-h-[14rem]">
-          {previewUrl ? (
-            <Image
-              src={previewUrl}
+          {heroImageUrl ? (
+            <StorageImage
+              src={heroImageUrl}
               alt="Aperçu image hero"
               width={480}
               height={240}
@@ -105,10 +112,14 @@ export default function VehicleHeroImageManager({
           className="de-btn de-btn-primary inline-flex items-center gap-2"
         >
           <Upload size={16} strokeWidth={1.75} />
-          {pending ? "Traitement…" : previewUrl ? "Remplacer l'image hero" : "Ajouter image hero"}
+          {pending
+            ? "Traitement…"
+            : heroImageUrl
+              ? "Remplacer l'image hero"
+              : "Ajouter image hero"}
         </button>
 
-        {previewUrl &&
+        {heroImageUrl &&
           (!confirmDelete ? (
             <button
               type="button"

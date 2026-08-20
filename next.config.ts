@@ -1,8 +1,28 @@
 import type { NextConfig } from "next";
 
+function getSupabaseHostname(): string | null {
+  const raw = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
+  if (!raw) return null;
+
+  try {
+    return new URL(raw).hostname;
+  } catch {
+    return null;
+  }
+}
+
+const supabaseHostname = getSupabaseHostname();
+
 const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
+      ...(supabaseHostname
+        ? [{ protocol: "https" as const, hostname: supabaseHostname }]
+        : []),
+      {
+        protocol: "https",
+        hostname: "**.supabase.co",
+      },
       {
         protocol: "https",
         hostname: "*.supabase.co",
@@ -15,6 +35,9 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     optimizePackageImports: ["recharts", "react-day-picker"],
+    serverActions: {
+      bodySizeLimit: "10mb",
+    },
   },
   /** Redirections permanentes — ajouter ici les anciennes URLs au fil du temps. */
   async redirects() {
