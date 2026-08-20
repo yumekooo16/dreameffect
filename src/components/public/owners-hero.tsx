@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import HeroBackground from "@/src/components/public/hero-background";
+import OwnersFigures from "@/src/components/public/owners-figures";
 import { formatServiceAreaLabel } from "@/src/lib/public/local-seo";
 
 type OwnersHeroProps = {
@@ -12,7 +13,7 @@ export default function OwnersHero({ imageUrl }: OwnersHeroProps) {
     <section className="de-hero de-hero--photo de-owners-hero">
       <HeroBackground imageUrl={imageUrl} />
 
-      <div className="de-public-container de-hero-content">
+      <div className="de-public-container de-hero-content de-hero-content--wide">
         <p className="de-hero-eyebrow de-hero-location-badge">
           Propriétaires · {formatServiceAreaLabel()}
         </p>
@@ -25,8 +26,8 @@ export default function OwnersHero({ imageUrl }: OwnersHeroProps) {
 
         <p className="de-hero-subtitle">
           DreamEffect gère réservations, remises de clés, nettoyage et suivi.
-          Vous percevez vos revenus chaque mois — revenus consultables en ligne,
-          sans charge opérationnelle.
+          Vous percevez vos revenus chaque mois — consultables en ligne, sans
+          charge opérationnelle.
         </p>
 
         <div className="de-hero-actions">
@@ -35,9 +36,11 @@ export default function OwnersHero({ imageUrl }: OwnersHeroProps) {
             className="de-btn de-btn-primary de-btn-lg de-hero-btn"
           >
             Confier mon véhicule
-            <ArrowRight size={18} strokeWidth={2} />
+            <ArrowRight size={18} strokeWidth={1.75} />
           </Link>
         </div>
+
+        <OwnersFigures />
       </div>
     </section>
   );

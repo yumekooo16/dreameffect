@@ -42,7 +42,7 @@ export default function VehiclesPreview({
           </Link>
         </div>
 
-        <div className="de-vehicles-grid">
+        <div className="de-vehicles-grid de-vehicles-grid--editorial">
           {preview.map((vehicle) => (
             <PublicVehicleCard key={vehicle.id} vehicle={vehicle} />
           ))}

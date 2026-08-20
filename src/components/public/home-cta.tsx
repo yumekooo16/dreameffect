@@ -31,6 +31,7 @@ export default function HomeCtaSection() {
               target="_blank"
               rel="noopener noreferrer"
               className="de-btn de-btn-primary de-btn-lg w-full justify-center sm:w-auto"
+              aria-label="Ouvrir WhatsApp"
             >
               <MessageCircle size={18} strokeWidth={2} />
               Ouvrir WhatsApp
@@ -38,6 +39,7 @@ export default function HomeCtaSection() {
             <Link
               href={telHref()}
               className="de-btn de-btn-ghost de-btn-lg w-full justify-center sm:w-auto"
+              aria-label={`Appeler le ${CONTACT_PHONE}`}
             >
               <Phone size={18} strokeWidth={2} />
               {CONTACT_PHONE}

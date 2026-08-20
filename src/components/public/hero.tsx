@@ -16,7 +16,7 @@ export default function HeroSection({ imageUrl }: HeroSectionProps) {
 
       <div className="de-public-container de-hero-content de-hero-content--wide">
         <p className="de-hero-eyebrow de-hero-location-badge">
-          {formatServiceAreaLabel()} · 24h/24
+          {formatServiceAreaLabel()}
         </p>
 
         <h1 className="de-display de-hero-title">
@@ -37,16 +37,23 @@ export default function HeroSection({ imageUrl }: HeroSectionProps) {
             className="de-btn de-btn-primary de-btn-lg de-hero-btn"
           >
             Voir les véhicules
-            <ArrowRight size={18} strokeWidth={2} />
+            <ArrowRight size={18} strokeWidth={1.75} />
+          </Link>
+          <Link
+            href={PUBLIC_ROUTES.owners}
+            className="de-btn de-btn-ghost de-btn-lg de-hero-btn"
+          >
+            Confier le mien
           </Link>
           <Link
             href={CONTACT_WHATSAPP_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="de-btn de-btn-ghost de-btn-lg de-hero-btn de-hero-btn-outline"
+            aria-label="Ouvrir WhatsApp"
           >
-            <MessageCircle size={18} strokeWidth={2} />
-            WhatsApp direct
+            <MessageCircle size={18} strokeWidth={1.75} aria-hidden />
+            WhatsApp
           </Link>
         </div>
       </div>

@@ -30,23 +30,26 @@ export default function OwnersFaq() {
   return (
     <section className="de-section" aria-labelledby="owners-faq-title">
       <div className="de-public-container">
-        <div className="de-section-header">
-          <h2 id="owners-faq-title" className="de-display de-section-title">
-            Questions fréquentes
-          </h2>
-          <p className="de-section-description">
-            Les réponses aux questions que se posent le plus souvent les
-            propriétaires.
-          </p>
-        </div>
+        <div className="de-owners-know-layout">
+          <div className="de-section-header de-section-header--flush">
+            <p className="de-section-eyebrow">Propriétaires</p>
+            <h2 id="owners-faq-title" className="de-display de-section-title">
+              Ce qu&apos;il faut savoir
+            </h2>
+            <p className="de-section-description">
+              Les questions que se posent les propriétaires avant de confier
+              leur véhicule — distinctes de la FAQ locataire.
+            </p>
+          </div>
 
-        <div className="de-owners-faq-list">
-          {FAQ_ITEMS.map(({ question, answer }) => (
-            <details key={question} className="de-faq-item">
-              <summary className="de-faq-question">{question}</summary>
-              <p className="de-faq-answer">{answer}</p>
-            </details>
-          ))}
+          <div className="de-owners-faq-list">
+            {FAQ_ITEMS.map(({ question, answer }) => (
+              <details key={question} className="de-faq-item">
+                <summary className="de-faq-question">{question}</summary>
+                <p className="de-faq-answer">{answer}</p>
+              </details>
+            ))}
+          </div>
         </div>
       </div>
     </section>

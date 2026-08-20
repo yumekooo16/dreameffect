@@ -10,6 +10,9 @@ export default function PublicLayout({
 }) {
   return (
     <div className="de-page de-landing">
+      <a href="#main-content" className="de-skip-link">
+        Aller au contenu
+      </a>
       <JsonLd data={globalPublicJsonLd()} />
       <PublicHeader />
       <main id="main-content">{children}</main>

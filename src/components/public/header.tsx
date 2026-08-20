@@ -5,7 +5,12 @@ import { createPortal } from "react-dom";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ArrowUpRight, Menu, X } from "lucide-react";
+import { ArrowUpRight, MessageCircle, Phone } from "lucide-react";
+import {
+  CONTACT_PHONE,
+  CONTACT_WHATSAPP_URL,
+  telHref,
+} from "@/src/lib/public/contact";
 import { PUBLIC_ROUTES, SITE_NAME } from "@/src/lib/public/site";
 
 const NAV_ITEMS = [
@@ -46,6 +51,19 @@ export default function PublicHeader() {
     setMenuOpen(false);
   }, [pathname]);
 
+  useEffect(() => {
+    if (!menuOpen) return;
+
+    function onKey(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setMenuOpen(false);
+      }
+    }
+
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [menuOpen]);
+
   const mobileMenu =
     menuOpen && typeof document !== "undefined"
       ? createPortal(
@@ -54,6 +72,7 @@ export default function PublicHeader() {
               type="button"
               className="de-public-mobile-overlay"
               aria-label="Fermer le menu"
+              tabIndex={-1}
               onClick={() => setMenuOpen(false)}
             />
             <nav
@@ -61,23 +80,6 @@ export default function PublicHeader() {
               className="de-public-mobile-drawer"
               aria-label="Navigation mobile"
             >
-              <div className="de-public-mobile-drawer-top">
-                <div>
-                  <p className="de-public-mobile-drawer-eyebrow">Menu</p>
-                  <p className="de-public-mobile-drawer-tagline">
-                    Location & gestion automobile
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  className="de-public-mobile-drawer-close"
-                  aria-label="Fermer le menu"
-                  onClick={() => setMenuOpen(false)}
-                >
-                  <X size={22} />
-                </button>
-              </div>
-
               <div className="de-public-mobile-drawer-links">
                 {NAV_ITEMS.map(({ href, label, exact, index }) => {
                   const active = isActive(pathname, href, exact);
@@ -101,12 +103,24 @@ export default function PublicHeader() {
 
               <div className="de-public-mobile-drawer-footer">
                 <Link
-                  href={PUBLIC_ROUTES.contact}
+                  href={CONTACT_WHATSAPP_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="de-btn de-btn-primary de-public-mobile-drawer-cta"
                   onClick={() => setMenuOpen(false)}
+                  aria-label="Ouvrir WhatsApp"
                 >
-                  Nous contacter
-                  <ArrowUpRight size={18} strokeWidth={1.75} aria-hidden />
+                  <MessageCircle size={18} strokeWidth={1.75} aria-hidden />
+                  WhatsApp
+                </Link>
+                <Link
+                  href={telHref()}
+                  className="de-btn de-btn-ghost de-public-mobile-drawer-cta"
+                  onClick={() => setMenuOpen(false)}
+                  aria-label={`Appeler le ${CONTACT_PHONE}`}
+                >
+                  <Phone size={18} strokeWidth={1.75} aria-hidden />
+                  {CONTACT_PHONE}
                 </Link>
               </div>
             </nav>
@@ -123,60 +137,58 @@ export default function PublicHeader() {
         }`}
       >
         <div className="de-public-header-bar de-public-container">
-          {!menuOpen && (
-            <Link href={PUBLIC_ROUTES.home} className="de-public-header-brand">
-              <Image
-                src="/logo.png"
-                alt={SITE_NAME}
-                width={34}
-                height={34}
-                className="de-public-header-logo"
-                priority
-              />
-              <span className="de-public-header-name">{SITE_NAME}</span>
-            </Link>
-          )}
-
-          <nav className="de-public-nav-desktop" aria-label="Navigation principale">
-          {NAV_ITEMS.map(({ href, label, exact }) => {
-            const active = isActive(pathname, href, exact);
-
-            return (
-              <Link
-                key={href}
-                href={href}
-                className={`de-public-nav-link${
-                  active ? " de-public-nav-link--active" : ""
-                }`}
-                aria-current={active ? "page" : undefined}
-              >
-                {label}
-              </Link>
-            );
-          })}
-        </nav>
-
-        <div className="de-public-header-actions">
-          <Link
-            href={PUBLIC_ROUTES.contact}
-            className="de-public-nav-cta"
-          >
-            Nous contacter
-            <ArrowUpRight size={16} strokeWidth={1.75} aria-hidden />
+          <Link href={PUBLIC_ROUTES.home} className="de-public-header-brand">
+            <Image
+              src="/logo.png"
+              alt={SITE_NAME}
+              width={34}
+              height={34}
+              className="de-public-header-logo"
+              priority
+            />
+            <span className="de-public-header-name">{SITE_NAME}</span>
           </Link>
 
-          <button
-            type="button"
-            className="de-public-nav-toggle"
-            onClick={() => setMenuOpen(true)}
-            aria-expanded={menuOpen}
-            aria-controls="public-mobile-drawer"
-            aria-label="Ouvrir le menu"
-          >
-            <Menu size={22} />
-          </button>
+          <nav className="de-public-nav-desktop" aria-label="Navigation principale">
+            {NAV_ITEMS.map(({ href, label, exact }) => {
+              const active = isActive(pathname, href, exact);
+
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  className={`de-public-nav-link${
+                    active ? " de-public-nav-link--active" : ""
+                  }`}
+                  aria-current={active ? "page" : undefined}
+                >
+                  {label}
+                </Link>
+              );
+            })}
+          </nav>
+
+          <div className="de-public-header-actions">
+            <Link href={PUBLIC_ROUTES.contact} className="de-public-nav-cta">
+              Nous contacter
+              <ArrowUpRight size={16} strokeWidth={1.75} aria-hidden />
+            </Link>
+
+            <button
+              type="button"
+              className={`de-public-nav-toggle${menuOpen ? " is-open" : ""}`}
+              onClick={() => setMenuOpen((open) => !open)}
+              aria-expanded={menuOpen}
+              aria-controls="public-mobile-drawer"
+              aria-label={menuOpen ? "Fermer le menu" : "Ouvrir le menu"}
+            >
+              <span className="de-burger" aria-hidden>
+                <span />
+                <span />
+              </span>
+            </button>
+          </div>
         </div>
-      </div>
       </header>
       {mobileMenu}
     </>

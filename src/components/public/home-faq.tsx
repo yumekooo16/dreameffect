@@ -10,8 +10,8 @@ export default function HomeFaqSection() {
             Questions fréquentes
           </h2>
           <p className="de-section-description">
-            Location à Beauvais et Gisors, gestion locative dans l&apos;Oise et
-            l&apos;Eure — les réponses aux questions les plus courantes.
+            Location à Beauvais et Gisors — disponibilités, remise des clés et
+            réservation. Pour la mise en gestion, voir la page propriétaires.
           </p>
         </div>
 
