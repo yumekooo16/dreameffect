@@ -7,13 +7,13 @@ export default function HomeFaqSection() {
     <section className="de-section" aria-labelledby="home-faq-title">
       <div className="de-public-container de-faq-manifest">
         <div>
-          <p className="de-mono-label">Locataires</p>
-          <h2 id="home-faq-title" className="de-display de-exhibit-head-title">
-            Questions fréquentes
+          <p className="de-motion-eyebrow">Locataires</p>
+          <h2 id="home-faq-title" className="de-motion-section-title">
+            Ce que vous souhaitez savoir
           </h2>
-          <p className="de-exhibit-head-lede" style={{ marginTop: "1rem" }}>
-            Disponibilités, remise des clés et réservation. Pour la mise en
-            gestion, voir la page propriétaires.
+          <p className="de-motion-page-lead">
+            Disponibilités, remise des clés et réservation. Pour la mise en gestion,
+            voir la page propriétaires.
           </p>
           <Link href={PUBLIC_ROUTES.owners} className="de-text-cta">
             Vos questions de propriétaire
@@ -21,14 +21,9 @@ export default function HomeFaqSection() {
         </div>
 
         <div>
-          {HOME_FAQ_ITEMS.map(({ question, answer }, index) => (
+          {HOME_FAQ_ITEMS.map(({ question, answer }) => (
             <details key={question} className="de-faq-item">
-              <summary>
-                <span className="de-faq-num de-mono-label" aria-hidden>
-                  {String(index + 1).padStart(2, "0")}
-                </span>
-                <span className="de-faq-item-q">{question}</span>
-              </summary>
+              <summary>{question}</summary>
               <p className="de-faq-item-a">{answer}</p>
             </details>
           ))}

@@ -9,6 +9,7 @@ import {
   faqPageJsonLd,
   organizationJsonLd,
 } from "@/src/lib/public/seo";
+import { withDemoFleetFallback } from "@/src/lib/public/demo-vehicles";
 import { fetchPublicVehicles } from "@/src/lib/public/vehicles-data";
 import { resolveHeroImageUrl } from "@/src/lib/public/hero-image";
 import {
@@ -44,7 +45,7 @@ function ownersServiceJsonLd() {
 }
 
 export default async function OwnersPage() {
-  const vehicles = await fetchPublicVehicles();
+  const vehicles = withDemoFleetFallback(await fetchPublicVehicles());
   const heroImageUrl = resolveHeroImageUrl(vehicles);
 
   return (
@@ -59,7 +60,7 @@ export default async function OwnersPage() {
           ownersServiceJsonLd(),
         ]}
       />
-      <OwnersHero imageUrl={heroImageUrl} />
+      <OwnersHero imageUrl={heroImageUrl} vehicles={vehicles} />
       <OwnersContent />
     </div>
   );

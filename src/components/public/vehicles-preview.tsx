@@ -20,38 +20,24 @@ export default function VehiclesPreview({
   }
 
   return (
-    <section className="de-section de-section-alt" aria-labelledby="home-fleet-title">
-      <div className="de-public-container">
-        <header className="de-exhibit-head">
-          <p className="de-exhibit-head-num" aria-hidden>
-            03
-          </p>
-          <div>
-            <p className="de-mono-label">Collection</p>
-            <h2 id="home-fleet-title" className="de-display de-exhibit-head-title">
-              À disposition
-            </h2>
-          </div>
-          <p className="de-exhibit-head-lede">
-            {preview.length} lot{preview.length > 1 ? "s" : ""} — tarifs à la
-            journée, réservation par WhatsApp.
-          </p>
-        </header>
-
-        <div className="de-lot-strip" role="list">
-          {preview.map((vehicle, index) => (
-            <PublicVehicleCard
-              key={vehicle.id}
-              vehicle={vehicle}
-              index={index + 1}
-            />
-          ))}
+    <section className="de-section de-motion-fleet" aria-labelledby="home-fleet-title">
+      <div className="de-public-container de-motion-fleet-head">
+        <div>
+          <p className="de-motion-eyebrow">Sélection</p>
+          <h2 id="home-fleet-title" className="de-motion-section-title">
+            Nos véhicules phares
+          </h2>
         </div>
-
-        <Link href={PUBLIC_ROUTES.vehicles} className="de-text-cta" style={{ marginTop: "2rem" }}>
-          Voir tout le catalogue
+        <Link href={PUBLIC_ROUTES.vehicles} className="de-motion-inline-cta">
+          Voir tous les tarifs
           <ArrowRight size={16} aria-hidden />
         </Link>
+      </div>
+
+      <div className="de-spotlight-grid">
+        {preview.map((vehicle) => (
+          <PublicVehicleCard key={vehicle.id} vehicle={vehicle} variant="spotlight" />
+        ))}
       </div>
     </section>
   );

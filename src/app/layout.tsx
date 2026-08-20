@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Cormorant_Garamond, IBM_Plex_Mono } from "next/font/google";
+import { Syne, DM_Sans } from "next/font/google";
 import { ServiceWorkerRegister } from "@/src/components/pwa/service-worker-register";
 import { StandaloneRedirect } from "@/src/components/pwa/standalone-redirect";
 import { pwaConfig } from "@/src/lib/pwa/config";
@@ -7,18 +7,17 @@ import { DEFAULT_DESCRIPTION, DEFAULT_OG_IMAGE } from "@/src/lib/public/seo";
 import { SITE_NAME, SITE_URL } from "@/src/lib/public/site";
 import "./globals.css";
 
-const display = Cormorant_Garamond({
+const display = Syne({
   subsets: ["latin"],
   variable: "--font-display",
-  weight: ["400", "500", "600", "700"],
-  style: ["normal", "italic"],
+  weight: ["500", "600", "700", "800"],
   display: "swap",
 });
 
-const body = IBM_Plex_Mono({
+const body = DM_Sans({
   subsets: ["latin"],
   variable: "--font-body",
-  weight: ["400", "500"],
+  weight: ["400", "500", "600"],
   display: "swap",
 });
 

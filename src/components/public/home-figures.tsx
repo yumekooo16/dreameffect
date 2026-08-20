@@ -22,7 +22,7 @@ export default function HomeFigures() {
       <div className="de-stats-band">
         {FIGURES.map((item) => (
           <article key={item.value} className="de-stat-cell">
-            <p className="de-stat-value de-display">{item.value}</p>
+            <p className="de-stat-value">{item.value}</p>
             <p className="de-stat-label">{item.label}</p>
           </article>
         ))}
@@ -30,24 +30,26 @@ export default function HomeFigures() {
 
       <div className="de-audience-grid">
         <article className="de-audience-panel">
-          <p className="de-mono-label">Locataires</p>
-          <h2 id="home-figures-title" className="de-display">
+          <p className="de-motion-eyebrow">Locataires</p>
+          <h2 id="home-figures-title" className="de-motion-section-title" style={{ fontSize: "1.75rem" }}>
             Louer, simplement
           </h2>
           <p>
-            Catalogue en ligne, tarifs affichés, véhicule préparé. Vous choisissez
-            les dates, nous organisons la remise des clés.
+            Catalogue en ligne, tarifs affichés, véhicule préparé. Vous choisissez les
+            dates, nous organisons la remise des clés.
           </p>
           <Link href={PUBLIC_ROUTES.vehicles} className="de-text-cta">
-            Voir la collection
+            Voir la flotte
           </Link>
         </article>
         <article className="de-audience-panel">
-          <p className="de-mono-label">Propriétaires</p>
-          <h2 className="de-display">Faire travailler le vôtre</h2>
+          <p className="de-motion-eyebrow">Propriétaires</p>
+          <h2 className="de-motion-section-title" style={{ fontSize: "1.75rem" }}>
+            Faire travailler le vôtre
+          </h2>
           <p>
-            Revenus mensuels consultables, prise en charge totale, transparence
-            sur chaque location. Vous restez propriétaire.
+            Revenus mensuels consultables, prise en charge totale, transparence sur
+            chaque location. Vous restez propriétaire.
           </p>
           <Link href={PUBLIC_ROUTES.owners} className="de-text-cta">
             Confier mon véhicule

@@ -25,28 +25,20 @@ export default function OwnersHowItWorks() {
   return (
     <section className="de-section" aria-labelledby="owners-how-title">
       <div className="de-public-container">
-        <header className="de-exhibit-head">
-          <p className="de-exhibit-head-num" aria-hidden>
-            01
-          </p>
-          <div>
-            <p className="de-mono-label">Parcours</p>
-            <h2 id="owners-how-title" className="de-display de-exhibit-head-title">
-              Comment ça fonctionne
-            </h2>
-          </div>
-          <p className="de-exhibit-head-lede">
-            Quatre temps pour mettre votre véhicule en location, sans charge
-            opérationnelle.
-          </p>
-        </header>
+        <p className="de-motion-eyebrow">Parcours</p>
+        <h2 id="owners-how-title" className="de-motion-section-title">
+          Comment ça fonctionne
+        </h2>
+        <p className="de-motion-page-lead">
+          Quatre temps pour mettre votre véhicule en location, sans charge opérationnelle.
+        </p>
 
-        <ol className="de-manifest-list">
+        <ol className="de-manifest-list" style={{ marginTop: "2rem" }}>
           {STEPS.map(({ step, title, text }) => (
             <li key={step}>
-              <span className="de-mono-label">{step}</span>
+              <span className="de-motion-eyebrow">{step}</span>
               <div>
-                <h3 className="de-display">{title}</h3>
+                <h3>{title}</h3>
                 <p>{text}</p>
               </div>
             </li>

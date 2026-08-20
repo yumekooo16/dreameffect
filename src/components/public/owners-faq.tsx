@@ -31,25 +31,19 @@ export default function OwnersFaq() {
     <section className="de-section de-section-alt" aria-labelledby="owners-faq-title">
       <div className="de-public-container de-faq-manifest">
         <div>
-          <p className="de-mono-label">Propriétaires</p>
-          <h2 id="owners-faq-title" className="de-display de-exhibit-head-title">
+          <p className="de-motion-eyebrow">Propriétaires</p>
+          <h2 id="owners-faq-title" className="de-motion-section-title">
             Ce qu&apos;il faut savoir
           </h2>
-          <p className="de-exhibit-head-lede" style={{ marginTop: "1rem" }}>
-            Les questions avant de confier votre véhicule — distinctes de la FAQ
-            locataire.
+          <p className="de-motion-page-lead">
+            Les questions avant de confier votre véhicule — distinctes de la FAQ locataire.
           </p>
         </div>
 
         <div>
-          {FAQ_ITEMS.map(({ question, answer }, index) => (
+          {FAQ_ITEMS.map(({ question, answer }) => (
             <details key={question} className="de-faq-item">
-              <summary>
-                <span className="de-mono-label" aria-hidden>
-                  {String(index + 1).padStart(2, "0")}
-                </span>
-                <span className="de-faq-item-q">{question}</span>
-              </summary>
+              <summary>{question}</summary>
               <p className="de-faq-item-a">{answer}</p>
             </details>
           ))}
