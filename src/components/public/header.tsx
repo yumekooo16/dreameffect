@@ -28,12 +28,11 @@ export default function PublicHeader() {
           <Image
             src="/logo.png"
             alt={SITE_NAME}
-            width={32}
-            height={32}
+            width={36}
+            height={36}
             className="de-maison-brandbar-logo"
             priority
           />
-          <span className="de-maison-brandbar-name">{SITE_NAME}</span>
         </Link>
       </div>
 
