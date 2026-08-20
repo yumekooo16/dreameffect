@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -18,23 +20,41 @@ function isActive(pathname: string, href: string, exact: boolean) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
+function BrandLogo() {
+  return (
+    <div className="de-maison-brandbar" role="banner">
+      <Link
+        href={PUBLIC_ROUTES.home}
+        className="de-maison-brandbar-link"
+        aria-label={`${SITE_NAME} — Accueil`}
+      >
+        <Image
+          src="/logo.png"
+          alt=""
+          width={40}
+          height={40}
+          className="de-maison-brandbar-logo"
+          priority
+        />
+      </Link>
+    </div>
+  );
+}
+
 export default function PublicHeader() {
   const pathname = usePathname();
+  const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null);
+
+  useEffect(() => {
+    setPortalTarget(document.body);
+  }, []);
+
+  const brand = <BrandLogo />;
 
   return (
     <>
-      <div className="de-maison-brandbar">
-        <Link href={PUBLIC_ROUTES.home} className="de-maison-brandbar-link">
-          <Image
-            src="/logo.png"
-            alt={SITE_NAME}
-            width={40}
-            height={40}
-            className="de-maison-brandbar-logo"
-            priority
-          />
-        </Link>
-      </div>
+      {/* Portail body = fixed réel, hors de tout overflow/transform ancestor */}
+      {portalTarget ? createPortal(brand, portalTarget) : brand}
 
       <nav className="de-dock" aria-label="Navigation principale">
         <div className="de-dock-inner">

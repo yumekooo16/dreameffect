@@ -43,9 +43,9 @@
   color: var(--text);
 }
 
-/* Contenu scrollable : clip horizontal sans affecter le logo fixed (frère) */
+/* Contenu scrollable — pas d’overflow sur le shell (casse le fixed) */
 .de-maison-shell.de-landing {
-  overflow-x: clip;
+  overflow-x: visible;
 }
 
 .de-maison :focus-visible {
@@ -138,17 +138,24 @@
   }
 }
 
-/* --- Brand haut gauche (logo seul, fixe au scroll) ---------- */
+/* --- Brand haut gauche (logo seul, fixed viewport) ---------- */
 .de-maison-brandbar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 110;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: auto !important;
+  bottom: auto !important;
+  z-index: 9999 !important;
+  margin: 0;
   padding:
-    calc(var(--safe-top) + 0.85rem)
-    var(--pad)
+    calc(var(--safe-top, env(safe-area-inset-top, 0px)) + 0.85rem)
+    clamp(1.25rem, 4vw, 2.75rem)
     0.75rem;
   pointer-events: none;
+  /* Pas de transform ici : ça recréerait un containing block */
+  transform: none !important;
+  filter: none !important;
+  contain: none;
 }
 
 .de-maison-brandbar-link {
