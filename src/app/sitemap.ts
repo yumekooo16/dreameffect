@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 import { fetchPublicVehicleSlugs } from "@/src/lib/public/vehicles-data";
-import { LEGAL_ROUTES, PUBLIC_ROUTES, SITE_URL } from "@/src/lib/public/site";
+import { INFO_ROUTES, LEGAL_ROUTES, PUBLIC_ROUTES, SITE_URL } from "@/src/lib/public/site";
 
 export const revalidate = 3600;
 
@@ -31,10 +31,34 @@ function staticSitemapEntries(lastModified: Date): MetadataRoute.Sitemap {
       priority: 0.7,
     },
     {
-      url: `${SITE_URL}${LEGAL_ROUTES.cookies}`,
+      url: `${SITE_URL}${INFO_ROUTES.insurance}`,
+      lastModified,
+      changeFrequency: "monthly",
+      priority: 0.65,
+    },
+    {
+      url: `${SITE_URL}${INFO_ROUTES.ownerManagement}`,
+      lastModified,
+      changeFrequency: "monthly",
+      priority: 0.65,
+    },
+    {
+      url: `${SITE_URL}${LEGAL_ROUTES.legal}`,
       lastModified,
       changeFrequency: "yearly",
       priority: 0.3,
+    },
+    {
+      url: `${SITE_URL}${LEGAL_ROUTES.privacy}`,
+      lastModified,
+      changeFrequency: "yearly",
+      priority: 0.3,
+    },
+    {
+      url: `${SITE_URL}${LEGAL_ROUTES.terms}`,
+      lastModified,
+      changeFrequency: "yearly",
+      priority: 0.4,
     },
   ];
 }

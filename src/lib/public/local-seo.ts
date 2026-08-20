@@ -2,11 +2,24 @@
 
 export const PRIMARY_SERVICE_CITY = "Beauvais";
 
-export const SERVICE_AREAS = [
-  { name: "Beauvais", region: "Oise", department: "60" },
-  { name: "Gisors", region: "Eure", department: "27" },
-  { name: "Oise", region: "Hauts-de-France" },
-  { name: "Eure", region: "Normandie" },
+type ServiceCity = {
+  name: string;
+  schemaType: "City";
+  region: string;
+  department?: string;
+};
+
+type ServiceDepartment = {
+  name: string;
+  schemaType: "AdministrativeArea";
+  region: string;
+};
+
+export const SERVICE_AREAS: readonly (ServiceCity | ServiceDepartment)[] = [
+  { name: "Beauvais", schemaType: "City", region: "Oise", department: "60" },
+  { name: "Gisors", schemaType: "City", region: "Eure", department: "27" },
+  { name: "Oise", schemaType: "AdministrativeArea", region: "Hauts-de-France" },
+  { name: "Eure", schemaType: "AdministrativeArea", region: "Normandie" },
 ] as const;
 
 export const LOCAL_KEYWORDS = [
@@ -82,7 +95,7 @@ export function buildVehicleSeoDescription({
     `à ${city} avec DreamEffect.`,
     fromPrice ? `Dès ${fromPrice}.` : null,
     fuel ? `Carburant : ${fuel}.` : null,
-    "Réservation simple, véhicule entretenu et suivi rigoureux.",
+    "Réservation par WhatsApp, véhicule préparé, suivi attentif.",
   ].filter(Boolean);
 
   return parts.join(" ").slice(0, 160);
@@ -124,9 +137,25 @@ export function buildVehicleImageAlt({
 }
 
 export function areaServedJsonLd() {
-  return SERVICE_AREAS.map((area) => ({
-    "@type": "City" as const,
-    name: area.name,
-    ...(area.region ? { containedInPlace: { "@type": "AdministrativeArea", name: area.region } } : {}),
-  }));
+  return SERVICE_AREAS.map((area) => {
+    if (area.schemaType === "City") {
+      return {
+        "@type": "City" as const,
+        name: area.name,
+        containedInPlace: {
+          "@type": "AdministrativeArea",
+          name: area.region,
+        },
+      };
+    }
+
+    return {
+      "@type": "AdministrativeArea" as const,
+      name: area.name,
+      containedInPlace: {
+        "@type": "AdministrativeArea",
+        name: area.region,
+      },
+    };
+  });
 }

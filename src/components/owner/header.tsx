@@ -24,7 +24,7 @@ export default function OwnerHeader() {
             priority
           />
           <div className="min-w-0">
-            <span className="de-display block truncate text-sm tracking-tight text-foreground">
+            <span className="de-display de-wordmark block truncate text-sm text-foreground">
               DreΛm Effect
             </span>
             <span className="text-xs de-muted">Espace propriétaire</span>
@@ -48,7 +48,7 @@ export default function OwnerHeader() {
             <User size={18} strokeWidth={1.75} />
           </Link>
           <NotificationsBell />
-          <SignOutButton className="de-btn de-btn-ghost hidden text-xs sm:inline-flex" />
+          <SignOutButton className="de-btn de-btn-ghost text-xs" />
         </div>
       </div>
     </header>

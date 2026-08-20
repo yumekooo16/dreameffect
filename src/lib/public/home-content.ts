@@ -23,38 +23,38 @@ export const HOME_PROCESS_STEPS = [
 
 export const HOME_FAQ_ITEMS = [
   {
-    question: "Combien coûte la location d'un véhicule à Beauvais ?",
+    question: "Combien coûte la location d'un véhicule ?",
     answer:
-      "Les tarifs varient selon le modèle et la durée (24 h, week-end, semaine). Chaque fiche véhicule affiche le prix à partir de X €/jour. Contactez-nous par WhatsApp pour un devis personnalisé selon vos dates.",
+      "Les tarifs dépendent du modèle et de la durée (24 h, week-end, semaine). Chaque fiche affiche le prix à la journée, au week-end ou à la semaine. Un devis selon vos dates se précise par WhatsApp.",
   },
   {
-    question: "Quels véhicules proposez-vous dans l'Oise et l'Eure ?",
+    question: "Quels véhicules proposez-vous ?",
     answer:
-      "Notre flotte comprend des berlines, SUV et modèles sportifs entretenus aux standards premium. Les véhicules disponibles sont listés dans notre catalogue, classés par marque, avec photos et caractéristiques détaillées.",
+      "Berlines, SUV et sportives, entretenues aux standards d'une flotte haut de gamme. Le catalogue présente les modèles disponibles, classés par marque, avec photos et caractéristiques.",
   },
   {
     question: "Comment réserver un véhicule chez DreamEffect ?",
     answer:
-      "Choisissez votre modèle dans le catalogue, sélectionnez vos dates sur la fiche véhicule, puis confirmez par WhatsApp ou via le formulaire de contact. Nous validons la disponibilité et organisons la remise des clés.",
+      "Choisissez le modèle, indiquez vos dates sur la fiche, puis confirmez par WhatsApp ou via le formulaire. Nous validons la disponibilité et organisons la remise des clés.",
   },
   {
     question: "Où se fait la remise des clés ?",
     answer:
-      "Nous intervenons à Beauvais, Gisors et dans l'ensemble de l'Oise et de l'Eure. Le lieu exact est convenu ensemble lors de la réservation — domicile, gare, aéroport de Beauvais-Tillé ou autre point de rendez-vous.",
+      "À Beauvais, Gisors et dans l'ensemble de l'Oise et de l'Eure. Le lieu se convient lors de la réservation — domicile, gare, aéroport de Beauvais-Tillé ou autre rendez-vous.",
   },
   {
     question: "Comment confier mon véhicule en gestion locative ?",
     answer:
-      "Contactez-nous avec la marque, le modèle et l'année de votre véhicule. Nous échangeons sur vos attentes, créons l'annonce avec photos et tarifs, puis gérons réservations, remises de clés et entretien. Vous percevez vos revenus chaque mois.",
+      "Indiquez-nous la marque, le modèle et l'année. Nous échangeons sur vos attentes, créons l'annonce, puis gérons réservations, remises de clés et entretien. Vous percevez vos revenus chaque mois.",
   },
   {
     question: "Quel délai pour obtenir une réponse ?",
     answer:
-      "Par WhatsApp ou téléphone, nous répondons généralement le jour même en heures ouvrées. Via le formulaire de contact, comptez une réponse sous 24 h ouvrées.",
+      "Par WhatsApp ou téléphone, généralement le jour même en heures ouvrées. Via le formulaire, une réponse sous 24 h ouvrées.",
   },
   {
     question: "Les véhicules sont-ils assurés pour la location ?",
     answer:
-      "Les conditions d'assurance sont définies lors de la réservation ou de la mise en gestion. Nous vérifions avec vous que la couverture est adaptée à l'activité de location, en toute transparence.",
+      "Les conditions d'assurance se définissent lors de la réservation ou de la mise en gestion. Nous vérifions avec vous que la couverture convient à l'activité de location.",
   },
 ] as const;

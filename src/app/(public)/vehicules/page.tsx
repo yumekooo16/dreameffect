@@ -8,6 +8,7 @@ import {
   vehicleCatalogItemListJsonLd,
 } from "@/src/lib/public/seo";
 import { CATALOG_KEYWORDS, formatServiceAreaLabel } from "@/src/lib/public/local-seo";
+import { withDemoFleetFallback } from "@/src/lib/public/demo-vehicles";
 import {
   fetchPublicVehicles,
   getVehicleDisplayName,
@@ -25,7 +26,8 @@ export const metadata: Metadata = buildPageMetadata({
 export const dynamic = "force-dynamic";
 
 export default async function VehiclesPage() {
-  const vehicles = await fetchPublicVehicles();
+  const fetched = await fetchPublicVehicles();
+  const vehicles = withDemoFleetFallback(fetched);
   const heroImageUrl = resolveHeroImageUrl(vehicles);
 
   return (
@@ -37,7 +39,7 @@ export default async function VehiclesPage() {
             { name: "Nos véhicules", path: PUBLIC_ROUTES.vehicles },
           ]),
           vehicleCatalogItemListJsonLd(
-            vehicles.map((vehicle) => ({
+            fetched.map((vehicle) => ({
               name: getVehicleDisplayName(vehicle),
               slug: vehicle.slug,
             }))

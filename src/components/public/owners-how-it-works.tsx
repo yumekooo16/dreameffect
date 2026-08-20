@@ -23,27 +23,27 @@ const STEPS = [
 
 export default function OwnersHowItWorks() {
   return (
-    <section className="de-section" aria-labelledby="owners-how-title">
+    <section className="de-keys-section" aria-labelledby="owners-how-title">
       <div className="de-public-container">
-        <div className="de-section-header">
-          <h2 id="owners-how-title" className="de-display de-section-title">
-            Comment ça fonctionne
-          </h2>
-          <p className="de-section-description">
-            Quatre étapes simples pour mettre votre véhicule en location sans
-            charge opérationnelle.
-          </p>
-        </div>
-
-        <div className="de-owners-steps-grid">
+        <p className="de-keys-eyebrow">Parcours</p>
+        <h2 id="owners-how-title" className="de-keys-h2">
+          Comment ça fonctionne
+        </h2>
+        <p className="de-keys-lede">
+          Quatre temps pour mettre votre véhicule en location, sans charge
+          opérationnelle.
+        </p>
+        <ol className="de-keys-manifest">
           {STEPS.map(({ step, title, text }) => (
-            <article key={step} className="de-step-card">
-              <span className="de-step-number">{step}</span>
-              <h3 className="de-display mt-4 text-lg tracking-tight">{title}</h3>
-              <p className="mt-2 text-sm leading-relaxed de-muted">{text}</p>
-            </article>
+            <li key={step}>
+              <span className="de-keys-eyebrow">{step}</span>
+              <div>
+                <h3>{title}</h3>
+                <p>{text}</p>
+              </div>
+            </li>
           ))}
-        </div>
+        </ol>
       </div>
     </section>
   );

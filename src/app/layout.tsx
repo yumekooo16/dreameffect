@@ -1,23 +1,24 @@
 import type { Metadata, Viewport } from "next";
-import { Space_Grotesk, Inter } from "next/font/google";
+import { Newsreader, Source_Sans_3 } from "next/font/google";
 import { ServiceWorkerRegister } from "@/src/components/pwa/service-worker-register";
 import { StandaloneRedirect } from "@/src/components/pwa/standalone-redirect";
-import { CookieConsentProvider } from "@/src/components/gdpr/cookie-consent-provider";
-import CookieBanner from "@/src/components/gdpr/cookie-banner";
 import { pwaConfig } from "@/src/lib/pwa/config";
-import { DEFAULT_DESCRIPTION } from "@/src/lib/public/seo";
+import { DEFAULT_DESCRIPTION, DEFAULT_OG_IMAGE } from "@/src/lib/public/seo";
+import { SITE_NAME, SITE_URL } from "@/src/lib/public/site";
 import "./globals.css";
-const display = Space_Grotesk({
+
+const display = Newsreader({
   subsets: ["latin"],
   variable: "--font-display",
-  weight: ["500", "600"],
+  weight: ["400", "500", "600"],
+  style: ["normal", "italic"],
   display: "swap",
 });
 
-const body = Inter({
+const body = Source_Sans_3({
   subsets: ["latin"],
   variable: "--font-body",
-  weight: ["400", "500"],
+  weight: ["400", "500", "600"],
   display: "swap",
 });
 
@@ -26,22 +27,31 @@ export const viewport: Viewport = {
   colorScheme: "dark",
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
+  maximumScale: 5,
+  userScalable: true,
   viewportFit: "cover",
 };
 
 export const metadata: Metadata = {
   title: {
-    default: `${pwaConfig.name} — Location véhicules haut de gamme`,
-    template: `%s | ${pwaConfig.shortName}`,
+    default: `${SITE_NAME} — Location véhicules haut de gamme`,
+    template: `%s | ${SITE_NAME}`,
   },
   description: DEFAULT_DESCRIPTION,
   applicationName: pwaConfig.name,
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ?? "https://dreameffect.fr"
-  ),
+  metadataBase: new URL(SITE_URL),
   verification: {
     google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
+  },
+  openGraph: {
+    images: [
+      {
+        url: DEFAULT_OG_IMAGE,
+        width: 1200,
+        height: 630,
+        alt: SITE_NAME,
+      },
+    ],
   },
   robots: {
     index: true,
@@ -97,12 +107,9 @@ export default function RootLayout({
   return (
     <html lang="fr" className={`${display.variable} ${body.variable}`}>
       <body className="bg-background text-foreground antialiased">
-        <CookieConsentProvider>
-          {children}
-          <StandaloneRedirect />
-          <ServiceWorkerRegister />
-          <CookieBanner />
-        </CookieConsentProvider>
+        {children}
+        <StandaloneRedirect />
+        <ServiceWorkerRegister />
       </body>
     </html>
   );

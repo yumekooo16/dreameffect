@@ -16,16 +16,42 @@ export function resolveHeroImageUrl(vehicles: PublicVehicle[] = []): string | nu
   return null;
 }
 
-/** Jusqu'à 3 visuels pour les sections numérotées (photos flotte). */
-export function pickNarrativeVisuals(vehicles: PublicVehicle[], count = 3): (string | null)[] {
-  const urls: string[] = [];
+/**
+ * Jusqu'à `count` visuels distincts pour les sections numérotées.
+ * Alterne les marques pour éviter de répéter la même photo BMW.
+ */
+export function pickNarrativeVisuals(
+  vehicles: PublicVehicle[],
+  count = 3,
+  excludeUrl?: string | null
+): (string | null)[] {
+  const excluded = excludeUrl ? resolveVehicleImageUrl(excludeUrl) : null;
+  const byBrand = new Map<string, string[]>();
 
   for (const vehicle of vehicles) {
     const url = resolveVehicleImageUrl(vehicle.image_url);
-    if (url && !urls.includes(url)) {
-      urls.push(url);
+    if (!url || url === excluded) continue;
+
+    const brand = vehicle.brand.trim().toLowerCase() || "autre";
+    const list = byBrand.get(brand) ?? [];
+    if (!list.includes(url)) {
+      list.push(url);
+      byBrand.set(brand, list);
     }
-    if (urls.length >= count) break;
+  }
+
+  const brands = Array.from(byBrand.keys());
+  const urls: string[] = [];
+  let guard = 0;
+
+  while (urls.length < count && brands.length > 0 && guard < count * brands.length + 8) {
+    const brand = brands[guard % brands.length];
+    const list = byBrand.get(brand);
+    const next = list?.shift();
+    if (next && !urls.includes(next)) {
+      urls.push(next);
+    }
+    guard += 1;
   }
 
   return Array.from({ length: count }, (_, index) => urls[index] ?? null);

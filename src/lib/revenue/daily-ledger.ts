@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { toDateKey } from "@/src/lib/dates/calendar-utils";
 import {
   computeRevenueSummary,
   resolveReservationSplit,
@@ -31,10 +32,6 @@ function startOfDay(date: Date) {
   const value = new Date(date);
   value.setHours(0, 0, 0, 0);
   return value;
-}
-
-function toDateKey(date: Date) {
-  return startOfDay(date).toISOString().slice(0, 10);
 }
 
 export function countInclusiveRentalDays(startDate: string, endDate: string) {
@@ -272,19 +269,21 @@ export function computeRevenueSummaryWithLedger(
       ? ledgerByReservation.get(reservationId)
       : undefined;
 
-    if (ledger && ledger.entryCount > 0) {
-      totalRevenue += ledger.totalRevenue;
-      ownerShare += ledger.ownerShare;
-      companyShare += ledger.companyShare;
-      rentalCount += 1;
-      continue;
-    }
-
+    // Réservation terminée : toujours le total contractuel (montants stockés)
     if (reservation.status === "finished") {
       const split = resolveReservationSplit(reservation);
       totalRevenue += split.total;
       ownerShare += split.ownerAmount;
       companyShare += split.companyAmount;
+      rentalCount += 1;
+      continue;
+    }
+
+    // En cours : journal quotidien si disponible, sinon ignorer
+    if (ledger && ledger.entryCount > 0) {
+      totalRevenue += ledger.totalRevenue;
+      ownerShare += ledger.ownerShare;
+      companyShare += ledger.companyShare;
       rentalCount += 1;
     }
   }

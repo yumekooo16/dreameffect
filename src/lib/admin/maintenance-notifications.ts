@@ -3,7 +3,6 @@ import type { MaintenanceRecord } from "@/src/lib/admin/maintenance-types";
 import { getMaintenanceTypeLabel } from "@/src/lib/maintenance/type";
 import {
   createNotification,
-  notifyAllAdmins,
   notifyOwnerAndAdmins,
 } from "@/src/lib/notifications/service";
 

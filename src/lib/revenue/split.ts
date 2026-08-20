@@ -38,6 +38,23 @@ export function resolveReservationSplit(reservation: {
     return { total: 0, ownerAmount: 0, companyAmount: 0 };
   }
 
+  const storedOwner = reservation.owner_amount;
+  const storedCompany = reservation.company_amount;
+
+  // Préférer les montants persistés (historique stable si le % change)
+  if (
+    storedOwner != null &&
+    storedCompany != null &&
+    Number.isFinite(Number(storedOwner)) &&
+    Number.isFinite(Number(storedCompany))
+  ) {
+    return {
+      total,
+      ownerAmount: Math.round(Number(storedOwner) * 100) / 100,
+      companyAmount: Math.round(Number(storedCompany) * 100) / 100,
+    };
+  }
+
   return splitRevenue(total);
 }
 

@@ -55,12 +55,12 @@ export default async function ProfilePage() {
         </div>
 
         <p className="mt-4 text-xs de-muted">
-          Pour toute modification, contactez l'équipe DreamEffect.
+          Pour toute modification, contactez l&apos;équipe DreamEffect.
         </p>
       </Section>
 
       <div className="de-card de-card-padded">
-        <p className="de-label">Besoin d'aide ?</p>
+        <p className="de-label">Besoin d&apos;aide ?</p>
         <p className="mt-2 text-sm de-muted">
           Notre équipe de conciergerie est disponible pour répondre à toutes vos
           questions concernant votre véhicule.

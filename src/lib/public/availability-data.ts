@@ -16,6 +16,22 @@ export async function fetchVehicleAvailability(
 ): Promise<VehicleAvailability> {
   const supabase = createAdminClient();
 
+  const { data: vehicle, error: vehicleError } = await supabase
+    .from("vehicles")
+    .select("id, is_published")
+    .eq("id", vehicleId)
+    .maybeSingle();
+
+  if (vehicleError) {
+    console.error("[fetchVehicleAvailability:vehicle]", vehicleError.message);
+    return { blockedPeriods: [], maintenanceDays: [] };
+  }
+
+  // Ne pas exposer le calendrier métier d'un véhicule non publié
+  if (!vehicle?.is_published) {
+    return { blockedPeriods: [], maintenanceDays: [] };
+  }
+
   const [reservationsRes, maintenanceRes] = await Promise.all([
     supabase
       .from("reservations")

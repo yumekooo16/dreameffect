@@ -42,7 +42,6 @@ type Props = {
   calendarReservations: Reservation[];
   calendarMaintenances: Maintenance[];
   revenueProps: {
-    totalRevenue: number;
     monthlyRevenue: number;
     totalRentals: number;
     reservations: Reservation[];

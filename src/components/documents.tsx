@@ -54,7 +54,7 @@ export default function Documents({
                     <p className="mt-1 text-sm font-medium">{doc.name}</p>
                     {doc.expiration_date && (
                       <p className="mt-1 text-xs de-muted">
-                        Valide jusqu'au{" "}
+                        Valide jusqu&apos;au{" "}
                         {new Date(doc.expiration_date).toLocaleDateString(
                           "fr-FR"
                         )}

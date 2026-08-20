@@ -13,32 +13,39 @@ export const metadata: Metadata = buildPageMetadata({
 
 export default function NotFound() {
   return (
-    <div className="de-page de-landing">
+    <div className="de-maison">
       <PublicHeader />
-      <main id="main-content">
-        <section className="de-page-hero">
-          <div className="de-public-container">
-            <p className="de-hero-eyebrow">Erreur 404</p>
-            <h1 className="de-display de-page-hero-title">Page introuvable</h1>
-            <p className="de-page-hero-description">
-              Cette page n&apos;existe pas ou a été déplacée. Retournez à
-              l&apos;accueil ou parcourez notre catalogue.
-            </p>
-            <div className="de-hero-actions mt-8">
-              <Link href={PUBLIC_ROUTES.home} className="de-btn de-btn-primary de-btn-lg">
-                Retour à l&apos;accueil
-              </Link>
-              <Link
-                href={PUBLIC_ROUTES.vehicles}
-                className="de-btn de-btn-ghost de-btn-lg de-hero-btn-outline"
-              >
-                Voir les véhicules
-              </Link>
+      <div className="de-page de-landing de-maison-shell">
+        <main id="main-content">
+          <section className="de-keys-page-hero">
+            <div className="de-public-container">
+              <p className="de-keys-kicker">Erreur 404</p>
+              <h1 id="page-hero-title" className="de-keys-page-title">
+                Page introuvable
+              </h1>
+              <p className="de-keys-page-lead">
+                Cette page n&apos;existe pas, ou a été déplacée. Retournez à
+                l&apos;accueil, ou parcourez le catalogue.
+              </p>
+              <div className="de-keys-actions" style={{ marginTop: "1.75rem" }}>
+                <Link
+                  href={PUBLIC_ROUTES.home}
+                  className="de-btn de-btn-primary de-btn-lg"
+                >
+                  Retour à l&apos;accueil
+                </Link>
+                <Link
+                  href={PUBLIC_ROUTES.vehicles}
+                  className="de-btn de-btn-outline"
+                >
+                  Découvrir la flotte
+                </Link>
+              </div>
             </div>
-          </div>
-        </section>
-      </main>
-      <PublicFooter />
+          </section>
+        </main>
+        <PublicFooter />
+      </div>
     </div>
   );
 }

@@ -77,7 +77,6 @@ export default function FinancePanel({
   monthlyCommissions,
   vehicleFinance,
   ownerFinance,
-  history,
   payouts,
   filterOptions,
   reservations,

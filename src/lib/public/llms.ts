@@ -1,8 +1,14 @@
+import { GOOGLE_BUSINESS_URL } from "@/src/lib/public/business";
 import { CONTACT_EMAIL, CONTACT_PHONE, SOCIAL_LINKS } from "@/src/lib/public/contact";
 import { formatServiceAreaLabel } from "@/src/lib/public/local-seo";
-import { PUBLIC_ROUTES, SITE_NAME, SITE_TAGLINE, SITE_URL } from "@/src/lib/public/site";
-
-const GOOGLE_BUSINESS_URL = process.env.NEXT_PUBLIC_GOOGLE_BUSINESS_URL?.trim() ?? null;
+import {
+  INFO_ROUTES,
+  LEGAL_ROUTES,
+  PUBLIC_ROUTES,
+  SITE_NAME,
+  SITE_TAGLINE,
+  SITE_URL,
+} from "@/src/lib/public/site";
 
 export function buildSameAsLinks(): string[] {
   return [
@@ -26,6 +32,9 @@ export function buildLlmsTxt(): string {
     `- Catalogue véhicules : ${SITE_URL}${PUBLIC_ROUTES.vehicles}`,
     `- Propriétaires : ${SITE_URL}${PUBLIC_ROUTES.owners}`,
     `- Contact : ${SITE_URL}${PUBLIC_ROUTES.contact}`,
+    `- Assurance location premium : ${SITE_URL}${INFO_ROUTES.insurance}`,
+    `- Gestion locative propriétaires : ${SITE_URL}${INFO_ROUTES.ownerManagement}`,
+    `- Conditions de location : ${SITE_URL}${LEGAL_ROUTES.terms}`,
     "",
     "## Contact",
     "",

@@ -98,6 +98,51 @@ function buildPayload(data: ReservationFormData) {
   };
 }
 
+function validateReservationDates(data: ReservationFormData): string | null {
+  if (!data.start_date || !data.end_date) {
+    return "Dates de début et de fin requises";
+  }
+  if (data.end_date < data.start_date) {
+    return "La date de fin doit être postérieure ou égale à la date de début";
+  }
+  return null;
+}
+
+/** Chevauchement inclusif [start, end] avec réservations pending/confirmed. */
+async function findOverlappingReservation(
+  vehicleId: string,
+  startDate: string,
+  endDate: string,
+  excludeId?: string
+): Promise<string | null> {
+  const supabase = await createClient();
+
+  let query = supabase
+    .from("reservations")
+    .select("id, start_date, end_date, status, customer_name")
+    .eq("vehicle_id", vehicleId)
+    .in("status", ["pending", "confirmed"])
+    .lte("start_date", endDate)
+    .gte("end_date", startDate);
+
+  if (excludeId) {
+    query = query.neq("id", excludeId);
+  }
+
+  const { data, error } = await query.limit(1).maybeSingle();
+
+  if (error) {
+    console.error("[reservations:overlap]", error.message);
+    return "Impossible de vérifier les disponibilités";
+  }
+
+  if (data) {
+    return `Chevauchement avec une réservation existante (${data.start_date} → ${data.end_date})`;
+  }
+
+  return null;
+}
+
 function validateFinishedDistance(data: ReservationFormData): string | null {
   if (data.status !== "finished") return null;
   if (data.distance_km == null || data.distance_km < 0) {
@@ -150,16 +195,33 @@ export async function createReservation(
 ): Promise<ActionResult> {
   const { user } = await requireAdmin();
 
+  const datesError = validateReservationDates(data);
+  if (datesError) {
+    return { success: false, error: datesError };
+  }
+
   const distanceError = validateFinishedDistance(data);
   if (distanceError) {
     return { success: false, error: distanceError };
+  }
+
+  const status = data.status || "pending";
+  if (status === "pending" || status === "confirmed") {
+    const overlapError = await findOverlappingReservation(
+      data.vehicle_id,
+      data.start_date,
+      data.end_date
+    );
+    if (overlapError) {
+      return { success: false, error: overlapError };
+    }
   }
 
   const supabase = await createClient();
 
   const { data: reservation, error } = await supabase
     .from("reservations")
-    .insert(buildPayload({ ...data, status: data.status || "pending" }))
+    .insert(buildPayload({ ...data, status }))
     .select(
       "id, vehicle_id, start_date, end_date, customer_name, customer_email, pickup_location, return_location, status, owner_amount, company_amount, total_price, distance_km"
     )
@@ -201,9 +263,26 @@ export async function updateReservation(
 ): Promise<ActionResult> {
   const { user } = await requireAdmin();
 
+  const datesError = validateReservationDates(data);
+  if (datesError) {
+    return { success: false, error: datesError };
+  }
+
   const distanceError = validateFinishedDistance(data);
   if (distanceError) {
     return { success: false, error: distanceError };
+  }
+
+  if (data.status === "pending" || data.status === "confirmed") {
+    const overlapError = await findOverlappingReservation(
+      data.vehicle_id,
+      data.start_date,
+      data.end_date,
+      reservationId
+    );
+    if (overlapError) {
+      return { success: false, error: overlapError };
+    }
   }
 
   const supabase = await createClient();

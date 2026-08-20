@@ -1,6 +1,5 @@
 "use client";
 
-import { useMemo } from "react";
 import RevenueChart from "@/src/components/revenue-chart";
 import RevenueSplitCard from "@/src/components/owner/revenue-split-card";
 import { computeRevenueSummary, resolveReservationSplit } from "@/src/lib/revenue/split";
@@ -17,14 +16,12 @@ type Reservation = {
 };
 
 type Props = {
-  totalRevenue: number;
   monthlyRevenue: number;
   totalRentals: number;
   reservations: Reservation[];
 };
 
 export default function VehicleRevenue({
-  totalRevenue,
   monthlyRevenue,
   totalRentals,
   reservations,
@@ -32,20 +29,17 @@ export default function VehicleRevenue({
   const history = reservations.filter((r) => r.status === "finished");
   const summary = computeRevenueSummary(history, { finishedOnly: false });
 
-  const chartData = useMemo(() => {
-    const byMonth = new Map<string, number>();
+  const byMonth = new Map<string, number>();
+  for (const r of history) {
+    const date = new Date(r.end_date);
+    const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-01`;
+    const amount = resolveReservationSplit(r).ownerAmount;
+    byMonth.set(key, (byMonth.get(key) ?? 0) + amount);
+  }
 
-    for (const r of history) {
-      const date = new Date(r.end_date);
-      const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-01`;
-      const amount = resolveReservationSplit(r).ownerAmount;
-      byMonth.set(key, (byMonth.get(key) ?? 0) + amount);
-    }
-
-    return Array.from(byMonth.entries())
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([month, revenue]) => ({ month, revenue }));
-  }, [history]);
+  const chartData = Array.from(byMonth.entries())
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([month, revenue]) => ({ month, revenue }));
 
   return (
     <div className="space-y-6">

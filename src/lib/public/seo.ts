@@ -1,8 +1,13 @@
 import type { Metadata } from "next";
 import { resolveVehicleImageUrl } from "@/src/lib/image-url";
-import { CONTACT_EMAIL, CONTACT_PHONE } from "@/src/lib/public/contact";
 import {
-  PRIMARY_SERVICE_CITY,
+  AREA_SERVED_LABELS,
+  PWA_ICON_512,
+  businessPostalAddressJsonLd,
+  openingHoursSpecificationJsonLd,
+} from "@/src/lib/public/business";
+import { CONTACT_EMAIL, CONTACT_PHONE_E164 } from "@/src/lib/public/contact";
+import {
   areaServedJsonLd,
   formatServiceAreaLabel,
 } from "@/src/lib/public/local-seo";
@@ -10,9 +15,11 @@ import { buildSameAsLinks } from "@/src/lib/public/llms";
 import { SITE_NAME, SITE_TAGLINE, SITE_URL } from "@/src/lib/public/site";
 
 export const DEFAULT_DESCRIPTION =
-  "DreamEffect — location de véhicules haut de gamme et gestion locative pour propriétaires à Beauvais, Gisors et dans l'Oise. Tarifs affichés, réservation WhatsApp.";
+  "DreamEffect — location de véhicules haut de gamme et gestion locative pour propriétaires, à Beauvais, Gisors et dans l'Oise. Flotte entretenue, tarifs affichés, réservation par WhatsApp.";
 
-export const DEFAULT_OG_IMAGE = "/icons/icon-512x512.png";
+/** Image sociale 1200×630 — distincte de l'icône PWA 512. */
+export const DEFAULT_OG_IMAGE = "/og.png";
+export const ORGANIZATION_LOGO = "/logo.png";
 
 type PageSeo = {
   title: string;
@@ -22,6 +29,8 @@ type PageSeo = {
   keywords?: string[];
   ogImage?: string | null;
   ogType?: "website" | "article";
+  /** Titre document complet, sans suffixe « | DreamEffect ». */
+  absoluteTitle?: boolean;
 };
 
 export function absoluteUrl(path = "") {
@@ -40,7 +49,9 @@ export function absoluteImageUrl(path?: string | null) {
   return absoluteUrl(target);
 }
 
-function buildSocialImages(imageUrl: string): NonNullable<Metadata["openGraph"]>["images"] {
+function buildSocialImages(
+  imageUrl: string
+): NonNullable<Metadata["openGraph"]>["images"] {
   return [
     {
       url: imageUrl,
@@ -59,13 +70,15 @@ export function buildPageMetadata({
   keywords = [],
   ogImage,
   ogType = "website",
+  absoluteTitle = false,
 }: PageSeo): Metadata {
   const url = absoluteUrl(path);
-  const socialTitle = `${title} | ${SITE_NAME}`;
+  const socialTitle =
+    absoluteTitle || title.includes(SITE_NAME) ? title : `${title} | ${SITE_NAME}`;
   const imageUrl = absoluteImageUrl(ogImage ?? DEFAULT_OG_IMAGE);
 
   return {
-    title,
+    title: absoluteTitle ? { absolute: title } : title,
     description,
     metadataBase: new URL(SITE_URL),
     alternates: { canonical: url },
@@ -103,10 +116,11 @@ export function organizationJsonLd() {
     "@type": "Organization",
     name: SITE_NAME,
     url: SITE_URL,
-    logo: absoluteUrl(DEFAULT_OG_IMAGE),
+    logo: absoluteUrl(ORGANIZATION_LOGO),
+    image: absoluteUrl(DEFAULT_OG_IMAGE),
     description: DEFAULT_DESCRIPTION,
     email: CONTACT_EMAIL,
-    telephone: CONTACT_PHONE,
+    telephone: CONTACT_PHONE_E164,
     areaServed: areaServedJsonLd(),
     ...(sameAs.length > 0 ? { sameAs } : {}),
   };
@@ -131,7 +145,6 @@ export function faqPageJsonLd(
 
 export function localBusinessJsonLd() {
   const sameAs = buildSameAsLinks();
-  const streetAddress = process.env.NEXT_PUBLIC_BUSINESS_STREET?.trim();
 
   return {
     "@context": "https://schema.org",
@@ -140,20 +153,14 @@ export function localBusinessJsonLd() {
     name: SITE_NAME,
     description: DEFAULT_DESCRIPTION,
     url: SITE_URL,
-    image: absoluteUrl(DEFAULT_OG_IMAGE),
-    telephone: CONTACT_PHONE,
+    image: absoluteUrl(PWA_ICON_512),
+    logo: absoluteUrl(ORGANIZATION_LOGO),
+    telephone: CONTACT_PHONE_E164,
     email: CONTACT_EMAIL,
     priceRange: "€€€",
-    address: {
-      "@type": "PostalAddress",
-      ...(streetAddress ? { streetAddress } : {}),
-      addressLocality: process.env.NEXT_PUBLIC_BUSINESS_CITY ?? PRIMARY_SERVICE_CITY,
-      addressRegion:
-        process.env.NEXT_PUBLIC_BUSINESS_REGION ?? "Oise",
-      postalCode: process.env.NEXT_PUBLIC_BUSINESS_POSTAL_CODE ?? "60000",
-      addressCountry: "FR",
-    },
+    address: businessPostalAddressJsonLd(),
     areaServed: areaServedJsonLd(),
+    openingHoursSpecification: openingHoursSpecificationJsonLd(),
     serviceType: [
       "Location de véhicules haut de gamme",
       "Gestion locative automobile",
@@ -164,14 +171,22 @@ export function localBusinessJsonLd() {
 }
 
 export function autoRentalJsonLd() {
+  const sameAs = buildSameAsLinks();
+
   return {
     "@context": "https://schema.org",
     "@type": "AutoRental",
     name: SITE_NAME,
     description: DEFAULT_DESCRIPTION,
+    image: absoluteUrl(PWA_ICON_512),
     url: SITE_URL,
-    areaServed: areaServedJsonLd(),
+    telephone: CONTACT_PHONE_E164,
+    priceRange: "€€€",
+    address: businessPostalAddressJsonLd(),
+    areaServed: [...AREA_SERVED_LABELS],
+    openingHoursSpecification: openingHoursSpecificationJsonLd(),
     serviceType: ["Location de véhicules", "Gestion de flotte pour propriétaires"],
+    ...(sameAs.length > 0 ? { sameAs } : {}),
   };
 }
 
@@ -188,6 +203,7 @@ export function webSiteJsonLd() {
       "@type": "Organization",
       name: SITE_NAME,
       url: SITE_URL,
+      logo: absoluteUrl(ORGANIZATION_LOGO),
     },
   };
 }

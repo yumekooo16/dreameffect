@@ -3,7 +3,7 @@
  * Push notifications : architecture préparée (voir src/lib/pwa/push.ts).
  */
 
-const CACHE_VERSION = "dreameffect-v2";
+const CACHE_VERSION = "dreameffect-v3";
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const OFFLINE_URL = "/offline";
 

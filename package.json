@@ -20,7 +20,8 @@
     "remove-preview-vehicles": "tsx scripts/remove-preview-vehicles.ts",
     "setup-ammotioncars": "tsx scripts/setup-ammotioncars.ts",
     "check-catalog": "tsx scripts/check-catalog.ts",
-    "generate-pwa-icons": "tsx scripts/generate-pwa-icons.ts"
+    "generate-pwa-icons": "tsx scripts/generate-pwa-icons.ts",
+    "generate-og-image": "tsx scripts/generate-og-image.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.4",

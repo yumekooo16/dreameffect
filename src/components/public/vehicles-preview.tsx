@@ -6,7 +6,6 @@ import { PUBLIC_ROUTES } from "@/src/lib/public/site";
 
 type VehiclesPreviewProps = {
   vehicles?: PublicVehicle[];
-  /** Nombre max affiché sur l'accueil */
   limit?: number;
 };
 
@@ -21,32 +20,34 @@ export default function VehiclesPreview({
   }
 
   return (
-    <section className="de-section de-section-alt">
+    <section className="de-keys-section de-keys-section--paper" aria-labelledby="home-fleet-title">
       <div className="de-public-container">
-        <div className="de-section-header de-section-header-row">
-          <div>
-            <p className="de-section-eyebrow">Flotte</p>
-            <h2 className="de-display de-section-title">Nos véhicules</h2>
-            <p className="de-section-description">
-              {preview.length} modèle{preview.length > 1 ? "s" : ""} disponible
-              {preview.length > 1 ? "s" : ""} — tarifs à la journée, réservation
-              par WhatsApp ou formulaire.
-            </p>
+        <p className="de-keys-eyebrow">Flotte</p>
+        <h2 id="home-fleet-title" className="de-keys-h2">
+          À disposition
+        </h2>
+        <p className="de-keys-lede">
+          {preview.length} modèle{preview.length > 1 ? "s" : ""} — tarifs à la journée,
+          réservation par WhatsApp.
+        </p>
+
+        <div className="de-keys-runway-wrap">
+          <div className="de-keys-runway">
+            {preview.map((vehicle, index) => (
+              <PublicVehicleCard
+                key={vehicle.id}
+                vehicle={vehicle}
+                index={index + 1}
+                variant="runway"
+              />
+            ))}
           </div>
-          <Link
-            href={PUBLIC_ROUTES.vehicles}
-            className="de-btn de-btn-ghost shrink-0 self-start"
-          >
-            Tout voir
-            <ArrowRight size={16} />
-          </Link>
         </div>
 
-        <div className="de-vehicles-grid">
-          {preview.map((vehicle) => (
-            <PublicVehicleCard key={vehicle.id} vehicle={vehicle} />
-          ))}
-        </div>
+        <Link href={PUBLIC_ROUTES.vehicles} className="de-keys-link">
+          Voir tout le catalogue
+          <ArrowRight size={16} aria-hidden />
+        </Link>
       </div>
     </section>
   );

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, startTransition } from "react";
 import Image from "next/image";
 import { createClient } from "@/src/lib/supabase/client";
 import { useRouter } from "next/navigation";
@@ -9,13 +9,12 @@ import {
   REMEMBER_ME_MAX_AGE,
   REMEMBER_EMAIL_KEY,
 } from "@/src/lib/supabase/session";
-import { readConsentFromDocument } from "@/src/lib/gdpr/cookies";
 
 function setRememberMePreference(enabled: boolean) {
   if (enabled) {
-    document.cookie = `${REMEMBER_ME_COOKIE}=1; path=/; max-age=${REMEMBER_ME_MAX_AGE}; SameSite=Lax`;
+    document.cookie = `${REMEMBER_ME_COOKIE}=1; path=/; max-age=${REMEMBER_ME_MAX_AGE}; SameSite=Lax; Secure`;
   } else {
-    document.cookie = `${REMEMBER_ME_COOKIE}=; path=/; max-age=0; SameSite=Lax`;
+    document.cookie = `${REMEMBER_ME_COOKIE}=; path=/; max-age=0; SameSite=Lax; Secure`;
   }
 }
 
@@ -41,13 +40,12 @@ export default function LoginPage() {
   }, [router, supabase]);
 
   useEffect(() => {
-    const consent = readConsentFromDocument();
-    if (!consent?.preferences) return;
-
     const savedEmail = localStorage.getItem(REMEMBER_EMAIL_KEY);
     const hasRememberCookie = document.cookie.includes(`${REMEMBER_ME_COOKIE}=1`);
-    if (savedEmail) setEmail(savedEmail);
-    setRememberMe(hasRememberCookie || Boolean(savedEmail));
+    startTransition(() => {
+      if (savedEmail) setEmail(savedEmail);
+      setRememberMe(hasRememberCookie || Boolean(savedEmail));
+    });
   }, []);
 
   async function handleLogin(e: React.FormEvent) {
@@ -66,12 +64,9 @@ export default function LoginPage() {
       return;
     }
 
-    const consent = readConsentFromDocument();
-    const canRemember = rememberMe && consent?.preferences === true;
+    setRememberMePreference(rememberMe);
 
-    setRememberMePreference(canRemember);
-
-    if (canRemember) {
+    if (rememberMe) {
       localStorage.setItem(REMEMBER_EMAIL_KEY, email);
     } else {
       localStorage.removeItem(REMEMBER_EMAIL_KEY);
@@ -94,8 +89,8 @@ export default function LoginPage() {
             priority
           />
           <div>
-            <h1 className="de-display de-login-title">DreΛm Effect</h1>
-            <p className="de-login-subtitle">Connexion DreamEffect</p>
+            <h1 className="de-display de-login-title de-wordmark">DreΛm Effect</h1>
+            <p className="de-login-subtitle">Espace propriétaire et administration</p>
           </div>
         </div>
 

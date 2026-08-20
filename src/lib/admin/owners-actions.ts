@@ -311,7 +311,28 @@ export async function setOwnerAccountActive(
 ): Promise<ActionResult> {
   await requireAdmin();
 
+  if (!ownerId.trim()) {
+    return { success: false, error: "Propriétaire introuvable" };
+  }
+
   const admin = createAdminClient();
+
+  const { data: owner, error: ownerError } = await admin
+    .from("profiles")
+    .select("id, role")
+    .eq("id", ownerId)
+    .maybeSingle();
+
+  if (ownerError) {
+    return { success: false, error: ownerError.message };
+  }
+
+  if (!owner || owner.role !== "owner") {
+    return {
+      success: false,
+      error: "Seuls les comptes propriétaires peuvent être activés ou désactivés",
+    };
+  }
 
   const { error } = await admin.auth.admin.updateUserById(ownerId, {
     ban_duration: active ? "none" : "876000h",

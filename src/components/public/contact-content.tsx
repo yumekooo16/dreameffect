@@ -1,120 +1,112 @@
 import Link from "next/link";
-import { Mail, MapPin, MessageCircle, Phone } from "lucide-react";
+import { ExternalLink, Mail, MessageCircle, Phone } from "lucide-react";
 import ContactForm from "@/src/components/public/contact-form";
+import {
+  GOOGLE_BUSINESS_URL,
+  GOOGLE_REVIEWS_URL,
+  OPENING_HOURS,
+  SERVICE_POINTS,
+} from "@/src/lib/public/business";
 import {
   CONTACT_EMAIL,
   CONTACT_PHONE,
   CONTACT_WHATSAPP_URL,
   SOCIAL_LINKS,
+  telHref,
 } from "@/src/lib/public/contact";
-import { SERVICE_AREAS, formatServiceAreaLabel } from "@/src/lib/public/local-seo";
 
 export default function ContactContent() {
   const socialEntries = Object.entries(SOCIAL_LINKS).filter(
     ([, url]) => url != null
   );
+  const hoursLabel = `Tous les jours, ${OPENING_HOURS.opens.replace(":", " h ")} – ${OPENING_HOURS.closes.replace(":", " h ")}`;
 
   return (
-    <section className="de-section">
+    <section className="de-keys-section">
       <div className="de-public-container">
-        <div className="de-contact-page-layout">
-          <div className="de-contact-form-block">
-            <h2 className="de-display text-xl tracking-tight sm:text-2xl">
-              Envoyez-nous un message
-            </h2>
-            <p className="mt-2 text-sm de-muted">
-              Remplissez le formulaire ci-dessous. On revient vers vous
-              rapidement.
-            </p>
+        <div className="de-keys-locales">
+          {SERVICE_POINTS.map((point) => (
+            <address key={point.city} className="de-keys-locale not-italic">
+              <p className="de-keys-locale-city">{point.city}</p>
+              <p className="de-keys-locale-code">{point.postalCode}</p>
+              <p className="de-keys-eyebrow" style={{ marginTop: "0.4rem" }}>
+                {point.region}
+              </p>
+            </address>
+          ))}
+        </div>
+
+        <div className="de-keys-contact-grid">
+          <div>
+            <p className="de-keys-eyebrow">Formulaire</p>
+            <h2 className="de-keys-h2">Écrivez-nous</h2>
+            <p className="de-keys-lede">Réponse sous 24 h ouvrées.</p>
             <div className="mt-8">
               <ContactForm />
             </div>
           </div>
 
-          <aside className="de-contact-sidebar">
-            <div className="de-contact-zone-card">
-              <span className="de-contact-icon">
-                <MapPin size={20} strokeWidth={1.75} />
-              </span>
-              <div>
-                <p className="de-label">Zone d&apos;intervention</p>
-                <p className="mt-1 text-sm leading-relaxed">
-                  {formatServiceAreaLabel()}
-                </p>
-                <ul className="de-contact-zone-list">
-                  {SERVICE_AREAS.map((area) => (
-                    <li key={area.name}>
-                      {area.name}
-                      {"department" in area && area.department
-                        ? ` (${area.department})`
-                        : ""}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-
-            <p className="text-sm leading-relaxed de-muted">
-              Vous préférez nous joindre directement ? Voici nos coordonnées.
+          <aside>
+            <p className="de-keys-eyebrow">Direct</p>
+            <p className="de-keys-lede">{hoursLabel}</p>
+            <p className="de-keys-lede">
+              Remise des clés à Beauvais, Gisors, ou sur rendez-vous dans
+              l&apos;Oise et l&apos;Eure.
             </p>
 
-            <div className="de-contact-sidebar-cards">
-              <div className="de-contact-card">
-                <span className="de-contact-icon">
-                  <Phone size={20} strokeWidth={1.75} />
-                </span>
-                <div>
-                  <p className="de-label">Téléphone</p>
-                  <a
-                    href={`tel:${CONTACT_PHONE.replace(/\s/g, "")}`}
-                    className="mt-1 block font-medium transition hover:text-[var(--blue-soft)]"
-                  >
-                    {CONTACT_PHONE}
-                  </a>
-                </div>
-              </div>
+            <a href={telHref()} className="de-keys-direct">
+              <Phone size={18} strokeWidth={1.75} aria-hidden />
+              <span>
+                <span className="de-label">Téléphone</span>
+                <span className="de-keys-direct-value">{CONTACT_PHONE}</span>
+              </span>
+            </a>
+            <a href={`mailto:${CONTACT_EMAIL}`} className="de-keys-direct">
+              <Mail size={18} strokeWidth={1.75} aria-hidden />
+              <span>
+                <span className="de-label">Email</span>
+                <span className="de-keys-direct-value">{CONTACT_EMAIL}</span>
+              </span>
+            </a>
 
-              <div className="de-contact-card">
-                <span className="de-contact-icon">
-                  <Mail size={20} strokeWidth={1.75} />
-                </span>
-                <div>
-                  <p className="de-label">Email</p>
-                  <a
-                    href={`mailto:${CONTACT_EMAIL}`}
-                    className="mt-1 block font-medium transition hover:text-[var(--blue-soft)]"
-                  >
-                    {CONTACT_EMAIL}
-                  </a>
-                </div>
-              </div>
+            <Link
+              href={CONTACT_WHATSAPP_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="de-btn de-btn-primary"
+              style={{ marginTop: "1.5rem", width: "100%" }}
+              aria-label="Ouvrir WhatsApp"
+            >
+              <MessageCircle size={18} strokeWidth={1.75} aria-hidden />
+              WhatsApp
+            </Link>
 
-              <div className="de-contact-whatsapp-card">
-                <span className="de-contact-icon">
-                  <MessageCircle size={22} strokeWidth={1.75} />
-                </span>
-                <h3 className="de-display mt-4 text-lg tracking-tight">
-                  WhatsApp direct
-                </h3>
-                <p className="mt-2 text-sm leading-relaxed de-muted">
-                  Sans passer par le formulaire, ouvrez une conversation
-                  directement.
-                </p>
-                <Link
-                  href={CONTACT_WHATSAPP_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="de-btn de-btn-ghost mt-5 w-full justify-center"
-                >
-                  <MessageCircle size={18} strokeWidth={2} />
-                  Ouvrir WhatsApp
-                </Link>
-              </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem", marginTop: "1.5rem" }}>
+              <a
+                href={GOOGLE_BUSINESS_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="de-keys-link"
+                style={{ marginTop: 0 }}
+              >
+                Fiche Google
+                <ExternalLink size={14} aria-hidden />
+              </a>
+              <a
+                href={GOOGLE_REVIEWS_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="de-keys-link"
+                style={{ marginTop: 0 }}
+              >
+                Avis Google
+                <ExternalLink size={14} aria-hidden />
+              </a>
             </div>
 
             {socialEntries.length > 0 && (
-              <div className="de-contact-social-block">
-                <p className="de-label">Réseaux sociaux</p>
+              <div style={{ marginTop: "1.5rem" }}>
+                <p className="de-keys-eyebrow">Réseaux</p>
                 <div className="mt-3 flex flex-wrap gap-2">
                   {socialEntries.map(([network, url]) => (
                     <Link
@@ -122,7 +114,8 @@ export default function ContactContent() {
                       href={url!}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="de-btn de-btn-ghost capitalize"
+                      className="de-keys-link capitalize"
+                      style={{ marginTop: 0 }}
                     >
                       {network}
                     </Link>

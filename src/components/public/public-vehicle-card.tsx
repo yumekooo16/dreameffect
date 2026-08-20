@@ -17,66 +17,89 @@ import { buildVehicleImageAlt } from "@/src/lib/public/local-seo";
 import type { PublicVehicle } from "@/src/lib/public/vehicles-types";
 import { PUBLIC_ROUTES } from "@/src/lib/public/site";
 
-function SpecLine({ label, value }: { label: string; value: string | null }) {
-  if (!value) return null;
-
-  return (
-    <span className="de-vehicle-spec">
-      <span className="de-vehicle-spec-label">{label}</span>
-      {value}
-    </span>
-  );
-}
-
-export default function PublicVehicleCard({ vehicle }: { vehicle: PublicVehicle }) {
-  const href = `${PUBLIC_ROUTES.vehicles}/${vehicle.slug}`;
+export default function PublicVehicleCard({
+  vehicle,
+  index,
+  variant = "list",
+}: {
+  vehicle: PublicVehicle;
+  index?: number;
+  variant?: "list" | "runway" | "spotlight";
+}) {
+  const isDemo = vehicle.id.startsWith("demo-");
+  const href = isDemo
+    ? PUBLIC_ROUTES.vehicles
+    : `${PUBLIC_ROUTES.vehicles}/${vehicle.slug}`;
   const fromPrice = formatPrice(getLowestRentalPrice(vehicle.pricing));
+  const alt = buildVehicleImageAlt({
+    brand: vehicle.brand,
+    model: vehicle.model,
+    version: vehicle.version,
+    year: vehicle.year,
+    location: vehicle.location,
+  });
+  const specs = [
+    vehicle.year ? String(vehicle.year) : null,
+    getFuelLabel(vehicle.fuel),
+    getTransmissionLabel(vehicle.transmission),
+    formatPower(vehicle.power),
+  ].filter(Boolean);
+
+  if (variant === "runway" || variant === "spotlight") {
+    return (
+      <Link href={href} className="de-keys-car">
+        <div className="de-keys-car-media">
+          <VehicleImage
+            src={vehicle.image_url}
+            alt={alt}
+            className="object-cover"
+          />
+          <span
+            className={`de-badge de-lot-badge ${getPublicVehicleStatusBadgeClass(vehicle.status)}`}
+            style={{ position: "absolute", top: "0.65rem", right: "0.65rem", zIndex: 2 }}
+          >
+            {getPublicVehicleStatusLabel(vehicle.status)}
+          </span>
+        </div>
+        <div className="de-keys-car-body">
+          <p className="de-keys-car-brand">{vehicle.brand}</p>
+          <h3 className="de-keys-car-model">
+            {vehicle.model}
+            {vehicle.version ? ` ${vehicle.version}` : ""}
+          </h3>
+          {specs.length > 0 ? (
+            <p className="de-keys-car-meta">{specs.join(" · ")}</p>
+          ) : null}
+          <p className="de-keys-car-price">
+            <small>À partir de</small>
+            {fromPrice ?? "Sur demande"}
+          </p>
+        </div>
+      </Link>
+    );
+  }
 
   return (
-    <Link href={href} className="de-public-vehicle-card group">
-      <div className="de-public-vehicle-card-image">
-        <VehicleImage
-          src={vehicle.image_url}
-          alt={buildVehicleImageAlt({
-            brand: vehicle.brand,
-            model: vehicle.model,
-            version: vehicle.version,
-            year: vehicle.year,
-            location: vehicle.location,
-          })}
-          className="object-cover transition duration-500 group-hover:scale-[1.02]"
-        />
-        <div className="de-public-vehicle-card-gradient" />
-        <span
-          className={`de-badge de-public-vehicle-card-badge ${getPublicVehicleStatusBadgeClass(vehicle.status)}`}
-        >
-          {getPublicVehicleStatusLabel(vehicle.status)}
-        </span>
+    <Link href={href} className="de-keys-lot">
+      <div className="de-keys-lot-thumb">
+        <VehicleImage src={vehicle.image_url} alt={alt} className="object-cover" />
       </div>
-
-      <div className="de-public-vehicle-card-body">
-        <div className="de-public-vehicle-card-top">
-          <div>
-            <p className="de-public-vehicle-brand">{vehicle.brand}</p>
-            <h3 className="de-display de-public-vehicle-model">
-              {vehicle.model}
-              {vehicle.version ? ` ${vehicle.version}` : ""}
-            </h3>
-          </div>
-          <div className="de-public-vehicle-price">
-            <p className="de-public-vehicle-price-label">À partir de</p>
-            <p className="de-public-vehicle-price-value">
-              {fromPrice ?? "Sur demande"}
-            </p>
-          </div>
-        </div>
-
-        <div className="de-public-vehicle-specs">
-          <SpecLine label="Année" value={vehicle.year ? String(vehicle.year) : null} />
-          <SpecLine label="Carburant" value={getFuelLabel(vehicle.fuel)} />
-          <SpecLine label="Boîte" value={getTransmissionLabel(vehicle.transmission)} />
-          <SpecLine label="Puissance" value={formatPower(vehicle.power)} />
-        </div>
+      <div>
+        <p className="de-keys-car-brand">
+          {index != null ? `${String(index).padStart(2, "0")} · ` : ""}
+          {vehicle.brand}
+        </p>
+        <h3 className="de-keys-car-model">
+          {vehicle.model}
+          {vehicle.version ? ` ${vehicle.version}` : ""}
+        </h3>
+        {specs.length > 0 ? (
+          <p className="de-keys-car-meta">{specs.join(" · ")}</p>
+        ) : null}
+      </div>
+      <div className="de-keys-car-price" style={{ textAlign: "right" }}>
+        <small>À partir de</small>
+        {fromPrice ?? "Sur demande"}
       </div>
     </Link>
   );

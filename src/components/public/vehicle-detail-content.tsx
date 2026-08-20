@@ -13,7 +13,6 @@ import {
 } from "@/src/lib/public/vehicle-status";
 import { getLowestRentalPrice, formatPrice } from "@/src/lib/vehicles/pricing";
 import { buildVehicleImageAlt } from "@/src/lib/public/local-seo";
-import { getVehicleDisplayName } from "@/src/lib/public/vehicles-data";
 import type { PublicVehicleDetail } from "@/src/lib/public/vehicles-types";
 import type { VehicleAvailability } from "@/src/lib/public/availability-data";
 import { PUBLIC_ROUTES } from "@/src/lib/public/site";
@@ -28,9 +27,9 @@ function SpecItem({
   if (!value) return null;
 
   return (
-    <div className="de-vehicle-detail-spec">
-      <p className="de-label">{label}</p>
-      <p className="mt-1 font-medium">{value}</p>
+    <div className="de-fleet-spec">
+      <dt>{label}</dt>
+      <dd>{value}</dd>
     </div>
   );
 }
@@ -42,7 +41,6 @@ export default function VehicleDetailContent({
   vehicle: PublicVehicleDetail;
   availability: VehicleAvailability;
 }) {
-  const displayName = getVehicleDisplayName(vehicle);
   const imageAlt = buildVehicleImageAlt({
     brand: vehicle.brand,
     model: vehicle.model,
@@ -84,13 +82,13 @@ export default function VehicleDetailContent({
             {fromPrice && (
               <div className="de-vehicle-detail-price-block">
                 <p className="de-public-vehicle-price-label">À partir de</p>
-                <p className="de-vehicle-detail-price">{fromPrice}</p>
+                <p className="de-display de-vehicle-detail-price">{fromPrice}</p>
               </div>
             )}
 
             <VehiclePricingTable pricing={vehicle.pricing} />
 
-            <div className="de-vehicle-detail-specs-grid">
+            <dl className="de-fleet-specs de-vehicle-detail-specs">
               <SpecItem label="Carburant" value={getFuelLabel(vehicle.fuel)} />
               <SpecItem
                 label="Boîte de vitesses"
@@ -102,7 +100,7 @@ export default function VehicleDetailContent({
                 label="Année"
                 value={vehicle.year ? String(vehicle.year) : undefined}
               />
-            </div>
+            </dl>
 
             {vehicle.description?.trim() && (
               <div className="de-vehicle-detail-description">
