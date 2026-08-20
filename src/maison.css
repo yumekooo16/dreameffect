@@ -1134,3 +1134,10 @@
   background: transparent;
   color: var(--paper-ink);
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .de-keys-car:hover .de-keys-car-media img {
+    transform: none;
+  }
+}
+
