@@ -1270,6 +1270,11 @@ button.de-list-item {
     );
 }
 
+/* Gagne sur .de-page:not(.de-dashboard) — pas de padding top sur le public */
+.de-page.de-landing {
+  padding-top: 0;
+}
+
 .de-landing main {
   overflow-x: clip;
   max-width: 100%;
