@@ -33,7 +33,7 @@
   --radius: 0.125rem;
   --pad: clamp(1.25rem, 4vw, 2.75rem);
   --dock-h: 4.25rem;
-  --header-h: 3.5rem;
+  --header-h: 4.25rem;
   --max: 68rem;
 }
 
@@ -75,7 +75,7 @@
   right: 0;
   z-index: 200;
   padding-top: env(safe-area-inset-top, 0px);
-  height: calc(3.5rem + env(safe-area-inset-top, 0px));
+  height: calc(var(--header-h, 4.25rem) + env(safe-area-inset-top, 0px));
   box-sizing: border-box;
   background: color-mix(in srgb, #0b1524 94%, transparent);
   border-bottom: 1px solid rgba(238, 242, 247, 0.14);
@@ -86,10 +86,12 @@
 .de-maison-header-inner {
   display: flex;
   align-items: center;
-  height: 3.5rem;
+  height: var(--header-h, 4.25rem);
   max-width: 68rem;
   margin-inline: auto;
-  padding-inline: clamp(1.25rem, 4vw, 2.75rem);
+  padding-block: 0.85rem;
+  padding-inline: clamp(1.35rem, 4.5vw, 2.75rem);
+  box-sizing: border-box;
 }
 
 .de-maison-header-brand {
@@ -98,6 +100,8 @@
   justify-content: center;
   text-decoration: none;
   line-height: 0;
+  padding: 0.25rem;
+  margin: -0.25rem;
 }
 
 .de-maison-header-brand:hover {
@@ -106,8 +110,8 @@
 
 .de-maison-header-logo {
   display: block;
-  width: 2.25rem;
-  height: 2.25rem;
+  width: 2.5rem;
+  height: 2.5rem;
   border-radius: 0.25rem;
   object-fit: contain;
 }
