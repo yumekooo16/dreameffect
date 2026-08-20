@@ -6,23 +6,23 @@
    ============================================================ */
 
 :root {
-  --bg: #0a0b0e;
-  --bg-nacre: #14161c;
-  --surface: #0f1b2e;
-  --surface-raised: #162338;
-  --border-raw: rgba(255, 255, 255, 0.08);
-  --border-subtle: rgba(201, 205, 212, 0.22);
-  --silver: #c9cdd4;
+  --bg: #0b1524;
+  --bg-nacre: #122033;
+  --surface: #122033;
+  --surface-raised: #1a2b42;
+  --border-raw: rgba(238, 242, 247, 0.14);
+  --border-subtle: rgba(184, 160, 120, 0.5);
+  --silver: #d9c6a2;
 
-  --text: #f2f1ec;
-  --text-muted: #a8acb4;
-  --text-subtle: #8b9099;
+  --text: #f2f5f9;
+  --text-muted: #b8c0cc;
+  --text-subtle: #9aa5b4;
 
-  --accent: #f2f1ec;
+  --accent: #f2f5f9;
   --accent-dim: #3e5c7d;
 
   --blue: #3e5c7d;
-  --blue-soft: #5b7fa6;
+  --blue-soft: #7a9bc4;
   --blue-border: color-mix(in srgb, var(--blue-soft) 35%, transparent);
   --blue-glow: color-mix(in srgb, var(--blue-soft) 10%, transparent);
 
