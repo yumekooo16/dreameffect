@@ -48,10 +48,6 @@ export default function PublicHeader() {
   }, [menuOpen]);
 
   useEffect(() => {
-    setMenuOpen(false);
-  }, [pathname]);
-
-  useEffect(() => {
     if (!menuOpen) return;
 
     function onKey(event: KeyboardEvent) {
