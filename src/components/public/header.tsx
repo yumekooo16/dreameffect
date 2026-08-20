@@ -28,8 +28,8 @@ export default function PublicHeader() {
           <Image
             src="/logo.png"
             alt={SITE_NAME}
-            width={36}
-            height={36}
+            width={40}
+            height={40}
             className="de-maison-brandbar-logo"
             priority
           />
