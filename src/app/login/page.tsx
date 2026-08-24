@@ -81,7 +81,7 @@ export default function LoginPage() {
       <form onSubmit={handleLogin} className="de-login-card">
         <div className="de-login-header">
           <Image
-            src="/logo.png"
+            src="/logo-de.png"
             alt="DreΛm Effect"
             width={88}
             height={88}

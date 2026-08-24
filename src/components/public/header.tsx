@@ -31,12 +31,13 @@ export default function PublicHeader() {
             aria-label={`${SITE_NAME} — Accueil`}
           >
             <Image
-              src="/logo.png"
+              src="/logo-de.png"
               alt=""
-              width={40}
-              height={40}
+              width={44}
+              height={44}
               className="de-maison-header-logo"
               priority
+              unoptimized
             />
           </Link>
         </div>

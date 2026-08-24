@@ -16,7 +16,7 @@ export default function OwnerHeader() {
           className="flex min-w-0 items-center gap-2 sm:gap-3 group"
         >
           <Image
-            src="/logo.png"
+            src="/logo-de.png"
             alt="DreΛm Effect"
             width={40}
             height={40}
