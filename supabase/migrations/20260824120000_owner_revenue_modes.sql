@@ -65,8 +65,11 @@ SET
   owner_revenue_share = NULL
 FROM auth.users AS u
 WHERE p.id = u.id
-  AND lower(u.email) = 'ammotioncars@dreameffect.fr'
-  AND p.role = 'owner';
+  AND p.role = 'owner'
+  AND lower(u.email) IN (
+    'contact@ammotioncars.com',
+    'ammotioncars@dreameffect.fr'
+  );
 
 UPDATE public.vehicles
 SET
