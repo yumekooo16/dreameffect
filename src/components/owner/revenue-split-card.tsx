@@ -2,6 +2,8 @@ import {
   COMPANY_REVENUE_SHARE_PERCENT,
   OWNER_REVENUE_SHARE_PERCENT,
   formatEuro,
+  revenueModeLabel,
+  type RevenueMode,
 } from "@/src/lib/revenue/split";
 
 type RevenueSplitCardProps = {
@@ -10,6 +12,7 @@ type RevenueSplitCardProps = {
   companyShare: number;
   title?: string;
   compact?: boolean;
+  revenueMode?: RevenueMode | null;
 };
 
 export default function RevenueSplitCard({
@@ -18,13 +21,22 @@ export default function RevenueSplitCard({
   companyShare,
   title = "Répartition des revenus",
   compact = false,
+  revenueMode = "percentage",
 }: RevenueSplitCardProps) {
+  const mode = revenueMode ?? "percentage";
   const ownerPercent =
-    totalRevenue > 0 ? Math.round((ownerShare / totalRevenue) * 100) : OWNER_REVENUE_SHARE_PERCENT;
+    totalRevenue > 0
+      ? Math.round((ownerShare / totalRevenue) * 100)
+      : OWNER_REVENUE_SHARE_PERCENT;
   const companyPercent =
     totalRevenue > 0
       ? Math.round((companyShare / totalRevenue) * 100)
       : COMPANY_REVENUE_SHARE_PERCENT;
+
+  const hint =
+    mode === "pro_price"
+      ? "Répartition automatique — grille prix pro (+ km supp.) · marge DreamEffect"
+      : `Répartition automatique — ${OWNER_REVENUE_SHARE_PERCENT} % propriétaire · ${COMPANY_REVENUE_SHARE_PERCENT} % DreamEffect`;
 
   return (
     <div className={`de-revenue-split ${compact ? "de-revenue-split--compact" : ""}`}>
@@ -32,8 +44,8 @@ export default function RevenueSplitCard({
         <p className="de-label">{title}</p>
         <p className="de-revenue-split__total">{formatEuro(totalRevenue)}</p>
         <p className="de-revenue-split__hint">
-          Répartition automatique — {OWNER_REVENUE_SHARE_PERCENT}&nbsp;% propriétaire ·{" "}
-          {COMPANY_REVENUE_SHARE_PERCENT}&nbsp;% DreamEffect
+          {hint}
+          <span className="ml-1 opacity-80">({revenueModeLabel(mode)})</span>
         </p>
       </div>
 
@@ -52,12 +64,16 @@ export default function RevenueSplitCard({
         <div className="de-revenue-split__item de-revenue-split__item--owner">
           <p className="de-label">Votre part</p>
           <p className="de-revenue-split__amount">{formatEuro(ownerShare)}</p>
-          <p className="de-revenue-split__percent">{ownerPercent}&nbsp;%</p>
+          <p className="de-revenue-split__percent">
+            {mode === "pro_price" ? "Prix pro" : `${ownerPercent} %`}
+          </p>
         </div>
         <div className="de-revenue-split__item de-revenue-split__item--company">
           <p className="de-label">Part DreamEffect</p>
           <p className="de-revenue-split__amount">{formatEuro(companyShare)}</p>
-          <p className="de-revenue-split__percent">{companyPercent}&nbsp;%</p>
+          <p className="de-revenue-split__percent">
+            {mode === "pro_price" ? "Marge" : `${companyPercent} %`}
+          </p>
         </div>
       </div>
     </div>

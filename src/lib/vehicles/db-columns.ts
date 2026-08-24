@@ -6,6 +6,9 @@ export function isMissingColumnError(message: string) {
 export const VEHICLE_PRICING_COLUMNS =
   "price_24h_weekday, price_24h_weekend, price_48h_weekend, price_72h_weekend, price_7_days, deposit";
 
+export const VEHICLE_PRO_PRICING_COLUMNS =
+  "pro_price_24h_weekday, pro_price_24h_weekend, pro_price_48h_weekend, pro_price_72h_weekend, pro_price_7_days, pro_included_km, pro_extra_km_rate";
+
 export const VEHICLE_CATALOG_EXTRA_COLUMNS =
   "daily_rate, fuel, transmission, power, location, description, slug, is_published";
 
@@ -20,12 +23,21 @@ export const PUBLIC_VEHICLE_CATALOG_BASE =
 export const PUBLIC_VEHICLE_CATALOG_SELECT = PUBLIC_VEHICLE_CATALOG_BASE;
 
 export const ADMIN_VEHICLE_BASE_SELECT =
+  `id, owner_id, brand, model, version, year, plate, vin, color, mileage, status, image_url, daily_rate, ${VEHICLE_PRICING_COLUMNS}, ${VEHICLE_PRO_PRICING_COLUMNS}, fuel, transmission, power, location, description, slug, is_published, created_at, updated_at`;
+
+export const ADMIN_VEHICLE_BASE_SELECT_LEGACY =
   `id, owner_id, brand, model, version, year, plate, vin, color, mileage, status, image_url, daily_rate, ${VEHICLE_PRICING_COLUMNS}, fuel, transmission, power, location, description, slug, is_published, created_at, updated_at`;
 
 export const ADMIN_VEHICLE_FULL_SELECT =
   `${ADMIN_VEHICLE_BASE_SELECT}, public_image_url, hero_image_url`;
 
+export const ADMIN_VEHICLE_FULL_SELECT_LEGACY =
+  `${ADMIN_VEHICLE_BASE_SELECT_LEGACY}, public_image_url, hero_image_url`;
+
 export const ADMIN_VEHICLE_PRICING_SELECT =
+  `id, owner_id, brand, model, version, year, plate, vin, color, mileage, status, image_url, ${VEHICLE_PRICING_COLUMNS}, ${VEHICLE_PRO_PRICING_COLUMNS}, created_at, updated_at`;
+
+export const ADMIN_VEHICLE_PRICING_SELECT_LEGACY =
   `id, owner_id, brand, model, version, year, plate, vin, color, mileage, status, image_url, ${VEHICLE_PRICING_COLUMNS}, created_at, updated_at`;
 
 export type PublicVehicleDbRow = {

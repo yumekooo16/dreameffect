@@ -12,6 +12,10 @@ import {
   normalizeVehiclePricing,
   type VehiclePricing,
 } from "@/src/lib/vehicles/pricing";
+import {
+  normalizeVehicleProPricing,
+  type VehicleProPricing,
+} from "@/src/lib/revenue/pro-pricing";
 import { isMissingColumnError } from "@/src/lib/vehicles/db-columns";
 
 const BUCKET = "vehicle-images";
@@ -34,6 +38,7 @@ export type VehicleFormData = {
   mileage: number;
   status: VehicleStatus;
   pricing?: Partial<VehiclePricing>;
+  proPricing?: Partial<VehicleProPricing>;
   fuel?: FuelType | "";
   transmission?: TransmissionType | "";
   power?: number | null;
@@ -46,11 +51,17 @@ function pricingPayload(data: VehicleFormData) {
   return normalizeVehiclePricing(data.pricing);
 }
 
+function proPricingPayload(data: VehicleFormData) {
+  return normalizeVehicleProPricing(data.proPricing);
+}
+
 function catalogPayload(data: VehicleFormData) {
   const pricing = pricingPayload(data);
+  const proPricing = proPricingPayload(data);
 
   return {
     ...pricing,
+    ...proPricing,
     daily_rate: deriveDailyRate(pricing),
     fuel: data.fuel?.trim() || null,
     transmission: data.transmission?.trim() || null,

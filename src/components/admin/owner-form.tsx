@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { createOwnerAccount } from "@/src/lib/admin/owners-actions";
 import type { OwnerFormData } from "@/src/lib/admin/owners-types";
+import type { RevenueMode } from "@/src/lib/revenue/split";
 
 const defaultForm: OwnerFormData = {
   email: "",
@@ -11,6 +12,8 @@ const defaultForm: OwnerFormData = {
   first_name: "",
   last_name: "",
   phone: "",
+  revenue_mode: "percentage",
+  owner_revenue_share_percent: 60,
 };
 
 export default function OwnerForm({ cancelHref }: { cancelHref: string }) {
@@ -46,8 +49,8 @@ export default function OwnerForm({ cancelHref }: { cancelHref: string }) {
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       <p className="text-sm de-muted">
-        Créez un accès à l&apos;espace propriétaire. Le propriétaire pourra se
-        connecter avec l&apos;email et le mot de passe définis ci-dessous.
+        Créez un accès à l&apos;espace propriétaire. Choisissez ensuite comment
+        calculer automatiquement ses gains.
       </p>
 
       <div className="grid gap-3 sm:grid-cols-2">
@@ -125,6 +128,95 @@ export default function OwnerForm({ cancelHref }: { cancelHref: string }) {
             className="de-input w-full"
           />
         </div>
+      </div>
+
+      <div className="space-y-3 border-t border-[var(--blue-border)] pt-5">
+        <h3 className="de-display text-base tracking-tight">
+          Rémunération automatique
+        </h3>
+        <p className="text-sm de-muted">
+          Pourcentage du CA client, ou grille de prix pro sur chaque véhicule
+          (saisie dans la fiche véhicule).
+        </p>
+
+        <fieldset className="grid gap-2">
+          <legend className="sr-only">Mode de rémunération</legend>
+          <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-[var(--blue-border)] p-3">
+            <input
+              type="radio"
+              name="revenue_mode"
+              className="mt-1"
+              checked={form.revenue_mode === "percentage"}
+              onChange={() =>
+                updateField("revenue_mode", "percentage" as RevenueMode)
+              }
+            />
+            <span>
+              <span className="block text-sm font-medium">Pourcentage</span>
+              <span className="text-xs de-muted">
+                Part propriétaire calculée automatiquement sur le prix de
+                location client.
+              </span>
+            </span>
+          </label>
+          <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-[var(--blue-border)] p-3">
+            <input
+              type="radio"
+              name="revenue_mode"
+              className="mt-1"
+              checked={form.revenue_mode === "pro_price"}
+              onChange={() =>
+                updateField("revenue_mode", "pro_price" as RevenueMode)
+              }
+            />
+            <span>
+              <span className="block text-sm font-medium">Prix pro</span>
+              <span className="text-xs de-muted">
+                Gain calculé via la grille prix pro du véhicule (+ km
+                supplémentaires).
+              </span>
+            </span>
+          </label>
+        </fieldset>
+
+        {form.revenue_mode === "percentage" && (
+          <div>
+            <label
+              htmlFor="owner-share-percent"
+              className="de-label mb-1 block"
+            >
+              Part propriétaire (%)
+            </label>
+            <input
+              id="owner-share-percent"
+              type="number"
+              min={0}
+              max={100}
+              step={1}
+              required
+              value={form.owner_revenue_share_percent}
+              onChange={(e) =>
+                updateField(
+                  "owner_revenue_share_percent",
+                  Number(e.target.value)
+                )
+              }
+              className="de-input w-full max-w-xs"
+            />
+            <p className="mt-1 text-xs de-muted">
+              DreamEffect conserve automatiquement le reste (
+              {Math.max(0, 100 - Number(form.owner_revenue_share_percent || 0))}
+              %).
+            </p>
+          </div>
+        )}
+
+        {form.revenue_mode === "pro_price" && (
+          <p className="text-sm de-muted">
+            Renseignez ensuite la grille prix pro sur chaque véhicule de ce
+            propriétaire (ex. 24 h semaine, week-end, km inclus).
+          </p>
+        )}
       </div>
 
       {error && <p className="text-sm text-destructive">{error}</p>}

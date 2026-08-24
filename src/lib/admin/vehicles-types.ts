@@ -22,6 +22,13 @@ export type VehicleRow = {
   price_72h_weekend?: number | null;
   price_7_days?: number | null;
   deposit?: number | null;
+  pro_price_24h_weekday?: number | null;
+  pro_price_24h_weekend?: number | null;
+  pro_price_48h_weekend?: number | null;
+  pro_price_72h_weekend?: number | null;
+  pro_price_7_days?: number | null;
+  pro_included_km?: number | null;
+  pro_extra_km_rate?: number | null;
   fuel?: string | null;
   transmission?: string | null;
   power?: number | null;

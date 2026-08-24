@@ -1,5 +1,11 @@
 /** Répartition automatique des revenus de location DreamEffect. */
 
+import {
+  computeProOwnerPayout,
+  hasAnyProPrice,
+  type VehicleProPricing,
+} from "@/src/lib/revenue/pro-pricing";
+
 export const OWNER_REVENUE_SHARE = 0.6;
 export const COMPANY_REVENUE_SHARE = 0.4;
 
@@ -8,24 +14,93 @@ export const COMPANY_REVENUE_SHARE_PERCENT = Math.round(
   COMPANY_REVENUE_SHARE * 100
 );
 
+export type RevenueMode = "percentage" | "pro_price";
+
 export type RevenueSplit = {
   total: number;
   ownerAmount: number;
   companyAmount: number;
 };
 
-export function splitRevenue(total: number): RevenueSplit {
+export type RevenueSplitContext = {
+  mode: RevenueMode;
+  /** Part propriétaire 0–1 (mode percentage). Défaut 0.6. */
+  ownerShare?: number | null;
+  startDate?: string | null;
+  endDate?: string | null;
+  distanceKm?: number | null;
+  proPricing?: VehicleProPricing | null;
+};
+
+export function normalizeOwnerShare(share?: number | null) {
+  if (share == null || !Number.isFinite(share)) return OWNER_REVENUE_SHARE;
+  if (share < 0) return 0;
+  if (share > 1) return 1;
+  return share;
+}
+
+export function splitRevenue(
+  total: number,
+  ownerShare: number = OWNER_REVENUE_SHARE
+): RevenueSplit {
   const safeTotal = Number.isFinite(total) && total > 0 ? total : 0;
-  const ownerAmount =
-    Math.round(safeTotal * OWNER_REVENUE_SHARE * 100) / 100;
-  const companyAmount =
-    Math.round((safeTotal - ownerAmount) * 100) / 100;
+  const share = normalizeOwnerShare(ownerShare);
+  const ownerAmount = Math.round(safeTotal * share * 100) / 100;
+  const companyAmount = Math.round((safeTotal - ownerAmount) * 100) / 100;
 
   return {
     total: safeTotal,
     ownerAmount,
     companyAmount,
   };
+}
+
+/**
+ * Calcule la répartition selon le mode propriétaire.
+ * - percentage : % du prix client
+ * - pro_price : grille prix pro véhicule (+ km supp.) ; DreamEffect = reste du CA
+ */
+export function splitRevenueForContext(
+  total: number,
+  context?: RevenueSplitContext | null
+): RevenueSplit & { mode: RevenueMode; tierLabel?: string | null } {
+  const mode = context?.mode ?? "percentage";
+  const safeTotal = Number.isFinite(total) && total > 0 ? total : 0;
+
+  if (
+    mode === "pro_price" &&
+    context?.proPricing &&
+    hasAnyProPrice(context.proPricing) &&
+    context.startDate &&
+    context.endDate
+  ) {
+    const payout = computeProOwnerPayout(
+      context.proPricing,
+      context.startDate,
+      context.endDate,
+      context.distanceKm
+    );
+
+    if (payout) {
+      const ownerAmount = payout.ownerAmount;
+      const companyAmount =
+        Math.round((safeTotal - ownerAmount) * 100) / 100;
+
+      return {
+        total: safeTotal,
+        ownerAmount,
+        companyAmount,
+        mode: "pro_price",
+        tierLabel: payout.tierLabel,
+      };
+    }
+  }
+
+  const percentageSplit = splitRevenue(
+    safeTotal,
+    context?.ownerShare ?? undefined
+  );
+  return { ...percentageSplit, mode: "percentage", tierLabel: null };
 }
 
 export function resolveReservationSplit(reservation: {
@@ -41,7 +116,7 @@ export function resolveReservationSplit(reservation: {
   const storedOwner = reservation.owner_amount;
   const storedCompany = reservation.company_amount;
 
-  // Préférer les montants persistés (historique stable si le % change)
+  // Préférer les montants persistés (historique stable si le % / mode change)
   if (
     storedOwner != null &&
     storedCompany != null &&
@@ -97,4 +172,8 @@ export function computeRevenueSummary(
 
 export function formatEuro(amount: number) {
   return `${amount.toLocaleString("fr-FR")} €`;
+}
+
+export function revenueModeLabel(mode: RevenueMode) {
+  return mode === "pro_price" ? "Prix pro" : "Pourcentage";
 }

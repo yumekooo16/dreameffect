@@ -6,7 +6,7 @@ import { fetchVehiclesForReservationForm } from "@/src/lib/admin/reservations-da
 
 export default async function NewReservationPage() {
   await requireAdmin();
-  const vehicles = await fetchVehiclesForReservationForm();
+  const { vehicles, revenueConfigs } = await fetchVehiclesForReservationForm();
 
   return (
     <div className="space-y-8">
@@ -25,6 +25,7 @@ export default async function NewReservationPage() {
       <Section title="Informations de location">
         <ReservationForm
           vehicles={vehicles}
+          revenueConfigs={revenueConfigs}
           mode="create"
           cancelHref="/admin/reservations"
         />

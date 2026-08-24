@@ -44,23 +44,33 @@ async function fetchBannedOwnerIds(): Promise<Set<string>> {
 export async function fetchOwnersList(): Promise<OwnerListItem[]> {
   const supabase = await createClient();
 
-  const [ownersRes, vehiclesRes, reservationsRes, bannedIds] =
-    await Promise.all([
-      supabase
-        .from("profiles")
-        .select("id, first_name, last_name, phone, role, created_at")
-        .eq("role", "owner")
-        .order("last_name", { ascending: true }),
-      supabase
-        .from("owner_vehicle_dashboard")
-        .select("vehicle_id, owner_id, total_revenue"),
-      supabase
-        .from("reservations")
-        .select("id, vehicle_id, status"),
-      fetchBannedOwnerIds(),
-    ]);
+  let ownersQuery = await supabase
+    .from("profiles")
+    .select(
+      "id, first_name, last_name, phone, role, created_at, revenue_mode, owner_revenue_share"
+    )
+    .eq("role", "owner")
+    .order("last_name", { ascending: true });
 
-  const owners = (ownersRes.data ?? []) as OwnerProfile[];
+  let owners = (ownersQuery.data ?? []) as OwnerProfile[];
+
+  if (ownersQuery.error?.message?.includes("does not exist")) {
+    const fallback = await supabase
+      .from("profiles")
+      .select("id, first_name, last_name, phone, role, created_at")
+      .eq("role", "owner")
+      .order("last_name", { ascending: true });
+    owners = (fallback.data ?? []) as OwnerProfile[];
+  }
+
+  const [vehiclesRes, reservationsRes, bannedIds] = await Promise.all([
+    supabase
+      .from("owner_vehicle_dashboard")
+      .select("vehicle_id, owner_id, total_revenue"),
+    supabase.from("reservations").select("id, vehicle_id, status"),
+    fetchBannedOwnerIds(),
+  ]);
+
   const vehicles = vehiclesRes.data ?? [];
   const reservations = reservationsRes.data ?? [];
 
@@ -106,18 +116,45 @@ export async function fetchOwnersList(): Promise<OwnerListItem[]> {
 
 export async function fetchOwnerDetail(ownerId: string) {
   const supabase = await createClient();
-  const admin = createAdminClient();
 
   const { data: owner, error: ownerError } = await supabase
     .from("profiles")
-    .select("id, first_name, last_name, phone, role, created_at")
+    .select(
+      "id, first_name, last_name, phone, role, created_at, revenue_mode, owner_revenue_share"
+    )
     .eq("id", ownerId)
     .eq("role", "owner")
     .single();
 
   if (ownerError || !owner) {
+    if (ownerError?.message?.includes("does not exist")) {
+      const { data: fallbackOwner, error: fallbackError } = await supabase
+        .from("profiles")
+        .select("id, first_name, last_name, phone, role, created_at")
+        .eq("id", ownerId)
+        .eq("role", "owner")
+        .single();
+
+      if (fallbackError || !fallbackOwner) {
+        return null;
+      }
+
+      return fetchOwnerDetailWithProfile({
+        ...fallbackOwner,
+        revenue_mode: "percentage",
+        owner_revenue_share: 0.6,
+      } as OwnerProfile);
+    }
     return null;
   }
+
+  return fetchOwnerDetailWithProfile(owner as OwnerProfile);
+}
+
+async function fetchOwnerDetailWithProfile(owner: OwnerProfile) {
+  const supabase = await createClient();
+  const admin = createAdminClient();
+  const ownerId = owner.id;
 
   const { data: vehiclesData } = await supabase
     .from("vehicles")
