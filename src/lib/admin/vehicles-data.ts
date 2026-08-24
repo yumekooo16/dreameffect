@@ -2,8 +2,11 @@ import { createClient } from "@/src/lib/supabase/server";
 import type { ReservationRow } from "@/src/lib/admin/dashboard-data";
 import {
   ADMIN_VEHICLE_BASE_SELECT,
+  ADMIN_VEHICLE_BASE_SELECT_LEGACY,
   ADMIN_VEHICLE_FULL_SELECT,
+  ADMIN_VEHICLE_FULL_SELECT_LEGACY,
   ADMIN_VEHICLE_PRICING_SELECT,
+  ADMIN_VEHICLE_PRICING_SELECT_LEGACY,
   isMissingColumnError,
 } from "@/src/lib/vehicles/db-columns";
 import {
@@ -127,6 +130,16 @@ async function fetchVehicleRow(
     return null;
   }
 
+  const fullLegacy = await supabase
+    .from("vehicles")
+    .select(ADMIN_VEHICLE_FULL_SELECT_LEGACY)
+    .eq("id", vehicleId)
+    .single();
+
+  if (!fullLegacy.error && fullLegacy.data) {
+    return fullLegacy.data as VehicleRow;
+  }
+
   const baseResult = await supabase
     .from("vehicles")
     .select(ADMIN_VEHICLE_BASE_SELECT)
@@ -144,18 +157,51 @@ async function fetchVehicleRow(
     return null;
   }
 
+  const baseLegacy = await supabase
+    .from("vehicles")
+    .select(ADMIN_VEHICLE_BASE_SELECT_LEGACY)
+    .eq("id", vehicleId)
+    .single();
+
+  if (!baseLegacy.error && baseLegacy.data) {
+    return enrichOptionalVehicleImages(
+      supabase,
+      baseLegacy.data as VehicleRow
+    );
+  }
+
   const pricingResult = await supabase
     .from("vehicles")
     .select(ADMIN_VEHICLE_PRICING_SELECT)
     .eq("id", vehicleId)
     .single();
 
-  if (pricingResult.error || !pricingResult.data) {
+  if (!pricingResult.error && pricingResult.data) {
+    return enrichOptionalVehicleImages(supabase, {
+      ...(pricingResult.data as VehicleRow),
+      daily_rate: null,
+      fuel: null,
+      transmission: null,
+      power: null,
+      location: null,
+      description: null,
+      slug: null,
+      is_published: true,
+    });
+  }
+
+  const pricingLegacy = await supabase
+    .from("vehicles")
+    .select(ADMIN_VEHICLE_PRICING_SELECT_LEGACY)
+    .eq("id", vehicleId)
+    .single();
+
+  if (pricingLegacy.error || !pricingLegacy.data) {
     return null;
   }
 
   return enrichOptionalVehicleImages(supabase, {
-    ...(pricingResult.data as VehicleRow),
+    ...(pricingLegacy.data as VehicleRow),
     daily_rate: null,
     fuel: null,
     transmission: null,

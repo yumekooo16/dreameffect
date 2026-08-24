@@ -1,6 +1,11 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { splitRevenueForContext } from "@/src/lib/revenue/split";
+import {
+  accrueReservationDailyRevenue,
+  type ReservationForDailyLedger,
+} from "@/src/lib/revenue/daily-ledger";
+import { buildRevenueSplitContextForVehicle } from "@/src/lib/revenue/owner-settings";
 import { createClient } from "@/src/lib/supabase/server";
 import { requireAdmin } from "@/src/lib/admin/auth";
 import type { ReservationFormData } from "@/src/lib/admin/reservations-types";
@@ -12,11 +17,7 @@ import {
 } from "@/src/lib/admin/reservations-notifications";
 import { syncVehicleStatusFromReservations } from "@/src/lib/vehicles/sync-status";
 import { buildVehicleSlug } from "@/src/lib/public/vehicle-slug";
-import { splitRevenue } from "@/src/lib/revenue/split";
-import {
-  accrueReservationDailyRevenue,
-  type ReservationForDailyLedger,
-} from "@/src/lib/revenue/daily-ledger";
+import { revalidatePath } from "next/cache";
 
 type ActionResult = {
   success: boolean;
@@ -78,8 +79,21 @@ async function getVehicleInfo(vehicleId: string) {
   return data;
 }
 
-function buildPayload(data: ReservationFormData) {
-  const { ownerAmount, companyAmount } = splitRevenue(data.total_price);
+async function buildPayload(data: ReservationFormData) {
+  const supabase = await createClient();
+  const context = await buildRevenueSplitContextForVehicle(
+    supabase,
+    data.vehicle_id,
+    {
+      startDate: data.start_date,
+      endDate: data.end_date,
+      distanceKm: data.distance_km,
+    }
+  );
+  const { ownerAmount, companyAmount } = splitRevenueForContext(
+    data.total_price,
+    context
+  );
 
   return {
     vehicle_id: data.vehicle_id,
@@ -218,10 +232,11 @@ export async function createReservation(
   }
 
   const supabase = await createClient();
+  const payload = await buildPayload({ ...data, status });
 
   const { data: reservation, error } = await supabase
     .from("reservations")
-    .insert(buildPayload({ ...data, status }))
+    .insert(payload)
     .select(
       "id, vehicle_id, start_date, end_date, customer_name, customer_email, pickup_location, return_location, status, owner_amount, company_amount, total_price, distance_km"
     )
@@ -295,9 +310,11 @@ export async function updateReservation(
     .eq("id", reservationId)
     .single();
 
+  const payload = await buildPayload(data);
+
   const { data: reservation, error } = await supabase
     .from("reservations")
-    .update(buildPayload(data))
+    .update(payload)
     .eq("id", reservationId)
     .select(
       "id, vehicle_id, start_date, end_date, customer_name, customer_email, pickup_location, return_location, status, owner_amount, company_amount, total_price, distance_km"
@@ -443,11 +460,24 @@ export async function finishReservation(
     return { success: false, error: "Réservation introuvable" };
   }
 
+  const context = await buildRevenueSplitContextForVehicle(
+    supabase,
+    existing.vehicle_id,
+    {
+      startDate: existing.start_date,
+      endDate: existing.end_date,
+      distanceKm,
+    }
+  );
+  const split = splitRevenueForContext(Number(existing.total_price ?? 0), context);
+
   const { data: reservation, error } = await supabase
     .from("reservations")
     .update({
       status: "finished",
       distance_km: distanceKm,
+      owner_amount: split.ownerAmount,
+      company_amount: split.companyAmount,
       updated_at: new Date().toISOString(),
     })
     .eq("id", reservationId)

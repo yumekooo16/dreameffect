@@ -25,6 +25,8 @@ export type ReservationForDailyLedger = {
   end_date: string;
   status: string;
   total_price?: number | null;
+  owner_amount?: number | null;
+  company_amount?: number | null;
   customer_name?: string | null;
 };
 
@@ -60,6 +62,31 @@ export function getDailyRevenueAmounts(totalPrice: number, rentalDays: number) {
   return splitRevenue(dailyTotal);
 }
 
+/** Répartit au prorata des montants déjà calculés (%, prix pro, km). */
+export function getDailyRevenueAmountsFromStoredSplit(
+  reservation: Pick<
+    ReservationForDailyLedger,
+    "total_price" | "owner_amount" | "company_amount"
+  >,
+  rentalDays: number
+) {
+  const days = Math.max(rentalDays, 1);
+  const split = resolveReservationSplit(reservation);
+  if (split.total <= 0) {
+    return { total: 0, ownerAmount: 0, companyAmount: 0 };
+  }
+
+  const dailyTotal = Math.round((split.total / days) * 100) / 100;
+  const dailyOwner = Math.round((split.ownerAmount / days) * 100) / 100;
+  const dailyCompany = Math.round((dailyTotal - dailyOwner) * 100) / 100;
+
+  return {
+    total: dailyTotal,
+    ownerAmount: dailyOwner,
+    companyAmount: dailyCompany,
+  };
+}
+
 export function canAccrueDailyRevenue(reservation: ReservationForDailyLedger) {
   return reservation.status === "confirmed";
 }
@@ -84,10 +111,7 @@ export async function accrueReservationDailyRevenue(
     reservation.start_date,
     reservation.end_date
   );
-  const daily = getDailyRevenueAmounts(
-    Number(reservation.total_price ?? 0),
-    rentalDays
-  );
+  const daily = getDailyRevenueAmountsFromStoredSplit(reservation, rentalDays);
 
   if (daily.total <= 0) {
     return { created: false, ownerAmount: 0, ledgerDate };
@@ -133,7 +157,7 @@ export async function accrueAllConfirmedReservations(
   const { data: reservations, error } = await supabase
     .from("reservations")
     .select(
-      "id, vehicle_id, start_date, end_date, status, total_price, customer_name"
+      "id, vehicle_id, start_date, end_date, status, total_price, owner_amount, company_amount, customer_name"
     )
     .eq("status", "confirmed");
 

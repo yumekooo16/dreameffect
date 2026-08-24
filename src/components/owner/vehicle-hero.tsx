@@ -5,6 +5,7 @@ import { resolveVehicleImageUrl } from "@/src/lib/image-url";
 import {
   COMPANY_REVENUE_SHARE_PERCENT,
   OWNER_REVENUE_SHARE_PERCENT,
+  type RevenueMode,
 } from "@/src/lib/revenue/split";
 
 type NextReservation = {
@@ -29,6 +30,7 @@ type VehicleHeroProps = {
   reservationCount: number;
   nextReservation: NextReservation;
   fleetCount?: number;
+  revenueMode?: RevenueMode | null;
 };
 
 function formatDate(date: string) {
@@ -59,11 +61,20 @@ export default function VehicleHero({
   reservationCount,
   nextReservation,
   fleetCount = 1,
+  revenueMode = "percentage",
 }: VehicleHeroProps) {
   const imageSrc =
     resolveVehicleImageUrl(heroImageUrl) ??
     resolveVehicleImageUrl(fallbackImageUrl);
   const displayModel = [model, version?.trim()].filter(Boolean).join(" ");
+  const ownerShareLabel =
+    revenueMode === "pro_price"
+      ? "Votre part (prix pro)"
+      : `Votre part (${OWNER_REVENUE_SHARE_PERCENT} %)`;
+  const companyShareLabel =
+    revenueMode === "pro_price"
+      ? "DreamEffect (marge)"
+      : `DreamEffect (${COMPANY_REVENUE_SHARE_PERCENT} %)`;
 
   return (
     <section className="de-vehicle-hero" aria-labelledby="owner-vehicle-hero-title">
@@ -131,11 +142,11 @@ export default function VehicleHero({
           <p className="de-vehicle-hero__stat-value">{formatEuro(totalRevenue)}</p>
         </div>
         <div className="de-vehicle-hero__stat de-vehicle-hero__stat--highlight">
-          <p className="de-label">Votre part ({OWNER_REVENUE_SHARE_PERCENT}&nbsp;%)</p>
+          <p className="de-label">{ownerShareLabel}</p>
           <p className="de-vehicle-hero__stat-value">{formatEuro(ownerShare)}</p>
         </div>
         <div className="de-vehicle-hero__stat">
-          <p className="de-label">DreamEffect ({COMPANY_REVENUE_SHARE_PERCENT}&nbsp;%)</p>
+          <p className="de-label">{companyShareLabel}</p>
           <p className="de-vehicle-hero__stat-value">{formatEuro(companyShare)}</p>
         </div>
         <div className="de-vehicle-hero__stat">

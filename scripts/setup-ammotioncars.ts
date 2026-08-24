@@ -9,7 +9,8 @@ import dotenv from "dotenv";
 import { createAdminClient } from "@/src/lib/supabase/admin";
 import { buildVehicleSlug } from "@/src/lib/public/vehicle-slug";
 import { deriveDailyRate } from "@/src/lib/vehicles/pricing";
-import { splitRevenue } from "@/src/lib/revenue/split";
+import { splitRevenueForContext } from "@/src/lib/revenue/split";
+import { normalizeVehicleProPricing } from "@/src/lib/revenue/pro-pricing";
 
 dotenv.config({ path: ".env.local" });
 dotenv.config({ path: ".env" });
@@ -37,6 +38,16 @@ const MONTHLY_PROJECTION = [
   { month: 12, daysRented: 18, revenue: 2250 },
 ] as const;
 
+const PRO_PRICING = normalizeVehicleProPricing({
+  pro_price_24h_weekday: 70,
+  pro_price_24h_weekend: 120,
+  pro_price_48h_weekend: 200,
+  pro_price_72h_weekend: 300,
+  pro_price_7_days: 500,
+  pro_included_km: 200,
+  pro_extra_km_rate: 1,
+});
+
 const VEHICLE = {
   brand: "BMW",
   model: "Serie 2",
@@ -61,11 +72,23 @@ const VEHICLE = {
     price_7_days: 650,
     deposit: 2000,
   },
+  proPricing: PRO_PRICING,
 };
 
-/** Part propriétaire / commission DreamEffect — appliquée automatiquement (60 / 40). */
-function splitAmount(total: number) {
-  const { ownerAmount, companyAmount } = splitRevenue(total);
+/** Part propriétaire via grille prix pro (mode AM Motion). */
+function splitAmount(
+  total: number,
+  start: string,
+  end: string,
+  distanceKm: number
+) {
+  const { ownerAmount, companyAmount } = splitRevenueForContext(total, {
+    mode: "pro_price",
+    startDate: start,
+    endDate: end,
+    distanceKm,
+    proPricing: PRO_PRICING,
+  });
   return { ownerAmount, companyAmount };
 }
 
@@ -120,12 +143,33 @@ async function ensureOwner(supabase: ReturnType<typeof createAdminClient>) {
       last_name: "Cars",
       role: "owner",
       phone: "+33 6 16 32 03 81",
+      revenue_mode: "pro_price",
+      owner_revenue_share: null,
     },
     { onConflict: "id" }
   );
 
   if (profileError) {
-    throw new Error(`Profil propriétaire : ${profileError.message}`);
+    if (profileError.message.includes("does not exist")) {
+      const { error: fallbackError } = await supabase.from("profiles").upsert(
+        {
+          id: user.id,
+          first_name: "AM Motion",
+          last_name: "Cars",
+          role: "owner",
+          phone: "+33 6 16 32 03 81",
+        },
+        { onConflict: "id" }
+      );
+      if (fallbackError) {
+        throw new Error(`Profil propriétaire : ${fallbackError.message}`);
+      }
+      console.warn(
+        "⚠ Colonnes revenue_mode absentes — exécutez la migration 20260824120000_owner_revenue_modes.sql"
+      );
+    } else {
+      throw new Error(`Profil propriétaire : ${profileError.message}`);
+    }
   }
 
   return user.id;
@@ -157,6 +201,7 @@ async function ensureVehicle(
     plate: VEHICLE.plate,
     slug,
     ...VEHICLE.pricing,
+    ...VEHICLE.proPricing,
     daily_rate: deriveDailyRate(VEHICLE.pricing),
     fuel: VEHICLE.fuel,
     transmission: VEHICLE.transmission,
@@ -225,20 +270,35 @@ async function seedReservations(
 
   if ((count ?? 0) >= MONTHLY_PROJECTION.length) {
     console.log(
-      `ℹ Projection ${PROJECTION_LABEL} (${PROJECTION_YEAR}) déjà en base — mise à jour des parts 60/40`
+      `ℹ Projection ${PROJECTION_LABEL} (${PROJECTION_YEAR}) déjà en base — mise à jour des parts prix pro`
     );
 
     for (const month of MONTHLY_PROJECTION) {
-      const { ownerAmount, companyAmount } = splitAmount(month.revenue);
+      const { start, end } = monthDateRange(
+        PROJECTION_YEAR,
+        month.month,
+        month.daysRented
+      );
+      const distanceKm = month.daysRented * 120;
+      const { ownerAmount, companyAmount } = splitAmount(
+        month.revenue,
+        start,
+        end,
+        distanceKm
+      );
       await supabase
         .from("reservations")
         .update({
           owner_amount: ownerAmount,
           company_amount: companyAmount,
           total_price: month.revenue,
+          distance_km: distanceKm,
         })
         .eq("vehicle_id", vehicleId)
-        .like("customer_name", `Client projection ${String(month.month).padStart(2, "0")}/${PROJECTION_YEAR}%`);
+        .like(
+          "customer_name",
+          `Client projection ${String(month.month).padStart(2, "0")}/${PROJECTION_YEAR}%`
+        );
     }
 
     return;
@@ -246,9 +306,14 @@ async function seedReservations(
 
   for (const month of MONTHLY_PROJECTION) {
     const { start, end } = monthDateRange(PROJECTION_YEAR, month.month, month.daysRented);
-    const { ownerAmount, companyAmount } = splitAmount(month.revenue);
     const avgKmPerDay = 120;
     const distanceKm = month.daysRented * avgKmPerDay;
+    const { ownerAmount, companyAmount } = splitAmount(
+      month.revenue,
+      start,
+      end,
+      distanceKm
+    );
 
     const { error } = await supabase.from("reservations").insert({
       vehicle_id: vehicleId,
@@ -270,7 +335,7 @@ async function seedReservations(
     }
 
     console.log(
-      `✓ Réservation ${String(month.month).padStart(2, "0")}/${PROJECTION_YEAR} (${PROJECTION_LABEL}) — ${month.daysRented} j, ${month.revenue} €`
+      `✓ Réservation ${String(month.month).padStart(2, "0")}/${PROJECTION_YEAR} (${PROJECTION_LABEL}) — ${month.daysRented} j, CA ${month.revenue} € → prop. ${ownerAmount} €`
     );
   }
 

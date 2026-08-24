@@ -152,7 +152,36 @@ function validateOwnerForm(data: OwnerFormData): string | null {
   if (!data.password || data.password.length < 8) {
     return "Mot de passe requis (8 caractères minimum)";
   }
+  if (data.revenue_mode !== "percentage" && data.revenue_mode !== "pro_price") {
+    return "Mode de rémunération invalide";
+  }
+  if (data.revenue_mode === "percentage") {
+    const percent = Number(data.owner_revenue_share_percent);
+    if (!Number.isFinite(percent) || percent < 0 || percent > 100) {
+      return "Le pourcentage propriétaire doit être entre 0 et 100";
+    }
+  }
   return null;
+}
+
+function revenueFieldsFromForm(data: {
+  revenue_mode: OwnerFormData["revenue_mode"];
+  owner_revenue_share_percent: number;
+}) {
+  if (data.revenue_mode === "pro_price") {
+    return {
+      revenue_mode: "pro_price" as const,
+      owner_revenue_share: null as number | null,
+    };
+  }
+
+  const percent = Number(data.owner_revenue_share_percent);
+  const share = Math.round(Math.min(100, Math.max(0, percent)) * 100) / 10000;
+
+  return {
+    revenue_mode: "percentage" as const,
+    owner_revenue_share: share,
+  };
 }
 
 async function findAuthUserByEmail(email: string) {
@@ -245,6 +274,7 @@ export async function createOwnerAccount(
     }
 
     const ownerId = created.user.id;
+    const revenueFields = revenueFieldsFromForm(data);
 
     const { error: profileError } = await admin.from("profiles").upsert(
       {
@@ -253,16 +283,39 @@ export async function createOwnerAccount(
         last_name: lastName || null,
         phone,
         role: "owner",
+        ...revenueFields,
       },
       { onConflict: "id" }
     );
 
     if (profileError) {
-      await admin.auth.admin.deleteUser(ownerId);
-      return {
-        success: false,
-        error: `Profil propriétaire impossible : ${profileError.message}`,
-      };
+      // Colonnes revenue_* absentes (migration non appliquée) → retry sans
+      if (profileError.message.includes("does not exist")) {
+        const { error: fallbackError } = await admin.from("profiles").upsert(
+          {
+            id: ownerId,
+            first_name: firstName || null,
+            last_name: lastName || null,
+            phone,
+            role: "owner",
+          },
+          { onConflict: "id" }
+        );
+
+        if (fallbackError) {
+          await admin.auth.admin.deleteUser(ownerId);
+          return {
+            success: false,
+            error: `Profil propriétaire impossible : ${fallbackError.message}`,
+          };
+        }
+      } else {
+        await admin.auth.admin.deleteUser(ownerId);
+        return {
+          success: false,
+          error: `Profil propriétaire impossible : ${profileError.message}`,
+        };
+      }
     }
 
     revalidateOwnerPaths(ownerId);
@@ -280,11 +333,28 @@ export async function updateOwnerProfile(
     first_name: string;
     last_name: string;
     phone: string;
+    revenue_mode: OwnerFormData["revenue_mode"];
+    owner_revenue_share_percent: number;
   }
 ): Promise<ActionResult> {
   await requireAdmin();
 
+  if (data.revenue_mode !== "percentage" && data.revenue_mode !== "pro_price") {
+    return { success: false, error: "Mode de rémunération invalide" };
+  }
+
+  if (data.revenue_mode === "percentage") {
+    const percent = Number(data.owner_revenue_share_percent);
+    if (!Number.isFinite(percent) || percent < 0 || percent > 100) {
+      return {
+        success: false,
+        error: "Le pourcentage propriétaire doit être entre 0 et 100",
+      };
+    }
+  }
+
   const supabase = await createClient();
+  const revenueFields = revenueFieldsFromForm(data);
 
   const { error } = await supabase
     .from("profiles")
@@ -292,11 +362,34 @@ export async function updateOwnerProfile(
       first_name: data.first_name.trim(),
       last_name: data.last_name.trim(),
       phone: data.phone.trim() || null,
+      ...revenueFields,
     })
     .eq("id", ownerId)
     .eq("role", "owner");
 
   if (error) {
+    if (error.message.includes("does not exist")) {
+      const { error: fallbackError } = await supabase
+        .from("profiles")
+        .update({
+          first_name: data.first_name.trim(),
+          last_name: data.last_name.trim(),
+          phone: data.phone.trim() || null,
+        })
+        .eq("id", ownerId)
+        .eq("role", "owner");
+
+      if (fallbackError) {
+        return { success: false, error: fallbackError.message };
+      }
+
+      return {
+        success: false,
+        error:
+          "Migration rémunération non appliquée — exécutez 20260824120000_owner_revenue_modes.sql",
+      };
+    }
+
     return { success: false, error: error.message };
   }
 

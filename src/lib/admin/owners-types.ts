@@ -1,4 +1,5 @@
 import type { ReservationRow } from "@/src/lib/admin/dashboard-data";
+import type { RevenueMode } from "@/src/lib/revenue/split";
 
 export type OwnerProfile = {
   id: string;
@@ -7,6 +8,8 @@ export type OwnerProfile = {
   phone: string | null;
   role: string;
   created_at?: string | null;
+  revenue_mode?: RevenueMode | null;
+  owner_revenue_share?: number | null;
 };
 
 export type OwnerFormData = {
@@ -15,6 +18,9 @@ export type OwnerFormData = {
   first_name: string;
   last_name: string;
   phone: string;
+  revenue_mode: RevenueMode;
+  /** Pourcentage 0–100 si mode percentage. Défaut 60. */
+  owner_revenue_share_percent: number;
 };
 
 export type OwnerListItem = OwnerProfile & {

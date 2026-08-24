@@ -7,7 +7,9 @@ import {
   confirmReservation,
   finishReservation,
 } from "@/src/lib/admin/reservations-actions";
-import ReservationForm from "./reservation-form";
+import ReservationForm, {
+  type ReservationVehicleRevenueConfig,
+} from "./reservation-form";
 import type { ReservationFormData } from "@/src/lib/admin/reservations-types";
 
 type VehicleOption = { id: string; label: string };
@@ -15,6 +17,7 @@ type VehicleOption = { id: string; label: string };
 export default function ReservationActionsPanel({
   reservationId,
   vehicles,
+  revenueConfigs = [],
   initial,
   canConfirm,
   canFinish,
@@ -22,6 +25,7 @@ export default function ReservationActionsPanel({
 }: {
   reservationId: string;
   vehicles: VehicleOption[];
+  revenueConfigs?: ReservationVehicleRevenueConfig[];
   initial: ReservationFormData;
   canConfirm: boolean;
   canFinish: boolean;
@@ -61,6 +65,7 @@ export default function ReservationActionsPanel({
       <div className="space-y-3">
         <ReservationForm
           vehicles={vehicles}
+          revenueConfigs={revenueConfigs}
           mode="edit"
           reservationId={reservationId}
           initial={initial}

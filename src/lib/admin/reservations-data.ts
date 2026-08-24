@@ -206,8 +206,16 @@ export async function fetchVehiclesForReservationForm() {
     (ownersRes.data ?? []).map((owner) => [owner.id, ownerDisplayName(owner)])
   );
 
-  return (data ?? []).map((vehicle) => ({
-    id: vehicle.vehicle_id,
-    label: `${vehicle.brand} ${vehicle.model} — ${owners.get(vehicle.owner_id) ?? "Propriétaire"}`,
-  }));
+  const { fetchVehiclesRevenueFormConfigs } = await import(
+    "@/src/lib/revenue/owner-settings"
+  );
+  const revenueConfigs = await fetchVehiclesRevenueFormConfigs(supabase);
+
+  return {
+    vehicles: (data ?? []).map((vehicle) => ({
+      id: vehicle.vehicle_id,
+      label: `${vehicle.brand} ${vehicle.model} — ${owners.get(vehicle.owner_id) ?? "Propriétaire"}`,
+    })),
+    revenueConfigs,
+  };
 }

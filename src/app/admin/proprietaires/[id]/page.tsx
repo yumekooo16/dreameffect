@@ -71,6 +71,8 @@ export default async function AdminOwnerDetailPage({
           phone={owner.phone ?? ""}
           createdAt={owner.created_at}
           role={owner.role}
+          revenueMode={owner.revenue_mode ?? "percentage"}
+          ownerRevenueShare={owner.owner_revenue_share ?? 0.6}
         />
       </Section>
 

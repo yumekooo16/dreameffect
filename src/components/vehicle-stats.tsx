@@ -16,11 +16,11 @@ const statItems = (stats: Stats) => [
     value: `${stats.total_revenue.toLocaleString("fr-FR")} €`,
   },
   {
-    label: "Votre part (60 %)",
+    label: "Votre part",
     value: `${(stats.owner_revenue ?? 0).toLocaleString("fr-FR")} €`,
   },
   {
-    label: "Part DreamEffect (40 %)",
+    label: "Part DreamEffect",
     value: `${(stats.company_revenue ?? 0).toLocaleString("fr-FR")} €`,
   },
   { label: "Jours loués", value: stats.rented_days.toLocaleString("fr-FR") },

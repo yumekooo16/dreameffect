@@ -18,6 +18,7 @@ import {
   fetchLedgerForReservations,
   resolveReservationSplit,
 } from "@/src/lib/revenue/daily-ledger";
+import { fetchOwnerRevenueSettings } from "@/src/lib/revenue/owner-settings";
 
 type ReservationRow = {
   id: string;
@@ -215,7 +216,8 @@ export default async function OwnerDashboard() {
 
   const supabase = await createClient();
 
-  const [profileRes, vehicles, monthlyRevenueRes] = await Promise.all([
+  const [profileRes, vehicles, monthlyRevenueRes, revenueSettings] =
+    await Promise.all([
       supabase
         .from("profiles")
         .select("first_name")
@@ -227,6 +229,7 @@ export default async function OwnerDashboard() {
         .select("amount")
         .eq("owner_id", user.id)
         .maybeSingle(),
+      fetchOwnerRevenueSettings(supabase, user.id),
     ]);
 
   if (vehicles.length === 0) {
@@ -323,6 +326,7 @@ export default async function OwnerDashboard() {
             primaryVehicle.vehicle_id
           )}
           fleetCount={vehicles.length}
+          revenueMode={revenueSettings.mode}
         />
       )}
 
@@ -333,6 +337,7 @@ export default async function OwnerDashboard() {
             ownerShare={fleetRevenue.ownerShare}
             companyShare={fleetRevenue.companyShare}
             title="Gains totaux de votre flotte"
+            revenueMode={revenueSettings.mode}
           />
           <div>
             <p className="de-label mb-3">Journal des revenus (locations confirmées)</p>

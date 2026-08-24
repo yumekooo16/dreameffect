@@ -35,7 +35,7 @@ export default async function ReservationDetailPage({
 }) {
   const { id } = await params;
 
-  const [reservation, vehicles] = await Promise.all([
+  const [reservation, formData] = await Promise.all([
     fetchReservationDetail(id),
     fetchVehiclesForReservationForm(),
   ]);
@@ -43,6 +43,8 @@ export default async function ReservationDetailPage({
   if (!reservation) {
     notFound();
   }
+
+  const { vehicles, revenueConfigs } = formData;
 
   const canConfirm = reservation.status === "pending";
   const canFinish =
@@ -208,6 +210,7 @@ export default async function ReservationDetailPage({
           <ReservationActionsPanel
             reservationId={reservation.id}
             vehicles={vehicles}
+            revenueConfigs={revenueConfigs}
             canConfirm={canConfirm}
             canFinish={canFinish}
             canCancel={canCancel}

@@ -1,22 +1,31 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import {
   createReservation,
   updateReservation,
 } from "@/src/lib/admin/reservations-actions";
 import {
-  COMPANY_REVENUE_SHARE_PERCENT,
-  OWNER_REVENUE_SHARE_PERCENT,
-  splitRevenue,
+  revenueModeLabel,
+  splitRevenueForContext,
+  type RevenueMode,
 } from "@/src/lib/revenue/split";
+import type { VehicleProPricing } from "@/src/lib/revenue/pro-pricing";
 import type { ReservationFormData } from "@/src/lib/admin/reservations-types";
 
 type VehicleOption = { id: string; label: string };
 
+export type ReservationVehicleRevenueConfig = {
+  vehicleId: string;
+  mode: RevenueMode;
+  ownerSharePercent: number;
+  proPricing: VehicleProPricing;
+};
+
 type Props = {
   vehicles: VehicleOption[];
+  revenueConfigs?: ReservationVehicleRevenueConfig[];
   mode: "create" | "edit";
   reservationId?: string;
   initial?: Partial<ReservationFormData>;
@@ -48,6 +57,7 @@ function toLocalInputValue(iso?: string) {
 
 export default function ReservationForm({
   vehicles,
+  revenueConfigs = [],
   mode,
   reservationId,
   initial,
@@ -66,21 +76,53 @@ export default function ReservationForm({
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
+  const configByVehicle = useMemo(() => {
+    const map = new Map<string, ReservationVehicleRevenueConfig>();
+    for (const config of revenueConfigs) {
+      map.set(config.vehicleId, config);
+    }
+    return map;
+  }, [revenueConfigs]);
+
+  const activeConfig = form.vehicle_id
+    ? configByVehicle.get(form.vehicle_id)
+    : undefined;
+
+  const parsedDistancePreview =
+    distanceKmInput.trim() === ""
+      ? null
+      : Number(distanceKmInput.replace(/\s/g, ""));
+
+  const previewSplit = useMemo(() => {
+    const context = activeConfig
+      ? {
+          mode: activeConfig.mode,
+          ownerShare: activeConfig.ownerSharePercent / 100,
+          startDate: form.start_date || null,
+          endDate: form.end_date || null,
+          distanceKm:
+            parsedDistancePreview != null &&
+            !Number.isNaN(parsedDistancePreview)
+              ? parsedDistancePreview
+              : null,
+          proPricing: activeConfig.proPricing,
+        }
+      : { mode: "percentage" as const, ownerShare: 0.6 };
+
+    return splitRevenueForContext(Number(form.total_price) || 0, context);
+  }, [
+    activeConfig,
+    form.total_price,
+    form.start_date,
+    form.end_date,
+    parsedDistancePreview,
+  ]);
+
   function updateField<K extends keyof ReservationFormData>(
     key: K,
     value: ReservationFormData[K]
   ) {
-    setForm((prev) => {
-      const next = { ...prev, [key]: value };
-
-      if (key === "total_price") {
-        const split = splitRevenue(Number(value));
-        next.owner_amount = split.ownerAmount;
-        next.company_amount = split.companyAmount;
-      }
-
-      return next;
-    });
+    setForm((prev) => ({ ...prev, [key]: value }));
   }
 
   function toIso(value: string) {
@@ -134,6 +176,22 @@ export default function ReservationForm({
     });
   }
 
+  const ownerHint =
+    previewSplit.mode === "pro_price"
+      ? previewSplit.tierLabel
+        ? `Prix pro — ${previewSplit.tierLabel}`
+        : "Prix pro"
+      : `Part propriétaire (${
+          activeConfig?.ownerSharePercent ?? 60
+        } %)`;
+
+  const companyHint =
+    previewSplit.mode === "pro_price"
+      ? "Marge DreamEffect (CA − prix pro)"
+      : `Commission DreamEffect (${
+          100 - (activeConfig?.ownerSharePercent ?? 60)
+        } %)`;
+
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       <div className="grid gap-3 sm:grid-cols-2">
@@ -152,10 +210,15 @@ export default function ReservationForm({
               </option>
             ))}
           </select>
+          {activeConfig && (
+            <p className="mt-1 text-xs de-muted">
+              Mode rémunération : {revenueModeLabel(activeConfig.mode)}
+            </p>
+          )}
         </div>
 
         <div>
-          <label className="de-label mb-1 block">Client</label>
+          <label className="de-label mb-1 block">Nom du client</label>
           <input
             required
             value={form.customer_name}
@@ -231,22 +294,27 @@ export default function ReservationForm({
           <p className="de-label">Répartition automatique</p>
           <div className="mt-2 grid gap-3 sm:grid-cols-2">
             <div>
-              <p className="text-xs de-muted">
-                Part propriétaire ({OWNER_REVENUE_SHARE_PERCENT}&nbsp;%)
-              </p>
+              <p className="text-xs de-muted">{ownerHint}</p>
               <p className="mt-0.5 font-medium">
-                {splitRevenue(form.total_price).ownerAmount.toLocaleString("fr-FR")} €
+                {previewSplit.ownerAmount.toLocaleString("fr-FR")} €
               </p>
             </div>
             <div>
-              <p className="text-xs de-muted">
-                Commission DreamEffect ({COMPANY_REVENUE_SHARE_PERCENT}&nbsp;%)
-              </p>
+              <p className="text-xs de-muted">{companyHint}</p>
               <p className="mt-0.5 font-medium">
-                {splitRevenue(form.total_price).companyAmount.toLocaleString("fr-FR")} €
+                {previewSplit.companyAmount.toLocaleString("fr-FR")} €
               </p>
             </div>
           </div>
+          {previewSplit.mode === "pro_price" &&
+            activeConfig &&
+            form.start_date &&
+            form.end_date && (
+              <p className="mt-2 text-xs de-muted">
+                Km inclus : {activeConfig.proPricing.pro_included_km ?? 200} ·{" "}
+                {activeConfig.proPricing.pro_extra_km_rate ?? 1} € / km supp.
+              </p>
+            )}
         </div>
 
         {mode === "edit" && (
@@ -284,7 +352,8 @@ export default function ReservationForm({
               placeholder="Ex. 450"
             />
             <p className="mt-1 text-xs de-muted">
-              Obligatoire à la fin de la location
+              Obligatoire à la fin de la location — utilisé pour le km
+              supplémentaire en mode prix pro
             </p>
           </div>
         )}

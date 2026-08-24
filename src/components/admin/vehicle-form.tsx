@@ -17,6 +17,11 @@ import {
   EMPTY_VEHICLE_PRICING,
   type VehiclePricing,
 } from "@/src/lib/vehicles/pricing";
+import {
+  PRO_PRICING_TIER_FIELDS,
+  EMPTY_VEHICLE_PRO_PRICING,
+  type VehicleProPricing,
+} from "@/src/lib/revenue/pro-pricing";
 
 type OwnerOption = { id: string; label: string };
 
@@ -40,6 +45,7 @@ const defaultForm: VehicleFormData = {
   mileage: 0,
   status: "available",
   pricing: { ...EMPTY_VEHICLE_PRICING },
+  proPricing: { ...EMPTY_VEHICLE_PRO_PRICING },
   fuel: "",
   transmission: "",
   power: null,
@@ -63,6 +69,10 @@ export default function VehicleForm({
       ...EMPTY_VEHICLE_PRICING,
       ...initial?.pricing,
     },
+    proPricing: {
+      ...EMPTY_VEHICLE_PRO_PRICING,
+      ...initial?.proPricing,
+    },
   });
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
@@ -81,6 +91,17 @@ export default function VehicleForm({
         ...EMPTY_VEHICLE_PRICING,
         ...prev.pricing,
         [key]: raw ? Number(raw) : null,
+      },
+    }));
+  }
+
+  function updateProPricingField(key: keyof VehicleProPricing, raw: string) {
+    setForm((prev) => ({
+      ...prev,
+      proPricing: {
+        ...EMPTY_VEHICLE_PRO_PRICING,
+        ...prev.proPricing,
+        [key]: raw === "" ? null : Number(raw),
       },
     }));
   }
@@ -333,6 +354,71 @@ export default function VehicleForm({
               />
               <span>Visible sur le site public</span>
             </label>
+          </div>
+        </div>
+      </div>
+
+      <div className="border-t border-[var(--border)] pt-5">
+        <h3 className="de-display mb-4 text-base tracking-tight">
+          Prix pro (propriétaire)
+        </h3>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div className="sm:col-span-2">
+            <p className="mb-3 text-sm de-muted">
+              Utilisé uniquement si le propriétaire est en mode « prix pro ».
+              Ces montants sont le reversement automatique au propriétaire
+              (indépendants des tarifs catalogue client).
+            </p>
+          </div>
+
+          {PRO_PRICING_TIER_FIELDS.map((tier) => (
+            <div key={tier.key}>
+              <label className="de-label mb-1 block">{tier.label} (€)</label>
+              <input
+                type="number"
+                min={0}
+                step={1}
+                value={form.proPricing?.[tier.key] ?? ""}
+                onChange={(e) =>
+                  updateProPricingField(tier.key, e.target.value)
+                }
+                className="de-input w-full"
+                placeholder="Ex. 70"
+              />
+              {tier.hint && (
+                <p className="mt-1 text-xs de-muted">{tier.hint}</p>
+              )}
+            </div>
+          ))}
+
+          <div>
+            <label className="de-label mb-1 block">Km inclus</label>
+            <input
+              type="number"
+              min={0}
+              step={1}
+              value={form.proPricing?.pro_included_km ?? ""}
+              onChange={(e) =>
+                updateProPricingField("pro_included_km", e.target.value)
+              }
+              className="de-input w-full"
+              placeholder="200"
+            />
+          </div>
+
+          <div>
+            <label className="de-label mb-1 block">€ / km supplémentaire</label>
+            <input
+              type="number"
+              min={0}
+              step={0.1}
+              value={form.proPricing?.pro_extra_km_rate ?? ""}
+              onChange={(e) =>
+                updateProPricingField("pro_extra_km_rate", e.target.value)
+              }
+              className="de-input w-full"
+              placeholder="1"
+            />
           </div>
         </div>
       </div>
