@@ -15,7 +15,9 @@ import { normalizeVehicleProPricing } from "@/src/lib/revenue/pro-pricing";
 dotenv.config({ path: ".env.local" });
 dotenv.config({ path: ".env" });
 
-const OWNER_EMAIL = "ammotioncars@dreameffect.fr";
+const OWNER_EMAIL = "contact@ammotioncars.com";
+/** Email legacy (seed / migration) */
+const OWNER_EMAIL_LEGACY = "ammotioncars@dreameffect.fr";
 const OWNER_PASSWORD = "AmmotionCars2026!";
 
 /** Exercice PDF « Rentabilité série 2 » — projection calendaire 2025 (2025/2026) */

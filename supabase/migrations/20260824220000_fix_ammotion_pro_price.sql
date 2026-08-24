@@ -9,7 +9,7 @@ FROM auth.users AS u
 WHERE p.id = u.id
   AND p.role = 'owner'
   AND (
-    lower(u.email) = 'ammotioncars@dreameffect.fr'
+    lower(u.email) IN ('contact@ammotioncars.com', 'ammotioncars@dreameffect.fr')
     OR lower(u.email) LIKE '%motion%'
     OR lower(trim(coalesce(p.first_name, '') || ' ' || coalesce(p.last_name, ''))) LIKE '%am motion%'
     OR lower(trim(coalesce(p.first_name, ''))) LIKE '%motion%'
