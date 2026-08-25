@@ -1,5 +1,6 @@
 import { requireAdmin } from "@/src/lib/admin/auth";
 import AdminHeader from "@/src/components/admin/header-shell";
+import AdminAppNav from "@/src/components/admin/app-nav";
 
 export default async function AdminLayout({
   children,
@@ -9,13 +10,12 @@ export default async function AdminLayout({
   await requireAdmin();
 
   return (
-    <div className="de-page de-dashboard min-h-screen">
-      <div className="de-page-inner mx-auto max-w-6xl px-4 sm:px-8 lg:px-12">
+    <div className="de-page de-dashboard de-app-shell de-app-shell--admin min-h-screen">
+      <div className="de-page-inner de-app-shell-inner">
         <AdminHeader />
-        <main className="de-dashboard-frame pb-8 pt-2 sm:pt-4">
-          {children}
-        </main>
+        <main className="de-dashboard-frame de-app-main">{children}</main>
       </div>
+      <AdminAppNav />
     </div>
   );
 }

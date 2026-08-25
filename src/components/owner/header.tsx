@@ -2,53 +2,46 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { User } from "lucide-react";
+import { usePathname } from "next/navigation";
 import SignOutButton from "@/src/components/auth/sign-out-button";
 import NotificationsBell from "./notifications-bell";
-import { WHATSAPP_URL } from "@/src/lib/constants";
+
+function titleForPath(pathname: string) {
+  if (pathname.startsWith("/espace-proprietaire/profil")) return "Mon profil";
+  if (pathname.startsWith("/espace-proprietaire/vehicule")) return "Véhicule";
+  return "Espace propriétaire";
+}
 
 export default function OwnerHeader() {
+  const pathname = usePathname();
+  const pageTitle = titleForPath(pathname);
+
   return (
-    <header className="de-header">
-      <div className="flex items-center justify-between gap-3 py-3 sm:py-4">
+    <header className="de-header de-app-header">
+      <div className="de-app-header-bar">
         <Link
           href="/espace-proprietaire"
-          className="flex min-w-0 items-center gap-2 sm:gap-3 group"
+          className="de-app-header-brand"
+          aria-label="Espace propriétaire"
         >
           <Image
             src="/logo-de.png"
-            alt="DreΛm Effect"
-            width={40}
-            height={40}
-            className="shrink-0 rounded-xl object-contain transition group-hover:opacity-90"
+            alt=""
+            width={36}
+            height={36}
+            className="de-app-header-logo"
             priority
+            unoptimized
           />
-          <div className="min-w-0">
-            <span className="de-display de-wordmark block truncate text-sm text-foreground">
-              DreΛm Effect
-            </span>
-            <span className="text-xs de-muted">Espace propriétaire</span>
+          <div className="de-app-header-titles">
+            <span className="de-app-header-eyebrow">DreamEffect</span>
+            <span className="de-app-header-title">{pageTitle}</span>
           </div>
         </Link>
 
-        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
-          <a
-            href={WHATSAPP_URL}
-            target="_blank"
-            rel="noreferrer"
-            className="de-btn de-btn-ghost hidden sm:inline-flex"
-          >
-            Contact
-          </a>
-          <Link
-            href="/espace-proprietaire/profil"
-            aria-label="Mon profil"
-            className="de-notifications-trigger flex h-10 w-10 items-center justify-center"
-          >
-            <User size={18} strokeWidth={1.75} />
-          </Link>
+        <div className="de-app-header-actions">
           <NotificationsBell />
-          <SignOutButton className="de-btn de-btn-ghost text-xs" />
+          <SignOutButton className="de-btn de-btn-ghost de-app-header-signout text-xs" />
         </div>
       </div>
     </header>
