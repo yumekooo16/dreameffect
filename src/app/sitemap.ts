@@ -31,6 +31,12 @@ function staticSitemapEntries(lastModified: Date): MetadataRoute.Sitemap {
       priority: 0.7,
     },
     {
+      url: `${SITE_URL}${PUBLIC_ROUTES.calendar}`,
+      lastModified,
+      changeFrequency: "daily",
+      priority: 0.85,
+    },
+    {
       url: `${SITE_URL}${INFO_ROUTES.insurance}`,
       lastModified,
       changeFrequency: "monthly",
