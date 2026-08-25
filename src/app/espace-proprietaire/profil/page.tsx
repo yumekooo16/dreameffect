@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { getAuthUser } from "@/src/lib/auth";
 import { createClient } from "@/src/lib/supabase/server";
 import Section from "@/src/components/owner/section";
+import SignOutButton from "@/src/components/auth/sign-out-button";
 import { WHATSAPP_URL } from "@/src/lib/constants";
 
 export default async function ProfilePage() {
@@ -28,13 +29,6 @@ export default async function ProfilePage() {
 
   return (
     <div className="space-y-6 sm:space-y-8">
-      <Link
-        href="/espace-proprietaire"
-        className="inline-flex items-center gap-1 text-sm de-muted transition hover:text-foreground"
-      >
-        ← Retour au tableau de bord
-      </Link>
-
       <div>
         <h1 className="de-display text-2xl sm:text-3xl tracking-tight">Mon profil</h1>
         <p className="mt-1 text-sm de-muted">
@@ -73,6 +67,11 @@ export default async function ProfilePage() {
         >
           Contacter DreamEffect
         </a>
+      </div>
+
+      <div className="de-card de-card-padded">
+        <p className="de-label">Compte</p>
+        <SignOutButton className="de-btn de-btn-ghost mt-3 w-full sm:w-auto" />
       </div>
     </div>
   );
