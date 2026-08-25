@@ -32,6 +32,7 @@ export function buildLlmsTxt(): string {
     `- Catalogue véhicules : ${SITE_URL}${PUBLIC_ROUTES.vehicles}`,
     `- Propriétaires : ${SITE_URL}${PUBLIC_ROUTES.owners}`,
     `- Contact : ${SITE_URL}${PUBLIC_ROUTES.contact}`,
+    `- Calendrier des réservations : ${SITE_URL}${PUBLIC_ROUTES.calendar}`,
     `- Assurance location premium : ${SITE_URL}${INFO_ROUTES.insurance}`,
     `- Gestion locative propriétaires : ${SITE_URL}${INFO_ROUTES.ownerManagement}`,
     `- Conditions de location : ${SITE_URL}${LEGAL_ROUTES.terms}`,

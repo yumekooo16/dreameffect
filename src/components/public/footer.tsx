@@ -52,6 +52,11 @@ export default function PublicFooter() {
               <li>
                 <Link href={PUBLIC_ROUTES.contact}>Contact</Link>
               </li>
+              <li>
+                <Link href={PUBLIC_ROUTES.calendar}>
+                  Calendrier des réservations
+                </Link>
+              </li>
             </ul>
           </nav>
 

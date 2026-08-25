@@ -26,6 +26,8 @@ export const PUBLIC_ROUTES = {
   vehicles: "/vehicules",
   owners: "/proprietaires",
   contact: "/contact",
+  /** Calendrier public — lien Instagram / footer */
+  calendar: "/calendrier",
 } as const;
 
 /** Pages éditoriales SEO (contenu informatif). */
