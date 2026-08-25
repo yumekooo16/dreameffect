@@ -6,7 +6,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
-  Shield,
   Users,
   Car,
   CalendarDays,
@@ -68,46 +67,43 @@ const NAV_ITEMS = [
   },
 ];
 
+function titleForPath(pathname: string) {
+  const match = NAV_ITEMS.find((item) => item.match(pathname));
+  return match?.label ?? "Administration";
+}
+
 export default function AdminHeader() {
   const pathname = usePathname();
+  const pageTitle = titleForPath(pathname);
 
   return (
-    <header className="de-header space-y-3">
-      <div className="flex items-center justify-between gap-3 py-3 sm:py-4">
-        <Link
-          href="/admin"
-          className="group flex min-w-0 items-center gap-2 sm:gap-3"
-        >
+    <header className="de-header de-app-header">
+      <div className="de-app-header-bar">
+        <Link href="/admin" className="de-app-header-brand" aria-label="Administration">
           <Image
             src="/logo-de.png"
-            alt="DreΛm Effect"
-            width={40}
-            height={40}
-            className="shrink-0 rounded-xl object-contain transition group-hover:opacity-90"
+            alt=""
+            width={36}
+            height={36}
+            className="de-app-header-logo"
             priority
+            unoptimized
           />
-          <div className="min-w-0">
-            <span className="de-display de-wordmark block truncate text-sm text-foreground">
-              DreΛm Effect
-            </span>
-            <span className="text-xs de-muted">Administration</span>
+          <div className="de-app-header-titles">
+            <span className="de-app-header-eyebrow">Administration</span>
+            <span className="de-app-header-title">{pageTitle}</span>
           </div>
         </Link>
 
-        <div className="flex shrink-0 items-center gap-2">
-          <span className="hidden items-center gap-1.5 rounded-full border border-[var(--blue-border)] px-3 py-1 text-xs font-medium text-[var(--blue-soft)] sm:inline-flex">
-            <Shield size={14} strokeWidth={1.75} />
-            Admin
-          </span>
-          <SignOutButton className="de-btn de-btn-ghost text-xs" />
+        <div className="de-app-header-actions">
           <NotificationsBell />
+          <SignOutButton className="de-btn de-btn-ghost de-app-header-signout text-xs" />
         </div>
       </div>
 
-      <nav className="flex gap-1 overflow-x-auto pb-1">
+      <nav className="de-app-header-tabs" aria-label="Sections admin">
         {NAV_ITEMS.map(({ href, label, icon: Icon, match }) => {
           const active = match(pathname);
-
           return (
             <Link
               key={href}

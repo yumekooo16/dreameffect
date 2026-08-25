@@ -1,5 +1,6 @@
 import { requireOwner } from "@/src/lib/owner/auth";
 import OwnerHeader from "@/src/components/owner/header";
+import OwnerAppNav from "@/src/components/owner/app-nav";
 
 export default async function OwnerLayout({
   children,
@@ -9,13 +10,12 @@ export default async function OwnerLayout({
   await requireOwner();
 
   return (
-    <div className="de-page de-dashboard min-h-screen">
-      <div className="de-page-inner mx-auto max-w-5xl px-4 sm:px-8 lg:px-12">
+    <div className="de-page de-dashboard de-app-shell de-app-shell--owner min-h-screen">
+      <div className="de-page-inner de-app-shell-inner">
         <OwnerHeader />
-        <main className="de-dashboard-frame pb-8 pt-2 sm:pt-4">
-          {children}
-        </main>
+        <main className="de-dashboard-frame de-app-main">{children}</main>
       </div>
+      <OwnerAppNav />
     </div>
   );
 }

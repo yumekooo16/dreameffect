@@ -69,6 +69,7 @@
   /* Marge supplémentaire sous la barre de statut (mobile / PWA) */
   --header-top-offset: 0.75rem;
   --page-top-offset: 1rem;
+  --app-dock-h: 3.75rem;
 }
 
 @theme inline {
@@ -216,6 +217,372 @@ body {
 
 .de-dashboard .de-section-label {
   color: var(--text-muted);
+}
+
+/* ============================================================
+   APP SHELL — admin + propriétaire (rendu application / PWA)
+   ============================================================ */
+
+.de-app-shell {
+  --app-brass: #c4a574;
+  --app-brass-soft: #d9c6a2;
+}
+
+.de-app-shell-inner {
+  width: 100%;
+  max-width: 72rem;
+  margin-inline: auto;
+  padding-inline: 0;
+}
+
+.de-app-shell--owner .de-app-shell-inner {
+  max-width: 64rem;
+}
+
+.de-app-shell .de-app-main {
+  margin-top: 0;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 1rem 1rem calc(var(--app-dock-h) + var(--safe-bottom) + 1.25rem);
+  min-height: calc(100dvh - 5.5rem);
+}
+
+.de-app-shell .de-page {
+  padding-bottom: 0;
+}
+
+.de-app-shell.de-page {
+  padding-bottom: 0;
+}
+
+/* Header compact type app */
+.de-app-header {
+  border-bottom: 1px solid var(--border) !important;
+  box-shadow: none !important;
+}
+
+.de-app-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-height: 3.25rem;
+  padding: 0.55rem 1rem 0.65rem;
+}
+
+.de-app-header-brand {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.de-app-header-logo {
+  flex-shrink: 0;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.55rem;
+  object-fit: contain;
+  background: color-mix(in srgb, var(--surface-raised) 80%, transparent);
+}
+
+.de-app-header-titles {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.05rem;
+}
+
+.de-app-header-eyebrow {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.de-app-header-title {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.de-app-header-actions {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.de-app-header-signout {
+  padding-inline: 0.55rem;
+  font-size: 0.7rem;
+}
+
+.de-app-header-tabs {
+  display: none;
+  gap: 0.35rem;
+  overflow-x: auto;
+  padding: 0 1rem 0.65rem;
+  scrollbar-width: none;
+}
+
+.de-app-header-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+/* Dock bas */
+.de-app-dock {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 100;
+  padding-bottom: var(--safe-bottom);
+  background: color-mix(in srgb, var(--bg) 94%, transparent);
+  border-top: 1px solid var(--border);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.de-app-dock-inner {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-around;
+  gap: 0.15rem;
+  max-width: 36rem;
+  margin-inline: auto;
+  min-height: var(--app-dock-h);
+  padding-inline: 0.35rem;
+}
+
+.de-app-dock-link {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  min-height: 3.15rem;
+  padding: 0.4rem 0.25rem;
+  border: 0;
+  background: transparent;
+  font-family: var(--font-body);
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color 0.15s ease, transform 0.12s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.de-app-dock-link:active {
+  transform: scale(0.96);
+}
+
+.de-app-dock-link:hover,
+.de-app-dock-link--active {
+  color: var(--text);
+}
+
+.de-app-dock-link--active {
+  box-shadow: inset 0 2px 0 var(--app-brass);
+  color: var(--app-brass-soft);
+}
+
+/* Sheet « Plus » */
+.de-app-sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 110;
+}
+
+.de-app-sheet__backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(5, 10, 18, 0.55);
+  cursor: pointer;
+}
+
+.de-app-sheet__panel {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-height: min(70dvh, 28rem);
+  padding: 0.85rem 1rem calc(var(--app-dock-h) + var(--safe-bottom) + 0.75rem);
+  border-radius: 1rem 1rem 0 0;
+  border: 1px solid var(--border);
+  border-bottom: 0;
+  background: var(--surface);
+  box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.35);
+  animation: de-app-sheet-up 0.22s ease-out;
+}
+
+@keyframes de-app-sheet-up {
+  from {
+    transform: translateY(12%);
+    opacity: 0.7;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.de-app-sheet__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.65rem;
+}
+
+.de-app-sheet__title {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 500;
+}
+
+.de-app-sheet__close {
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.de-app-sheet__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.de-app-sheet__item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.9rem 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.de-app-sheet__item:active {
+  transform: scale(0.99);
+}
+
+.de-app-sheet__item--active {
+  border-color: color-mix(in srgb, var(--app-brass) 55%, var(--border));
+  background: color-mix(in srgb, var(--app-brass) 12%, var(--bg));
+  color: var(--app-brass-soft);
+}
+
+.de-app-sheet__item--danger {
+  color: #fca5a5;
+}
+
+/* Densité app — listes / cartes */
+.de-app-shell .de-card {
+  border-radius: 0.85rem;
+}
+
+.de-app-shell .de-card-padded {
+  padding: 1rem;
+}
+
+.de-app-shell .de-list {
+  gap: 0.4rem;
+}
+
+.de-app-shell .de-list-item {
+  border-radius: 0.75rem;
+  padding: 0.8rem 0.9rem;
+}
+
+.de-app-shell .de-vehicle-hero {
+  border-radius: 1rem;
+}
+
+/* Écrase les anciens cadres dashboard (mobile inclus) */
+.de-app-shell .de-dashboard-frame {
+  margin-top: 0;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 1rem 1rem calc(var(--app-dock-h) + var(--safe-bottom) + 1.25rem);
+}
+
+@media (min-width: 640px) {
+  .de-app-shell-inner {
+    padding-inline: 1.25rem;
+  }
+
+  .de-app-shell .de-app-main,
+  .de-app-shell .de-dashboard-frame {
+    margin-top: 0.75rem;
+    border: 1px solid var(--blue-border);
+    border-radius: 1rem;
+    padding: 1.5rem 1.5rem calc(var(--app-dock-h) + var(--safe-bottom) + 1.5rem);
+    box-shadow: 0 0 0 1px var(--blue-glow);
+  }
+
+  .de-app-header-signout {
+    display: inline-flex;
+  }
+
+  .de-app-header-bar {
+    padding-inline: 0.25rem;
+  }
+}
+
+@media (min-width: 900px) {
+  .de-app-header-tabs {
+    display: flex;
+    padding-inline: 0.25rem;
+  }
+
+  .de-app-dock-inner {
+    max-width: 48rem;
+    gap: 0.35rem;
+  }
+
+  .de-app-dock-link {
+    flex-direction: row;
+    gap: 0.45rem;
+    font-size: 0.7rem;
+    padding-inline: 0.75rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .de-app-sheet__panel {
+    animation: none;
+  }
+
+  .de-app-dock-link:active,
+  .de-app-sheet__item:active {
+    transform: none;
+  }
 }
 
 /* --- Espace propriétaire — hero véhicule premium -------------- */
