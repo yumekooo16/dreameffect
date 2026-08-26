@@ -4,6 +4,7 @@ import { formatServiceAreaLabel } from "@/src/lib/public/local-seo";
 import {
   INFO_ROUTES,
   LEGAL_ROUTES,
+  LOCAL_ROUTES,
   PUBLIC_ROUTES,
   SITE_NAME,
   SITE_TAGLINE,
@@ -35,6 +36,10 @@ export function buildLlmsTxt(): string {
     `- Calendrier des réservations : ${SITE_URL}${PUBLIC_ROUTES.calendar}`,
     `- Assurance location premium : ${SITE_URL}${INFO_ROUTES.insurance}`,
     `- Gestion locative propriétaires : ${SITE_URL}${INFO_ROUTES.ownerManagement}`,
+    `- Agence de location Beauvais : ${SITE_URL}${LOCAL_ROUTES.locationBeauvais}`,
+    `- Agence de location Gisors : ${SITE_URL}${LOCAL_ROUTES.locationGisors}`,
+    `- Conciergerie automobile Beauvais : ${SITE_URL}${LOCAL_ROUTES.conciergerieBeauvais}`,
+    `- Conciergerie automobile Gisors : ${SITE_URL}${LOCAL_ROUTES.conciergerieGisors}`,
     `- Conditions de location : ${SITE_URL}${LEGAL_ROUTES.terms}`,
     "",
     "## Contact",

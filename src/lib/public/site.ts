@@ -36,6 +36,14 @@ export const INFO_ROUTES = {
   ownerManagement: "/gestion-locative-proprietaires",
 } as const;
 
+/** Landings SEO locales (intentions ville + service). */
+export const LOCAL_ROUTES = {
+  conciergerieBeauvais: "/conciergerie-automobile-beauvais",
+  conciergerieGisors: "/conciergerie-automobile-gisors",
+  locationBeauvais: "/agence-location-vehicule-beauvais",
+  locationGisors: "/agence-location-vehicule-gisors",
+} as const;
+
 export const LEGAL_ROUTES = {
   privacy: "/politique-de-confidentialite",
   legal: "/mentions-legales",

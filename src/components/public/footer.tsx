@@ -6,7 +6,12 @@ import {
   CONTACT_PHONE,
   telHref,
 } from "@/src/lib/public/contact";
-import { INFO_ROUTES, PUBLIC_ROUTES, SITE_NAME } from "@/src/lib/public/site";
+import {
+  INFO_ROUTES,
+  LOCAL_ROUTES,
+  PUBLIC_ROUTES,
+  SITE_NAME,
+} from "@/src/lib/public/site";
 
 export default function PublicFooter() {
   const year = new Date().getFullYear();
@@ -68,6 +73,24 @@ export default function PublicFooter() {
               </li>
               <li>
                 <Link href={INFO_ROUTES.ownerManagement}>Gestion locative</Link>
+              </li>
+              <li>
+                <Link href={LOCAL_ROUTES.locationBeauvais}>
+                  Location Beauvais
+                </Link>
+              </li>
+              <li>
+                <Link href={LOCAL_ROUTES.locationGisors}>Location Gisors</Link>
+              </li>
+              <li>
+                <Link href={LOCAL_ROUTES.conciergerieBeauvais}>
+                  Conciergerie Beauvais
+                </Link>
+              </li>
+              <li>
+                <Link href={LOCAL_ROUTES.conciergerieGisors}>
+                  Conciergerie Gisors
+                </Link>
               </li>
             </ul>
           </nav>
