@@ -15,7 +15,7 @@ export const LEGAL_ENTITY = {
   tradeName: SITE_NAME,
   legalName: env("NEXT_PUBLIC_LEGAL_NAME") ?? "DREAMEFFECT",
   legalForm: env("NEXT_PUBLIC_LEGAL_FORM") ?? "SAS",
-  capital: env("NEXT_PUBLIC_LEGAL_CAPITAL"),
+  capital: env("NEXT_PUBLIC_LEGAL_CAPITAL") ?? "1 000 €",
   siren: env("NEXT_PUBLIC_LEGAL_SIREN") ?? "108 889 791",
   siret: env("NEXT_PUBLIC_LEGAL_SIRET") ?? "108 889 791 00019",
   rcs: env("NEXT_PUBLIC_LEGAL_RCS") ?? "108 889 791 R.C.S. Paris",
