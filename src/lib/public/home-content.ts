@@ -43,6 +43,16 @@ export const HOME_FAQ_ITEMS = [
       "À Beauvais, Gisors et dans l'ensemble de l'Oise et de l'Eure. Le lieu se convient lors de la réservation — domicile, gare, aéroport de Beauvais-Tillé ou autre rendez-vous.",
   },
   {
+    question: "Proposez-vous une agence de location à Beauvais et Gisors ?",
+    answer:
+      "Oui. DreamEffect est une agence de location de véhicules à Beauvais et Gisors : flotte en ligne, devis selon vos dates, remise des clés organisée localement dans l'Oise et le Vexin.",
+  },
+  {
+    question: "Faites-vous de la conciergerie automobile à Beauvais et Gisors ?",
+    answer:
+      "Oui. Notre conciergerie automobile à Beauvais et Gisors gère mise en location, entretien et suivi pour les propriétaires qui souhaitent rentabiliser leur véhicule sans s'en occuper au quotidien.",
+  },
+  {
     question: "Comment confier mon véhicule en gestion locative ?",
     answer:
       "Indiquez-nous la marque, le modèle et l'année. Nous échangeons sur vos attentes, créons l'annonce, puis gérons réservations, remises de clés et entretien. Vous percevez vos revenus chaque mois.",

@@ -4,8 +4,16 @@ import Link from "next/link";
 import { PUBLIC_ROUTES } from "@/src/lib/public/site";
 
 export default function HomeFaqSection() {
-  const renterFaqs = HOME_FAQ_ITEMS.slice(0, 4);
-  const ownerFaqs = OWNERS_FAQ.slice(0, 4);
+  const renterFaqs = [
+    HOME_FAQ_ITEMS[0],
+    HOME_FAQ_ITEMS[2],
+    HOME_FAQ_ITEMS[3],
+    HOME_FAQ_ITEMS[4], // agence Beauvais / Gisors
+  ];
+  const ownerFaqs = [
+    HOME_FAQ_ITEMS[5], // conciergerie Beauvais / Gisors
+    ...OWNERS_FAQ.slice(0, 3),
+  ];
 
   return (
     <section className="de-keys-section de-keys-section--paper" aria-labelledby="home-faq-title">

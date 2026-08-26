@@ -27,6 +27,12 @@ export const LOCAL_KEYWORDS = [
   "location voiture Oise",
   "location auto Gisors",
   "location véhicule Eure",
+  "agence de location Beauvais",
+  "agence de location Gisors",
+  "conciergerie Beauvais",
+  "conciergerie Gisors",
+  "conciergerie automobile Beauvais",
+  "conciergerie automobile Gisors",
   "DreamEffect",
 ] as const;
 
@@ -35,6 +41,8 @@ export const HOME_KEYWORDS = [
   "location véhicule haut de gamme",
   "gestion véhicule propriétaire",
   "conciergerie automobile",
+  "agence location véhicule Beauvais",
+  "agence location véhicule Gisors",
 ] as const;
 
 export const CATALOG_KEYWORDS = [

@@ -1,6 +1,12 @@
 import type { MetadataRoute } from "next";
 import { fetchPublicVehicleSlugs } from "@/src/lib/public/vehicles-data";
-import { INFO_ROUTES, LEGAL_ROUTES, PUBLIC_ROUTES, SITE_URL } from "@/src/lib/public/site";
+import {
+  INFO_ROUTES,
+  LEGAL_ROUTES,
+  LOCAL_ROUTES,
+  PUBLIC_ROUTES,
+  SITE_URL,
+} from "@/src/lib/public/site";
 
 export const revalidate = 3600;
 
@@ -47,6 +53,30 @@ function staticSitemapEntries(lastModified: Date): MetadataRoute.Sitemap {
       lastModified,
       changeFrequency: "monthly",
       priority: 0.65,
+    },
+    {
+      url: `${SITE_URL}${LOCAL_ROUTES.locationBeauvais}`,
+      lastModified,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      url: `${SITE_URL}${LOCAL_ROUTES.locationGisors}`,
+      lastModified,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      url: `${SITE_URL}${LOCAL_ROUTES.conciergerieBeauvais}`,
+      lastModified,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      url: `${SITE_URL}${LOCAL_ROUTES.conciergerieGisors}`,
+      lastModified,
+      changeFrequency: "monthly",
+      priority: 0.8,
     },
     {
       url: `${SITE_URL}${LEGAL_ROUTES.legal}`,

@@ -17,8 +17,8 @@ import { pickNarrativeVisuals, resolveHeroImageUrl } from "@/src/lib/public/hero
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "DreamEffect — Location véhicules haut de gamme",
-  description: `Location et gestion de véhicules haut de gamme à ${formatServiceAreaLabel()}. Flotte entretenue, tarifs affichés, réservation par WhatsApp. Gestion locative pour propriétaires.`,
+  title: "DreamEffect — Location & conciergerie Beauvais · Gisors",
+  description: `Agence de location et conciergerie automobile à Beauvais et Gisors (${formatServiceAreaLabel()}). Flotte haut de gamme, tarifs affichés, réservation WhatsApp. Gestion locative pour propriétaires.`,
   path: "/",
   keywords: [...HOME_KEYWORDS],
   absoluteTitle: true,
