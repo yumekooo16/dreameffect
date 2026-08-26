@@ -1,5 +1,5 @@
-import { BUSINESS_ADDRESS } from "@/src/lib/public/business";
 import { CONTACT_EMAIL, CONTACT_PHONE } from "@/src/lib/public/contact";
+import { formatServiceAreaLabel } from "@/src/lib/public/local-seo";
 import { LEGAL_ROUTES, SITE_NAME, SITE_URL } from "@/src/lib/public/site";
 
 function env(name: string) {
@@ -7,20 +7,27 @@ function env(name: string) {
   return value ? value : null;
 }
 
+/**
+ * Identité légale DREAMEFFECT (SIREN 108 889 791) — source INSEE / RNE.
+ * Surchargeable via variables d'environnement si le siège ou les mentions évoluent.
+ */
 export const LEGAL_ENTITY = {
   tradeName: SITE_NAME,
-  legalName: env("NEXT_PUBLIC_LEGAL_NAME") ?? SITE_NAME,
-  legalForm: env("NEXT_PUBLIC_LEGAL_FORM"),
+  legalName: env("NEXT_PUBLIC_LEGAL_NAME") ?? "DREAMEFFECT",
+  legalForm: env("NEXT_PUBLIC_LEGAL_FORM") ?? "SAS",
   capital: env("NEXT_PUBLIC_LEGAL_CAPITAL"),
-  siret: env("NEXT_PUBLIC_LEGAL_SIRET"),
-  rcs: env("NEXT_PUBLIC_LEGAL_RCS"),
-  vat: env("NEXT_PUBLIC_LEGAL_VAT"),
-  publicationDirector: env("NEXT_PUBLIC_PUBLICATION_DIRECTOR") ?? SITE_NAME,
-  street: BUSINESS_ADDRESS.street,
-  city: BUSINESS_ADDRESS.city,
-  postalCode: BUSINESS_ADDRESS.postalCode,
-  region: BUSINESS_ADDRESS.region,
-  country: BUSINESS_ADDRESS.countryLabel,
+  siren: env("NEXT_PUBLIC_LEGAL_SIREN") ?? "108 889 791",
+  siret: env("NEXT_PUBLIC_LEGAL_SIRET") ?? "108 889 791 00019",
+  rcs: env("NEXT_PUBLIC_LEGAL_RCS") ?? "108 889 791 R.C.S. Paris",
+  vat: env("NEXT_PUBLIC_LEGAL_VAT") ?? "FR60108889791",
+  naf: env("NEXT_PUBLIC_LEGAL_NAF") ?? "77.11A — Location de courte durée de voitures et de véhicules automobiles légers",
+  publicationDirector:
+    env("NEXT_PUBLIC_PUBLICATION_DIRECTOR") ?? "Wyatt Charleston",
+  street: env("NEXT_PUBLIC_LEGAL_STREET") ?? "47 rue Vivienne",
+  city: env("NEXT_PUBLIC_LEGAL_CITY") ?? "Paris",
+  postalCode: env("NEXT_PUBLIC_LEGAL_POSTAL_CODE") ?? "75002",
+  region: env("NEXT_PUBLIC_LEGAL_REGION") ?? "Île-de-France",
+  country: "France",
   email: CONTACT_EMAIL,
   phone: CONTACT_PHONE,
 } as const;
@@ -44,28 +51,19 @@ export type LegalBlock = {
 
 export function getLegalNoticeBlocks(): LegalBlock[] {
   const identification = [
-    `Le site ${SITE_URL} est édité sous le nom commercial ${LEGAL_ENTITY.tradeName}.`,
-    `Raison sociale : ${LEGAL_ENTITY.legalName}${LEGAL_ENTITY.legalForm ? ` (${LEGAL_ENTITY.legalForm})` : ""}.`,
-    `Siège / zone d'activité : ${formatLegalAddress()}.`,
+    `Le site ${SITE_URL} est édité par la société ${LEGAL_ENTITY.legalName}, sous le nom commercial ${LEGAL_ENTITY.tradeName}.`,
+    `Forme juridique : ${LEGAL_ENTITY.legalForm}.`,
+    `Siège social : ${formatLegalAddress()}.`,
     `Email : ${LEGAL_ENTITY.email}. Téléphone : ${LEGAL_ENTITY.phone}.`,
+    `SIREN : ${LEGAL_ENTITY.siren}.`,
+    `SIRET : ${LEGAL_ENTITY.siret}.`,
+    `RCS : ${LEGAL_ENTITY.rcs}.`,
+    `Code NAF / APE : ${LEGAL_ENTITY.naf}.`,
+    `TVA intracommunautaire : ${LEGAL_ENTITY.vat}.`,
   ];
 
-  if (LEGAL_ENTITY.siret) {
-    identification.push(`SIRET : ${LEGAL_ENTITY.siret}.`);
-  }
-  if (LEGAL_ENTITY.rcs) {
-    identification.push(`RCS : ${LEGAL_ENTITY.rcs}.`);
-  }
   if (LEGAL_ENTITY.capital) {
     identification.push(`Capital social : ${LEGAL_ENTITY.capital}.`);
-  }
-  if (LEGAL_ENTITY.vat) {
-    identification.push(`TVA intracommunautaire : ${LEGAL_ENTITY.vat}.`);
-  }
-  if (!LEGAL_ENTITY.siret) {
-    identification.push(
-      `Pour toute demande d'identification complémentaire (extrait Kbis, SIRET), écrivez à ${LEGAL_ENTITY.email}.`
-    );
   }
 
   return [
@@ -76,7 +74,7 @@ export function getLegalNoticeBlocks(): LegalBlock[] {
     {
       title: "Directeur de la publication",
       paragraphs: [
-        `Le directeur de la publication est ${LEGAL_ENTITY.publicationDirector}.`,
+        `Le directeur de la publication est ${LEGAL_ENTITY.publicationDirector}, Président de la SAS ${LEGAL_ENTITY.legalName}.`,
       ],
     },
     {
@@ -88,7 +86,8 @@ export function getLegalNoticeBlocks(): LegalBlock[] {
     {
       title: "Activité",
       paragraphs: [
-        `${SITE_NAME} propose la location de véhicules haut de gamme et la gestion locative pour propriétaires, principalement à Beauvais, Gisors, dans l'Oise et l'Eure.`,
+        `${SITE_NAME} propose la location de véhicules haut de gamme, la conciergerie automobile et la gestion locative pour propriétaires.`,
+        `Zones d'activité principales : ${formatServiceAreaLabel()}. Le siège social est à Paris ; les remises de clés et l'accueil clients se font à Beauvais, Gisors ou sur rendez-vous dans l'Oise et l'Eure.`,
         "Les réservations se font par WhatsApp, téléphone ou formulaire. Aucun paiement n'est encaissé en ligne sur ce site.",
       ],
     },
@@ -126,8 +125,8 @@ export function getPrivacyBlocks(): LegalBlock[] {
     {
       title: "Responsable de traitement",
       paragraphs: [
-        `${LEGAL_ENTITY.legalName} (${SITE_NAME}) est responsable du traitement des données collectées via ${SITE_URL}.`,
-        `Contact : ${LEGAL_ENTITY.email} — ${LEGAL_ENTITY.phone}. Adresse : ${formatLegalAddress()}.`,
+        `${LEGAL_ENTITY.legalName}, ${LEGAL_ENTITY.legalForm} (${SITE_NAME}), SIRET ${LEGAL_ENTITY.siret}, est responsable du traitement des données collectées via ${SITE_URL}.`,
+        `Contact : ${LEGAL_ENTITY.email} — ${LEGAL_ENTITY.phone}. Siège social : ${formatLegalAddress()}.`,
       ],
     },
     {
