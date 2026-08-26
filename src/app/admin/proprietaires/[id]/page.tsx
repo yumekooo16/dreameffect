@@ -29,7 +29,8 @@ export default async function AdminOwnerDetailPage({
     notFound();
   }
 
-  const { owner, vehicles, reservations, revenue, isActive } = data;
+  const { owner, vehicles, reservations, revenue, isActive, emailConfirmed } =
+    data;
   const whatsappUrl = owner.phone
     ? buildWhatsAppUrl(
         owner.phone,
@@ -53,13 +54,28 @@ export default async function AdminOwnerDetailPage({
               {ownerName(owner.first_name, owner.last_name)}
             </h1>
             <p className="mt-1 text-sm de-muted">Fiche propriétaire</p>
+            {owner.email && (
+              <a
+                href={`mailto:${owner.email}`}
+                className="mt-1 inline-block text-sm text-[var(--blue-soft)] hover:underline"
+              >
+                {owner.email}
+              </a>
+            )}
           </div>
 
-          <span
-            className={`de-badge ${isActive ? "de-badge--available" : "de-badge--unavailable"}`}
-          >
-            {isActive ? "Compte actif" : "Compte désactivé"}
-          </span>
+          <div className="flex flex-wrap gap-2">
+            <span
+              className={`de-badge ${isActive ? "de-badge--available" : "de-badge--unavailable"}`}
+            >
+              {isActive ? "Compte actif" : "Compte désactivé"}
+            </span>
+            <span
+              className={`de-badge ${emailConfirmed ? "de-badge--available" : "de-badge--unavailable"}`}
+            >
+              {emailConfirmed ? "Email vérifié" : "Email à vérifier"}
+            </span>
+          </div>
         </div>
       </div>
 
@@ -78,11 +94,28 @@ export default async function AdminOwnerDetailPage({
 
       <Section title="Contact">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="de-label">Téléphone</p>
-            <p className="mt-1 text-lg font-medium">
-              {owner.phone?.trim() || "Non renseigné — complétez ci-dessus"}
-            </p>
+          <div className="space-y-3">
+            <div>
+              <p className="de-label">Email</p>
+              <p className="mt-1 text-lg font-medium">
+                {owner.email ? (
+                  <a
+                    href={`mailto:${owner.email}`}
+                    className="text-[var(--blue-soft)] hover:underline"
+                  >
+                    {owner.email}
+                  </a>
+                ) : (
+                  "Non renseigné"
+                )}
+              </p>
+            </div>
+            <div>
+              <p className="de-label">Téléphone</p>
+              <p className="mt-1 text-lg font-medium">
+                {owner.phone?.trim() || "Non renseigné — complétez ci-dessus"}
+              </p>
+            </div>
           </div>
 
           {whatsappUrl ? (
@@ -115,7 +148,12 @@ export default async function AdminOwnerDetailPage({
       </Section>
 
       <Section title="Compte">
-        <OwnerAccountActions ownerId={owner.id} isActive={isActive} />
+        <OwnerAccountActions
+          ownerId={owner.id}
+          isActive={isActive}
+          emailConfirmed={emailConfirmed}
+          email={owner.email}
+        />
         <OwnerDeleteButton
           ownerId={owner.id}
           ownerName={ownerName(owner.first_name, owner.last_name)}

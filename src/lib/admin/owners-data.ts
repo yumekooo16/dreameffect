@@ -15,9 +15,15 @@ function isUserBanned(bannedUntil?: string | null) {
   return new Date(bannedUntil) > new Date();
 }
 
-async function fetchBannedOwnerIds(): Promise<Set<string>> {
+type AuthOwnerMeta = {
+  email: string | null;
+  emailConfirmed: boolean;
+  banned: boolean;
+};
+
+async function fetchAuthOwnerMeta(): Promise<Map<string, AuthOwnerMeta>> {
   const admin = createAdminClient();
-  const banned = new Set<string>();
+  const map = new Map<string, AuthOwnerMeta>();
   let page = 1;
 
   while (true) {
@@ -29,26 +35,32 @@ async function fetchBannedOwnerIds(): Promise<Set<string>> {
     if (error || !data.users.length) break;
 
     for (const user of data.users) {
-      if (isUserBanned(user.banned_until)) {
-        banned.add(user.id);
-      }
+      map.set(user.id, {
+        email: user.email?.toLowerCase() ?? null,
+        emailConfirmed: Boolean(user.email_confirmed_at),
+        banned: isUserBanned(user.banned_until),
+      });
     }
 
     if (data.users.length < 1000) break;
     page += 1;
   }
 
-  return banned;
+  return map;
 }
+
+const OWNER_SELECT_WITH_EMAIL =
+  "id, first_name, last_name, phone, email, role, created_at, revenue_mode, owner_revenue_share";
+
+const OWNER_SELECT_BASE =
+  "id, first_name, last_name, phone, role, created_at, revenue_mode, owner_revenue_share";
 
 export async function fetchOwnersList(): Promise<OwnerListItem[]> {
   const supabase = await createClient();
 
   let ownersQuery = await supabase
     .from("profiles")
-    .select(
-      "id, first_name, last_name, phone, role, created_at, revenue_mode, owner_revenue_share"
-    )
+    .select(OWNER_SELECT_WITH_EMAIL)
     .eq("role", "owner")
     .order("last_name", { ascending: true });
 
@@ -57,18 +69,18 @@ export async function fetchOwnersList(): Promise<OwnerListItem[]> {
   if (ownersQuery.error?.message?.includes("does not exist")) {
     const fallback = await supabase
       .from("profiles")
-      .select("id, first_name, last_name, phone, role, created_at")
+      .select(OWNER_SELECT_BASE)
       .eq("role", "owner")
       .order("last_name", { ascending: true });
     owners = (fallback.data ?? []) as OwnerProfile[];
   }
 
-  const [vehiclesRes, reservationsRes, bannedIds] = await Promise.all([
+  const [vehiclesRes, reservationsRes, authMeta] = await Promise.all([
     supabase
       .from("owner_vehicle_dashboard")
       .select("vehicle_id, owner_id, total_revenue"),
     supabase.from("reservations").select("id, vehicle_id, status"),
-    fetchBannedOwnerIds(),
+    fetchAuthOwnerMeta(),
   ]);
 
   const vehicles = vehiclesRes.data ?? [];
@@ -103,13 +115,16 @@ export async function fetchOwnersList(): Promise<OwnerListItem[]> {
       (sum, v) => sum + Number(v.total_revenue ?? 0),
       0
     );
+    const meta = authMeta.get(owner.id);
 
     return {
       ...owner,
+      email: owner.email ?? meta?.email ?? null,
       vehicleCount: ownerVehicles.length,
       reservationCount: reservationsByOwner.get(owner.id) ?? 0,
       totalRevenue,
-      isActive: !bannedIds.has(owner.id),
+      isActive: !(meta?.banned ?? false),
+      emailConfirmed: meta?.emailConfirmed ?? false,
     };
   });
 }
@@ -119,9 +134,7 @@ export async function fetchOwnerDetail(ownerId: string) {
 
   const { data: owner, error: ownerError } = await supabase
     .from("profiles")
-    .select(
-      "id, first_name, last_name, phone, role, created_at, revenue_mode, owner_revenue_share"
-    )
+    .select(OWNER_SELECT_WITH_EMAIL)
     .eq("id", ownerId)
     .eq("role", "owner")
     .single();
@@ -130,7 +143,7 @@ export async function fetchOwnerDetail(ownerId: string) {
     if (ownerError?.message?.includes("does not exist")) {
       const { data: fallbackOwner, error: fallbackError } = await supabase
         .from("profiles")
-        .select("id, first_name, last_name, phone, role, created_at")
+        .select(OWNER_SELECT_BASE)
         .eq("id", ownerId)
         .eq("role", "owner")
         .single();
@@ -225,13 +238,26 @@ async function fetchOwnerDetailWithProfile(owner: OwnerProfile) {
   );
 
   const { data: authData } = await admin.auth.admin.getUserById(ownerId);
-  const isActive = !isUserBanned(authData.user?.banned_until);
+  const authUser = authData.user;
+  const isActive = !isUserBanned(authUser?.banned_until);
+  const email = owner.email ?? authUser?.email?.toLowerCase() ?? null;
+  const emailConfirmed = Boolean(authUser?.email_confirmed_at);
+
+  // Synchronise profiles.email si vide
+  if (email && !owner.email) {
+    try {
+      await admin.from("profiles").update({ email }).eq("id", ownerId);
+    } catch {
+      // Colonne absente tant que la migration n'est pas appliquée
+    }
+  }
 
   return {
-    owner: owner as OwnerProfile,
+    owner: { ...owner, email } as OwnerProfile,
     vehicles,
     reservations: reservationsWithVehicle,
     revenue: computeOwnerRevenue(reservations),
     isActive,
+    emailConfirmed,
   };
 }
