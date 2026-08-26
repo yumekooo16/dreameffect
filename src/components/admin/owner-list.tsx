@@ -45,6 +45,7 @@ export default function OwnerListPanel({ owners }: { owners: OwnerListItem[] }) 
         owner.first_name,
         owner.last_name,
         owner.phone,
+        owner.email,
       ]
         .filter(Boolean)
         .join(" ")
@@ -63,7 +64,7 @@ export default function OwnerListPanel({ owners }: { owners: OwnerListItem[] }) 
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Rechercher par nom ou téléphone…"
+            placeholder="Rechercher par nom, email ou téléphone…"
             className="de-input w-full"
           />
         </div>
@@ -116,7 +117,19 @@ export default function OwnerListPanel({ owners }: { owners: OwnerListItem[] }) 
                           Désactivé
                         </span>
                       )}
+                      {owner.emailConfirmed ? (
+                        <span className="de-badge de-badge--available">
+                          Email vérifié
+                        </span>
+                      ) : (
+                        <span className="de-badge de-badge--unavailable">
+                          Email à vérifier
+                        </span>
+                      )}
                     </div>
+                    <p className="mt-0.5 text-sm de-muted">
+                      {owner.email?.trim() || "Email non renseigné"}
+                    </p>
                     <p className="mt-0.5 text-sm de-muted">
                       {owner.phone?.trim() || "Téléphone non renseigné"}
                     </p>

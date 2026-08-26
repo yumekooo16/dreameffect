@@ -5,6 +5,11 @@ import { createClient } from "@/src/lib/supabase/server";
 import { createAdminClient } from "@/src/lib/supabase/admin";
 import { requireAdmin } from "@/src/lib/admin/auth";
 import type { OwnerFormData } from "@/src/lib/admin/owners-types";
+import {
+  authCallbackUrl,
+  normalizeEmail,
+  validateRealOwnerEmail,
+} from "@/src/lib/auth/email";
 
 type ActionResult = {
   success: boolean;
@@ -144,14 +149,9 @@ async function deleteOwnerRelatedData(
 }
 
 function validateOwnerForm(data: OwnerFormData): string | null {
-  const email = data.email.trim().toLowerCase();
-  if (!email) return "Email requis";
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return "Email invalide";
-  }
-  if (!data.password || data.password.length < 8) {
-    return "Mot de passe requis (8 caractères minimum)";
-  }
+  const emailError = validateRealOwnerEmail(data.email);
+  if (emailError) return emailError;
+
   if (data.revenue_mode !== "percentage" && data.revenue_mode !== "pro_price") {
     return "Mode de rémunération invalide";
   }
@@ -211,7 +211,7 @@ async function findAuthUserByEmail(email: string) {
 
 export async function createOwnerAccount(
   data: OwnerFormData
-): Promise<ActionResult> {
+): Promise<ActionResult & { invited?: boolean }> {
   await requireAdmin();
 
   const validationError = validateOwnerForm(data);
@@ -219,7 +219,7 @@ export async function createOwnerAccount(
     return { success: false, error: validationError };
   }
 
-  const email = data.email.trim().toLowerCase();
+  const email = normalizeEmail(data.email);
   const firstName = data.first_name.trim();
   const lastName = data.last_name.trim();
   const phone = data.phone.trim() || null;
@@ -255,41 +255,46 @@ export async function createOwnerAccount(
       };
     }
 
-    const { data: created, error: createError } =
-      await admin.auth.admin.createUser({
-        email,
-        password: data.password,
-        email_confirm: true,
-        user_metadata: {
+    // Invitation = vrai email + vérification obligatoire (le propriétaire
+    // choisit son mot de passe via le lien reçu).
+    const { data: invited, error: inviteError } =
+      await admin.auth.admin.inviteUserByEmail(email, {
+        data: {
           first_name: firstName,
           last_name: lastName,
+          role: "owner",
         },
+        redirectTo: authCallbackUrl("/espace-proprietaire"),
       });
 
-    if (createError || !created.user) {
+    if (inviteError || !invited.user) {
       return {
         success: false,
-        error: createError?.message ?? "Impossible de créer le compte",
+        error:
+          inviteError?.message ??
+          "Impossible d'envoyer l'invitation. Vérifiez la config email Supabase (SMTP / Auth).",
       };
     }
 
-    const ownerId = created.user.id;
+    const ownerId = invited.user.id;
     const revenueFields = revenueFieldsFromForm(data);
 
-    const { error: profileError } = await admin.from("profiles").upsert(
-      {
-        id: ownerId,
-        first_name: firstName || null,
-        last_name: lastName || null,
-        phone,
-        role: "owner",
-        ...revenueFields,
-      },
-      { onConflict: "id" }
-    );
+    const profilePayload: Record<string, unknown> = {
+      id: ownerId,
+      first_name: firstName || null,
+      last_name: lastName || null,
+      phone,
+      email,
+      role: "owner",
+      ...revenueFields,
+    };
+
+    const { error: profileError } = await admin
+      .from("profiles")
+      .upsert(profilePayload, { onConflict: "id" });
 
     if (profileError) {
-      // Colonnes revenue_* absentes (migration non appliquée) → retry sans
+      // Colonnes absentes (migration non appliquée) → retry progressif
       if (profileError.message.includes("does not exist")) {
         const { error: fallbackError } = await admin.from("profiles").upsert(
           {
@@ -319,12 +324,91 @@ export async function createOwnerAccount(
     }
 
     revalidateOwnerPaths(ownerId);
-    return { success: true, id: ownerId };
+    return { success: true, id: ownerId, invited: true };
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Erreur inattendue";
     return { success: false, error: message };
   }
+}
+
+export async function resendOwnerInvite(
+  ownerId: string
+): Promise<ActionResult & { inviteLink?: string }> {
+  await requireAdmin();
+
+  if (!ownerId.trim()) {
+    return { success: false, error: "Propriétaire introuvable" };
+  }
+
+  const admin = createAdminClient();
+
+  const { data: authData, error: authError } =
+    await admin.auth.admin.getUserById(ownerId);
+
+  if (authError || !authData.user?.email) {
+    return {
+      success: false,
+      error: authError?.message ?? "Email propriétaire introuvable",
+    };
+  }
+
+  if (authData.user.email_confirmed_at) {
+    return {
+      success: false,
+      error: "Cet email est déjà vérifié — pas besoin de renvoyer l'invitation.",
+    };
+  }
+
+  const email = normalizeEmail(authData.user.email);
+  const redirectTo = authCallbackUrl("/espace-proprietaire");
+
+  // Relance l'email d'invitation (si le projet Auth/SMTP est configuré)
+  const { error: inviteError } = await admin.auth.admin.inviteUserByEmail(
+    email,
+    {
+      data: {
+        first_name: authData.user.user_metadata?.first_name,
+        last_name: authData.user.user_metadata?.last_name,
+        role: "owner",
+      },
+      redirectTo,
+    }
+  );
+
+  if (!inviteError) {
+    revalidateOwnerPaths(ownerId);
+    return { success: true, id: ownerId };
+  }
+
+  // Utilisateur déjà créé : générer un lien à transmettre (email / WhatsApp)
+  const { data: linkData, error: linkError } =
+    await admin.auth.admin.generateLink({
+      type: "invite",
+      email,
+      options: { redirectTo },
+    });
+
+  if (linkError) {
+    return {
+      success: false,
+      error:
+        inviteError.message ||
+        linkError.message ||
+        "Impossible de renvoyer l'invitation",
+    };
+  }
+
+  const inviteLink =
+    linkData?.properties?.action_link ??
+    (linkData as { action_link?: string } | null)?.action_link;
+
+  revalidateOwnerPaths(ownerId);
+  return {
+    success: true,
+    id: ownerId,
+    inviteLink: inviteLink || undefined,
+  };
 }
 
 export async function updateOwnerProfile(

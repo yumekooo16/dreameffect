@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getAuthUser } from "@/src/lib/auth";
 import { createClient } from "@/src/lib/supabase/server";
@@ -17,11 +16,16 @@ export default async function ProfilePage() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("first_name, last_name, phone")
+    .select("first_name, last_name, phone, email")
     .eq("id", user.id)
     .single();
 
+  const email =
+    profile?.email?.trim() || user.email?.toLowerCase() || null;
+  const emailVerified = Boolean(user.email_confirmed_at);
+
   const fields = [
+    { label: "Email", value: email },
     { label: "Prénom", value: profile?.first_name },
     { label: "Nom", value: profile?.last_name },
     { label: "Téléphone", value: profile?.phone },
@@ -44,6 +48,13 @@ export default async function ProfilePage() {
               <p className="mt-1 font-medium">
                 {field.value?.trim() || "Non renseigné"}
               </p>
+              {field.label === "Email" && (
+                <p className="mt-1 text-xs de-muted">
+                  {emailVerified
+                    ? "Adresse vérifiée"
+                    : "Adresse non vérifiée — ouvrez le lien reçu par email"}
+                </p>
+              )}
             </div>
           ))}
         </div>

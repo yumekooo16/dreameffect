@@ -6,6 +6,7 @@ export type OwnerProfile = {
   first_name: string | null;
   last_name: string | null;
   phone: string | null;
+  email?: string | null;
   role: string;
   created_at?: string | null;
   revenue_mode?: RevenueMode | null;
@@ -14,7 +15,6 @@ export type OwnerProfile = {
 
 export type OwnerFormData = {
   email: string;
-  password: string;
   first_name: string;
   last_name: string;
   phone: string;
@@ -28,6 +28,7 @@ export type OwnerListItem = OwnerProfile & {
   reservationCount: number;
   totalRevenue: number;
   isActive: boolean;
+  emailConfirmed: boolean;
 };
 
 export type OwnerVehicle = {

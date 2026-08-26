@@ -8,7 +8,6 @@ import type { RevenueMode } from "@/src/lib/revenue/split";
 
 const defaultForm: OwnerFormData = {
   email: "",
-  password: "",
   first_name: "",
   last_name: "",
   phone: "",
@@ -20,6 +19,7 @@ export default function OwnerForm({ cancelHref }: { cancelHref: string }) {
   const router = useRouter();
   const [form, setForm] = useState<OwnerFormData>(defaultForm);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
   function updateField<K extends keyof OwnerFormData>(
@@ -32,6 +32,7 @@ export default function OwnerForm({ cancelHref }: { cancelHref: string }) {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    setSuccess(null);
 
     startTransition(async () => {
       const result = await createOwnerAccount(form);
@@ -41,6 +42,9 @@ export default function OwnerForm({ cancelHref }: { cancelHref: string }) {
         return;
       }
 
+      setSuccess(
+        "Invitation envoyée sur l'email du propriétaire. Il devra cliquer le lien pour vérifier son adresse et choisir son mot de passe."
+      );
       router.push(`/admin/proprietaires/${result.id}`);
       router.refresh();
     });
@@ -49,14 +53,15 @@ export default function OwnerForm({ cancelHref }: { cancelHref: string }) {
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       <p className="text-sm de-muted">
-        Créez un accès à l&apos;espace propriétaire. Choisissez ensuite comment
-        calculer automatiquement ses gains.
+        Saisissez le <strong>vrai email</strong> du propriétaire. Une invitation
+        de vérification lui est envoyée : il confirme son adresse et crée son
+        mot de passe. Vous pourrez ensuite le joindre par mail en cas de besoin.
       </p>
 
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="sm:col-span-2">
           <label htmlFor="owner-email" className="de-label mb-1 block">
-            Email de connexion
+            Email réel du propriétaire
           </label>
           <input
             id="owner-email"
@@ -65,26 +70,13 @@ export default function OwnerForm({ cancelHref }: { cancelHref: string }) {
             autoComplete="off"
             value={form.email}
             onChange={(e) => updateField("email", e.target.value)}
-            placeholder="Ex. jean.dupont@email.com"
+            placeholder="Ex. jean.dupont@gmail.com"
             className="de-input w-full"
           />
-        </div>
-
-        <div className="sm:col-span-2">
-          <label htmlFor="owner-password" className="de-label mb-1 block">
-            Mot de passe
-          </label>
-          <input
-            id="owner-password"
-            type="password"
-            required
-            minLength={8}
-            autoComplete="new-password"
-            value={form.password}
-            onChange={(e) => updateField("password", e.target.value)}
-            placeholder="8 caractères minimum"
-            className="de-input w-full"
-          />
+          <p className="mt-1 text-xs de-muted">
+            Pas d&apos;email inventé (@test, @example…). L&apos;invitation part
+            sur cette boîte.
+          </p>
         </div>
 
         <div>
@@ -220,6 +212,7 @@ export default function OwnerForm({ cancelHref }: { cancelHref: string }) {
       </div>
 
       {error && <p className="text-sm text-destructive">{error}</p>}
+      {success && <p className="text-sm text-[var(--blue-soft)]">{success}</p>}
 
       <div className="flex flex-wrap gap-2">
         <button
@@ -227,7 +220,7 @@ export default function OwnerForm({ cancelHref }: { cancelHref: string }) {
           disabled={pending}
           className="de-btn de-btn-primary"
         >
-          {pending ? "Création…" : "Créer le compte propriétaire"}
+          {pending ? "Envoi de l'invitation…" : "Inviter le propriétaire"}
         </button>
         <a href={cancelHref} className="de-btn de-btn-ghost">
           Annuler

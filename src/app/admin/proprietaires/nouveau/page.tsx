@@ -19,7 +19,8 @@ export default async function NewOwnerPage() {
           Nouveau propriétaire
         </h1>
         <p className="mt-1 text-sm de-muted">
-          Créer un compte d&apos;accès à l&apos;espace propriétaire
+          Invitation par email réel — le propriétaire vérifie son adresse et
+          choisit son mot de passe
         </p>
       </div>
 
