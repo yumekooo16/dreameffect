@@ -2,14 +2,21 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { HOME_PROCESS_STEPS } from "@/src/lib/public/home-content";
-import { resolveVehicleImageUrl } from "@/src/lib/image-url";
+import type { HomeVisual } from "@/src/lib/public/hero-image";
 import { PUBLIC_ROUTES } from "@/src/lib/public/site";
+import {
+  vehicleImageFrameClassName,
+  vehicleImageFrameStyle,
+} from "@/src/lib/vehicles/image-frame";
 
 type HowItWorksSectionProps = {
+  visuals?: (HomeVisual | null)[];
+  /** @deprecated Préférer visuals */
   visualUrls?: (string | null)[];
 };
 
 export default function HowItWorksSection({
+  visuals = [],
   visualUrls = [],
 }: HowItWorksSectionProps) {
   return (
@@ -25,7 +32,8 @@ export default function HowItWorksSection({
 
         <div className="de-keys-narrative">
           {HOME_PROCESS_STEPS.map(({ step, title, text, visualAlt }, index) => {
-            const imageUrl = resolveVehicleImageUrl(visualUrls[index]);
+            const visual = visuals[index] ?? null;
+            const imageUrl = visual?.url ?? visualUrls[index] ?? null;
             const alt = index % 2 === 1;
 
             return (
@@ -39,7 +47,8 @@ export default function HowItWorksSection({
                       src={imageUrl}
                       alt={visualAlt}
                       fill
-                      className="object-cover"
+                      className={vehicleImageFrameClassName(visual?.frame)}
+                      style={vehicleImageFrameStyle(visual?.frame)}
                       sizes="(max-width: 900px) 100vw, 48vw"
                     />
                   ) : null}

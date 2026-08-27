@@ -279,6 +279,7 @@
 .de-keys-media .de-hero-visual {
   position: absolute;
   inset: 0;
+  overflow: hidden;
   background: var(--surface);
 }
 
@@ -446,6 +447,10 @@
   overflow: hidden;
   border: 1px solid var(--line);
   background: var(--surface);
+}
+
+.de-keys-step-visual img {
+  --de-img-scale: 1;
 }
 
 .de-keys-step-num {
