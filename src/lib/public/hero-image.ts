@@ -2,45 +2,29 @@ import { createAdminClient } from "@/src/lib/supabase/admin";
 import { resolveVehicleImageUrl } from "@/src/lib/image-url";
 import type { PublicVehicle } from "@/src/lib/public/vehicles-types";
 import {
+  homeVisualFromUrl,
+  pickNarrativeVisualsFromPool,
+  type HomeVisual,
+} from "@/src/lib/public/narrative-visuals";
+import {
   DEFAULT_VEHICLE_IMAGE_FRAME,
   type VehicleImageFrame,
 } from "@/src/lib/vehicles/image-frame";
 
-export type HomeVisual = {
-  url: string;
-  frame: VehicleImageFrame;
-};
+export type { HomeVisual } from "@/src/lib/public/narrative-visuals";
+export {
+  pickNarrativeVisualsFromPool,
+  shuffleArray,
+} from "@/src/lib/public/narrative-visuals";
 
 const NARRATIVE_GALLERY_LIMIT = 36;
 
 function visualFromVehicle(vehicle: PublicVehicle): HomeVisual | null {
-  const url = resolveVehicleImageUrl(vehicle.image_url);
-  if (!url) return null;
-  return {
-    url,
-    frame: vehicle.imageFrame ?? DEFAULT_VEHICLE_IMAGE_FRAME,
-  };
-}
-
-function visualFromPath(
-  path: string,
-  frame: VehicleImageFrame
-): HomeVisual | null {
-  const url = resolveVehicleImageUrl(path);
-  if (!url) return null;
-  return { url, frame };
-}
-
-/** Mélange Fisher–Yates — O(n), sans alloc lourde. */
-export function shuffleArray<T>(items: T[]): T[] {
-  const copy = items.slice();
-  for (let i = copy.length - 1; i > 0; i -= 1) {
-    const j = Math.floor(Math.random() * (i + 1));
-    const tmp = copy[i];
-    copy[i] = copy[j]!;
-    copy[j] = tmp!;
-  }
-  return copy;
+  if (!vehicle.image_url) return null;
+  return homeVisualFromUrl(
+    vehicle.image_url,
+    vehicle.imageFrame ?? DEFAULT_VEHICLE_IMAGE_FRAME
+  );
 }
 
 /** Image hero : variable d'environnement, puis première photo de flotte disponible. */
@@ -76,7 +60,7 @@ export function resolveHeroImageUrl(vehicles: PublicVehicle[] = []): string | nu
 
 /**
  * Pool de visuels uniques pour le parcours accueil.
- * Couvertures flotte + galeries (1 requête batch) — fluide même avec + de photos.
+ * Couvertures flotte + galeries (1 requête batch).
  */
 export async function collectNarrativeVisualPool(
   vehicles: PublicVehicle[]
@@ -117,7 +101,7 @@ export async function collectNarrativeVisualPool(
         const frame =
           frameByVehicleId.get(String(row.vehicle_id)) ??
           DEFAULT_VEHICLE_IMAGE_FRAME;
-        const visual = visualFromPath(path, frame);
+        const visual = homeVisualFromUrl(path, frame);
         if (visual) byUrl.set(visual.url, visual);
       }
     }
@@ -128,40 +112,6 @@ export async function collectNarrativeVisualPool(
   return Array.from(byUrl.values());
 }
 
-/**
- * Tirage aléatoire sans doublon.
- * Préfère d'éviter l'URL du hero si d'autres photos existent.
- * Jamais la même photo 2× dans le résultat.
- */
-export function pickNarrativeVisualsFromPool(
-  pool: HomeVisual[],
-  count = 3,
-  preferExcludeUrl?: string | null
-): (HomeVisual | null)[] {
-  const excluded = preferExcludeUrl
-    ? resolveVehicleImageUrl(preferExcludeUrl) ?? preferExcludeUrl
-    : null;
-
-  const unique = new Map<string, HomeVisual>();
-  for (const visual of pool) {
-    if (visual.url) unique.set(visual.url, visual);
-  }
-
-  const all = Array.from(unique.values());
-  const preferred = excluded
-    ? all.filter((visual) => visual.url !== excluded)
-    : all;
-
-  const source = preferred.length > 0 ? preferred : all;
-  const shuffled = shuffleArray(source);
-  const picked = shuffled.slice(0, Math.min(count, shuffled.length));
-
-  return Array.from({ length: count }, (_, index) => picked[index] ?? null);
-}
-
-/**
- * Compatible sync (couvertures seules) — préférer `loadNarrativeVisuals` sur l'accueil.
- */
 export function pickNarrativeVisuals(
   vehicles: PublicVehicle[],
   count = 3,
@@ -174,7 +124,7 @@ export function pickNarrativeVisuals(
   return pickNarrativeVisualsFromPool(pool, count, preferExcludeUrl);
 }
 
-/** Accueil : pool élargi + shuffle sans doublon. */
+/** @deprecated Préférer collectNarrativeVisualPool + tirage client */
 export async function loadNarrativeVisuals(
   vehicles: PublicVehicle[],
   count = 3,

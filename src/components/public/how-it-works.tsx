@@ -1,8 +1,14 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { HOME_PROCESS_STEPS } from "@/src/lib/public/home-content";
-import type { HomeVisual } from "@/src/lib/public/hero-image";
+import {
+  pickNarrativeVisualsFromPool,
+  type HomeVisual,
+} from "@/src/lib/public/narrative-visuals";
 import { PUBLIC_ROUTES } from "@/src/lib/public/site";
 import {
   vehicleImageFrameClassName,
@@ -10,15 +16,43 @@ import {
 } from "@/src/lib/vehicles/image-frame";
 
 type HowItWorksSectionProps = {
+  /** Pool complet — mélangé côté navigateur à chaque visite. */
+  visualPool?: HomeVisual[];
+  excludeUrl?: string | null;
+  /** @deprecated Préférer visualPool */
   visuals?: (HomeVisual | null)[];
-  /** @deprecated Préférer visuals */
+  /** @deprecated Préférer visualPool */
   visualUrls?: (string | null)[];
 };
 
 export default function HowItWorksSection({
-  visuals = [],
+  visualPool = [],
+  excludeUrl = null,
+  visuals: legacyVisuals = [],
   visualUrls = [],
 }: HowItWorksSectionProps) {
+  const [visuals, setVisuals] = useState<(HomeVisual | null)[]>(() => {
+    if (visualPool.length > 0) {
+      // Placeholder stable (évite mismatch hydratation) — le vrai tirage est en useEffect
+      return Array.from({ length: HOME_PROCESS_STEPS.length }, () => null);
+    }
+    if (legacyVisuals.length > 0) return legacyVisuals;
+    return visualUrls.map((url) =>
+      url ? { url, frame: { fit: "cover", positionX: 50, positionY: 50, scale: 100 } } : null
+    );
+  });
+
+  useEffect(() => {
+    if (visualPool.length === 0) return;
+    setVisuals(
+      pickNarrativeVisualsFromPool(
+        visualPool,
+        HOME_PROCESS_STEPS.length,
+        excludeUrl
+      )
+    );
+  }, [visualPool, excludeUrl]);
+
   return (
     <section className="de-keys-section" aria-labelledby="home-process-title">
       <div className="de-public-container">
@@ -33,7 +67,7 @@ export default function HowItWorksSection({
         <div className="de-keys-narrative">
           {HOME_PROCESS_STEPS.map(({ step, title, text, visualAlt }, index) => {
             const visual = visuals[index] ?? null;
-            const imageUrl = visual?.url ?? visualUrls[index] ?? null;
+            const imageUrl = visual?.url ?? null;
             const alt = index % 2 === 1;
 
             return (
