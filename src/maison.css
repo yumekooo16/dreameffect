@@ -277,10 +277,9 @@
 }
 
 .de-keys-media .de-hero-visual {
-  overflow: hidden;
-}
   position: absolute;
   inset: 0;
+  overflow: hidden;
   background: var(--surface);
 }
 
