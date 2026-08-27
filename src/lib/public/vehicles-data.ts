@@ -253,15 +253,45 @@ async function fetchPublicGalleryImages(
   coverUrl: string | null
 ): Promise<PublicVehicleImage[]> {
   const supabase = createCatalogClient();
-  const { data, error } = await supabase
+
+  const withOrder = await supabase
     .from("vehicle_images")
-    .select("id, image_url, is_primary, created_at")
+    .select("id, image_url, is_primary, sort_order, created_at")
     .eq("vehicle_id", vehicleId)
-    .order("is_primary", { ascending: false })
+    .order("sort_order", { ascending: true })
     .order("created_at", { ascending: true })
     .limit(MAX_VEHICLE_PHOTOS);
 
-  if (error || !data?.length) {
+  type GalleryRow = {
+    id: string | number;
+    image_url: string | null;
+    is_primary: boolean | null;
+    created_at?: string | null;
+    sort_order?: number | null;
+  };
+
+  let data: GalleryRow[] | null = withOrder.data as GalleryRow[] | null;
+
+  if (withOrder.error) {
+    if (!isMissingColumnError(withOrder.error.message)) {
+      return buildPublicCoverImages(vehicleId, coverUrl);
+    }
+
+    const legacy = await supabase
+      .from("vehicle_images")
+      .select("id, image_url, is_primary, created_at")
+      .eq("vehicle_id", vehicleId)
+      .order("is_primary", { ascending: false })
+      .order("created_at", { ascending: true })
+      .limit(MAX_VEHICLE_PHOTOS);
+
+    if (legacy.error || !legacy.data?.length) {
+      return buildPublicCoverImages(vehicleId, coverUrl);
+    }
+    data = legacy.data as GalleryRow[];
+  }
+
+  if (!data?.length) {
     return buildPublicCoverImages(vehicleId, coverUrl);
   }
 
@@ -274,26 +304,23 @@ async function fetchPublicGalleryImages(
       is_primary: Boolean(row.is_primary),
     }));
 
-  if (coverUrl) {
-    const coverIndex = images.findIndex((image) => image.image_url === coverUrl);
-    if (coverIndex > 0) {
-      const [cover] = images.splice(coverIndex, 1);
-      images.unshift({ ...cover, is_primary: true });
-    } else if (coverIndex === -1) {
-      images.unshift({
-        id: `public-${vehicleId}`,
-        image_url: coverUrl,
-        is_primary: true,
-      });
-      return images.slice(0, MAX_VEHICLE_PHOTOS);
-    }
+  // Couverture catalogue absente de la galerie : on l'ajoute en dernière position
+  // sans écraser l'ordre manuel choisi en admin.
+  if (coverUrl && !images.some((image) => image.image_url === coverUrl)) {
+    images.push({
+      id: `public-${vehicleId}`,
+      image_url: coverUrl,
+      is_primary: false,
+    });
   }
 
-  if (images.length === 0) {
+  const capped = images.slice(0, MAX_VEHICLE_PHOTOS);
+
+  if (capped.length === 0) {
     return buildPublicCoverImages(vehicleId, coverUrl);
   }
 
-  return images.map((image, index) => ({
+  return capped.map((image, index) => ({
     ...image,
     is_primary: index === 0,
   }));

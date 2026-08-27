@@ -10,6 +10,7 @@ import {
   DEFAULT_VEHICLE_IMAGE_FRAME,
   type VehicleImageFrame,
 } from "@/src/lib/vehicles/image-frame";
+import { isMissingColumnError } from "@/src/lib/vehicles/db-columns";
 
 export type { HomeVisual } from "@/src/lib/public/narrative-visuals";
 export {
@@ -91,7 +92,7 @@ export async function collectNarrativeVisualPool(
       .from("vehicle_images")
       .select("vehicle_id, image_url")
       .in("vehicle_id", vehicleIds)
-      .order("is_primary", { ascending: false })
+      .order("sort_order", { ascending: true })
       .limit(NARRATIVE_GALLERY_LIMIT);
 
     if (!error && data) {
@@ -103,6 +104,25 @@ export async function collectNarrativeVisualPool(
           DEFAULT_VEHICLE_IMAGE_FRAME;
         const visual = homeVisualFromUrl(path, frame);
         if (visual) byUrl.set(visual.url, visual);
+      }
+    } else if (error && isMissingColumnError(error.message)) {
+      const legacy = await supabase
+        .from("vehicle_images")
+        .select("vehicle_id, image_url")
+        .in("vehicle_id", vehicleIds)
+        .order("is_primary", { ascending: false })
+        .limit(NARRATIVE_GALLERY_LIMIT);
+
+      if (!legacy.error && legacy.data) {
+        for (const row of legacy.data) {
+          const path = typeof row.image_url === "string" ? row.image_url.trim() : "";
+          if (!path) continue;
+          const frame =
+            frameByVehicleId.get(String(row.vehicle_id)) ??
+            DEFAULT_VEHICLE_IMAGE_FRAME;
+          const visual = homeVisualFromUrl(path, frame);
+          if (visual) byUrl.set(visual.url, visual);
+        }
       }
     }
   } catch {

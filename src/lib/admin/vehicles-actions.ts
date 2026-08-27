@@ -157,11 +157,23 @@ async function syncPrimaryImage(
   supabase: Awaited<ReturnType<typeof createClient>>,
   vehicleId: string
 ) {
-  const { data: images } = await supabase
+  const withOrder = await supabase
     .from("vehicle_images")
-    .select("id, image_url, is_primary")
+    .select("id, image_url, is_primary, sort_order, created_at")
     .eq("vehicle_id", vehicleId)
+    .order("sort_order", { ascending: true })
     .order("created_at", { ascending: true });
+
+  const images =
+    !withOrder.error && withOrder.data
+      ? withOrder.data
+      : (
+          await supabase
+            .from("vehicle_images")
+            .select("id, image_url, is_primary, created_at")
+            .eq("vehicle_id", vehicleId)
+            .order("created_at", { ascending: true })
+        ).data;
 
   if (!images?.length) {
     await supabase
@@ -410,7 +422,7 @@ export async function uploadVehiclePhoto(
 
     const { data: existing } = await admin
       .from("vehicle_images")
-      .select("id")
+      .select("id, sort_order")
       .eq("vehicle_id", vehicleId);
 
     if ((existing?.length ?? 0) >= MAX_VEHICLE_PHOTOS) {
@@ -436,12 +448,34 @@ export async function uploadVehiclePhoto(
     }
 
     const isFirst = !existing?.length;
+    const nextSortOrder =
+      existing && existing.length > 0
+        ? Math.max(
+            ...existing.map((row) =>
+              typeof row.sort_order === "number" ? row.sort_order : 0
+            )
+          ) + 1
+        : 0;
 
-    const { error: insertError } = await admin.from("vehicle_images").insert({
+    const insertPayload = {
       vehicle_id: vehicleId,
       image_url: storagePath,
       is_primary: isFirst,
-    });
+      sort_order: nextSortOrder,
+    };
+
+    let { error: insertError } = await admin
+      .from("vehicle_images")
+      .insert(insertPayload);
+
+    if (insertError && isMissingColumnError(insertError.message)) {
+      const legacy = await admin.from("vehicle_images").insert({
+        vehicle_id: vehicleId,
+        image_url: storagePath,
+        is_primary: isFirst,
+      });
+      insertError = legacy.error;
+    }
 
     if (insertError) {
       await admin.storage.from(BUCKET).remove([storagePath]);
@@ -471,6 +505,82 @@ export async function uploadVehiclePhoto(
       error: mapUploadFailure(error, "Impossible d'ajouter la photo pour le moment"),
     };
   }
+}
+
+export async function moveVehiclePhoto(
+  vehicleId: string,
+  imageId: string,
+  direction: "up" | "down"
+): Promise<ActionResult> {
+  await requireAdmin();
+
+  if (imageId.startsWith("legacy-")) {
+    return {
+      success: false,
+      error: "Ajoutez d'abord les photos via la galerie pour pouvoir les réordonner.",
+    };
+  }
+
+  const admin = createAdminClient();
+
+  const { data: rows, error } = await admin
+    .from("vehicle_images")
+    .select("id, sort_order, created_at")
+    .eq("vehicle_id", vehicleId)
+    .order("sort_order", { ascending: true })
+    .order("created_at", { ascending: true });
+
+  if (error) {
+    if (isMissingColumnError(error.message)) {
+      return {
+        success: false,
+        error:
+          "Colonne sort_order absente. Exécutez la migration SQL vehicle_images_sort_order sur Supabase.",
+      };
+    }
+    return { success: false, error: error.message };
+  }
+
+  if (!rows?.length) {
+    return { success: false, error: "Aucune photo à réordonner" };
+  }
+
+  const ordered = [...rows].sort((a, b) => {
+    const orderA = typeof a.sort_order === "number" ? a.sort_order : Number.MAX_SAFE_INTEGER;
+    const orderB = typeof b.sort_order === "number" ? b.sort_order : Number.MAX_SAFE_INTEGER;
+    if (orderA !== orderB) return orderA - orderB;
+    return String(a.created_at ?? "").localeCompare(String(b.created_at ?? ""));
+  });
+
+  const index = ordered.findIndex((row) => row.id === imageId);
+  if (index < 0) {
+    return { success: false, error: "Photo introuvable" };
+  }
+
+  const swapIndex = direction === "up" ? index - 1 : index + 1;
+  if (swapIndex < 0 || swapIndex >= ordered.length) {
+    return { success: true };
+  }
+
+  const reordered = [...ordered];
+  const current = reordered[index]!;
+  reordered[index] = reordered[swapIndex]!;
+  reordered[swapIndex] = current;
+
+  for (let i = 0; i < reordered.length; i += 1) {
+    const { error: updateError } = await admin
+      .from("vehicle_images")
+      .update({ sort_order: i })
+      .eq("id", reordered[i]!.id)
+      .eq("vehicle_id", vehicleId);
+
+    if (updateError) {
+      return { success: false, error: updateError.message };
+    }
+  }
+
+  revalidateVehiclePaths(vehicleId);
+  return { success: true };
 }
 
 export async function setVehiclePrimaryPhoto(

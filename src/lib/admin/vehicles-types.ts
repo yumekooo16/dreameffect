@@ -49,6 +49,7 @@ export type VehicleImageRow = {
   vehicle_id: string;
   image_url: string;
   is_primary: boolean;
+  sort_order?: number | null;
   created_at?: string | null;
 };
 
