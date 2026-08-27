@@ -10,6 +10,15 @@ export type HomeVisual = {
   frame: VehicleImageFrame;
 };
 
+function visualFromVehicle(vehicle: PublicVehicle): HomeVisual | null {
+  const url = resolveVehicleImageUrl(vehicle.image_url);
+  if (!url) return null;
+  return {
+    url,
+    frame: vehicle.imageFrame ?? DEFAULT_VEHICLE_IMAGE_FRAME,
+  };
+}
+
 /** Image hero : variable d'environnement, puis première photo de flotte disponible. */
 export function resolveHeroVisual(
   vehicles: PublicVehicle[] = []
@@ -17,7 +26,6 @@ export function resolveHeroVisual(
   const envHero = process.env.NEXT_PUBLIC_HERO_IMAGE?.trim();
   if (envHero) {
     const url = resolveVehicleImageUrl(envHero) ?? envHero;
-    // Si l'URL matche un véhicule, réutiliser son cadrage admin
     const match = vehicles.find((vehicle) => {
       const vehicleUrl = resolveVehicleImageUrl(vehicle.image_url);
       return vehicleUrl === url || vehicle.image_url === envHero;
@@ -30,13 +38,8 @@ export function resolveHeroVisual(
   }
 
   for (const vehicle of vehicles) {
-    const url = resolveVehicleImageUrl(vehicle.image_url);
-    if (url) {
-      return {
-        url,
-        frame: vehicle.imageFrame ?? DEFAULT_VEHICLE_IMAGE_FRAME,
-      };
-    }
+    const visual = visualFromVehicle(vehicle);
+    if (visual) return visual;
   }
 
   return null;
@@ -48,32 +51,72 @@ export function resolveHeroImageUrl(vehicles: PublicVehicle[] = []): string | nu
 }
 
 /**
- * Jusqu'à `count` visuels distincts pour les sections numérotées.
- * Alterne les marques pour éviter de répéter la même photo BMW.
+ * Jusqu'à `count` visuels pour les sections numérotées.
+ * Préfère des photos distinctes (différentes du hero si possible),
+ * puis réutilise la flotte pour ne jamais laisser un step vide.
  */
 export function pickNarrativeVisuals(
   vehicles: PublicVehicle[],
   count = 3,
-  excludeUrl?: string | null
+  preferExcludeUrl?: string | null
 ): (HomeVisual | null)[] {
-  const excluded = excludeUrl ? resolveVehicleImageUrl(excludeUrl) : null;
-  const byBrand = new Map<string, HomeVisual[]>();
+  const excluded = preferExcludeUrl
+    ? resolveVehicleImageUrl(preferExcludeUrl)
+    : null;
+
+  const all: HomeVisual[] = [];
+  const preferredByBrand = new Map<string, HomeVisual[]>();
 
   for (const vehicle of vehicles) {
-    const url = resolveVehicleImageUrl(vehicle.image_url);
-    if (!url || url === excluded) continue;
+    const visual = visualFromVehicle(vehicle);
+    if (!visual) continue;
+
+    if (!all.some((item) => item.url === visual.url)) {
+      all.push(visual);
+    }
+
+    if (visual.url === excluded) continue;
 
     const brand = vehicle.brand.trim().toLowerCase() || "autre";
-    const list = byBrand.get(brand) ?? [];
-    if (!list.some((item) => item.url === url)) {
-      list.push({
-        url,
-        frame: vehicle.imageFrame ?? DEFAULT_VEHICLE_IMAGE_FRAME,
-      });
-      byBrand.set(brand, list);
+    const list = preferredByBrand.get(brand) ?? [];
+    if (!list.some((item) => item.url === visual.url)) {
+      list.push(visual);
+      preferredByBrand.set(brand, list);
     }
   }
 
+  const picked = pickAlternatingByBrand(preferredByBrand, count);
+
+  // Compléter avec toute la flotte (y compris le hero) si pas assez de photos
+  if (picked.length < count && all.length > 0) {
+    let i = 0;
+    while (picked.length < count && i < count * Math.max(all.length, 1) + 4) {
+      const candidate = all[i % all.length];
+      if (!candidate) break;
+
+      const alreadyUsed = picked.some((item) => item.url === candidate.url);
+      if (!alreadyUsed || picked.length + (count - picked.length) > all.length) {
+        // Ajoute si nouveau, ou autorise la répétition en dernier recours
+        if (!alreadyUsed || i >= all.length) {
+          picked.push(candidate);
+        }
+      }
+      i += 1;
+    }
+  }
+
+  // Dernier filet : répéter la première photo dispo plutôt qu'un cadre vide
+  while (picked.length < count && all[0]) {
+    picked.push(all[0]);
+  }
+
+  return Array.from({ length: count }, (_, index) => picked[index] ?? null);
+}
+
+function pickAlternatingByBrand(
+  byBrand: Map<string, HomeVisual[]>,
+  count: number
+): HomeVisual[] {
   const brands = Array.from(byBrand.keys());
   const visuals: HomeVisual[] = [];
   let guard = 0;
@@ -92,5 +135,5 @@ export function pickNarrativeVisuals(
     guard += 1;
   }
 
-  return Array.from({ length: count }, (_, index) => visuals[index] ?? null);
+  return visuals;
 }

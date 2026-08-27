@@ -101,6 +101,15 @@ export default function ReservationCalendar({
                         fill
                         sizes="96px"
                         className="object-cover"
+                        unoptimized={imageSrc.includes("supabase.co")}
+                        style={
+                          vehicle.imageFrame
+                            ? {
+                                objectFit: vehicle.imageFrame.fit,
+                                objectPosition: `${vehicle.imageFrame.positionX}% ${vehicle.imageFrame.positionY}%`,
+                              }
+                            : undefined
+                        }
                       />
                     ) : (
                       <span className="de-calendar-vehicle-card__placeholder">
