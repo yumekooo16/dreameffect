@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import HeroSection from "@/src/components/public/hero";
 import HomeCitiesSection from "@/src/components/public/home-cities";
 import HowItWorksSection from "@/src/components/public/how-it-works";
@@ -12,7 +13,10 @@ import { withDemoFleetFallback } from "@/src/lib/public/demo-vehicles";
 import { fetchPublicVehicles } from "@/src/lib/public/vehicles-data";
 import { HOME_KEYWORDS, formatServiceAreaLabel } from "@/src/lib/public/local-seo";
 import { buildPageMetadata, faqPageJsonLd } from "@/src/lib/public/seo";
-import { loadNarrativeVisuals, resolveHeroVisual } from "@/src/lib/public/hero-image";
+import {
+  collectNarrativeVisualPool,
+  resolveHeroVisual,
+} from "@/src/lib/public/hero-image";
 
 export const dynamic = "force-dynamic";
 
@@ -25,13 +29,11 @@ export const metadata: Metadata = buildPageMetadata({
 });
 
 export default async function HomePage() {
+  await connection();
+
   const vehicles = withDemoFleetFallback(await fetchPublicVehicles());
   const heroVisual = resolveHeroVisual(vehicles);
-  const narrativeVisuals = await loadNarrativeVisuals(
-    vehicles,
-    3,
-    heroVisual?.url
-  );
+  const visualPool = await collectNarrativeVisualPool(vehicles);
 
   return (
     <>
@@ -40,7 +42,10 @@ export default async function HomePage() {
       <HomeCitiesSection />
       <HomeFigures />
       <VehiclesPreview vehicles={vehicles} />
-      <HowItWorksSection visuals={narrativeVisuals} />
+      <HowItWorksSection
+        visualPool={visualPool}
+        excludeUrl={heroVisual?.url}
+      />
       <HomeReviewsSection />
       <HomeFaqSection />
       <HomeCtaSection />
