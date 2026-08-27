@@ -50,6 +50,7 @@ export default function HowItWorksSection({
                       className={vehicleImageFrameClassName(visual?.frame)}
                       style={vehicleImageFrameStyle(visual?.frame)}
                       sizes="(max-width: 900px) 100vw, 48vw"
+                      unoptimized={imageUrl.includes("supabase.co")}
                     />
                   ) : null}
                 </div>
