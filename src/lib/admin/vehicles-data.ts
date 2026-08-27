@@ -31,7 +31,12 @@ function normalizeImages(
   rows: VehicleImageRow[]
 ): VehicleImageRow[] {
   if (rows.length > 0) {
-    return rows;
+    return [...rows].sort((a, b) => {
+      const orderA = a.sort_order ?? Number.MAX_SAFE_INTEGER;
+      const orderB = b.sort_order ?? Number.MAX_SAFE_INTEGER;
+      if (orderA !== orderB) return orderA - orderB;
+      return String(a.created_at ?? "").localeCompare(String(b.created_at ?? ""));
+    });
   }
 
   if (!vehicleImageUrl) return [];
@@ -42,6 +47,7 @@ function normalizeImages(
       vehicle_id: vehicleId,
       image_url: vehicleImageUrl,
       is_primary: true,
+      sort_order: 0,
     },
   ];
 }
@@ -89,6 +95,38 @@ export async function fetchVehiclesList(): Promise<VehicleListItem[]> {
       total_revenue: Number(dash?.total_revenue ?? 0),
     };
   });
+}
+
+async function fetchVehicleImages(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  vehicleId: string
+): Promise<VehicleImageRow[]> {
+  const withOrder = await supabase
+    .from("vehicle_images")
+    .select("id, vehicle_id, image_url, is_primary, sort_order, created_at")
+    .eq("vehicle_id", vehicleId)
+    .order("sort_order", { ascending: true })
+    .order("created_at", { ascending: true });
+
+  if (!withOrder.error) {
+    return (withOrder.data ?? []) as VehicleImageRow[];
+  }
+
+  if (!isMissingColumnError(withOrder.error.message)) {
+    return [];
+  }
+
+  const legacy = await supabase
+    .from("vehicle_images")
+    .select("id, vehicle_id, image_url, is_primary, created_at")
+    .eq("vehicle_id", vehicleId)
+    .order("is_primary", { ascending: false })
+    .order("created_at", { ascending: true });
+
+  return (legacy.data ?? []).map((row, index) => ({
+    ...(row as VehicleImageRow),
+    sort_order: index,
+  }));
 }
 
 async function enrichOptionalVehicleImages(
@@ -265,11 +303,7 @@ export async function fetchVehicleDetail(
       .select("total_revenue, total_rentals")
       .eq("vehicle_id", vehicleId)
       .maybeSingle(),
-    supabase
-      .from("vehicle_images")
-      .select("id, vehicle_id, image_url, is_primary, created_at")
-      .eq("vehicle_id", vehicleId)
-      .order("created_at", { ascending: true }),
+    fetchVehicleImages(supabase, vehicleId),
     supabase
       .from("reservations")
       .select(
@@ -305,11 +339,7 @@ export async function fetchVehicleDetail(
       total_revenue: dashboardTotal,
       total_rentals: Number(dashboardRes.data?.total_rentals ?? 0),
     },
-    images: normalizeImages(
-      vehicleId,
-      vehicle.image_url,
-      (imagesRes.data ?? []) as VehicleImageRow[]
-    ),
+    images: normalizeImages(vehicleId, vehicle.image_url, imagesRes),
     reservations,
     maintenances: maintenanceRes.data ?? [],
     documents: documentsRes.data ?? [],

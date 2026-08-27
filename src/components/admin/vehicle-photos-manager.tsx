@@ -2,7 +2,14 @@
 
 import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Globe, Star, Trash2, Upload } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowUp,
+  Globe,
+  Star,
+  Trash2,
+  Upload,
+} from "lucide-react";
 import StorageImage from "@/src/components/admin/storage-image";
 import {
   formatUploadError,
@@ -11,6 +18,7 @@ import {
 import {
   clearVehiclePublicPhoto,
   deleteVehiclePhoto,
+  moveVehiclePhoto,
   setVehiclePrimaryPhoto,
   setVehiclePublicPhoto,
   updateVehiclePublicImageFrame,
@@ -179,6 +187,13 @@ export default function VehiclePhotosManager({
     if (ok) setMessage("Image site web réinitialisée (photo principale).");
   }
 
+  async function handleMove(image: VehicleImageRow, direction: "up" | "down") {
+    const ok = await runAction(() =>
+      moveVehiclePhoto(vehicleId, image.id, direction)
+    );
+    if (ok) setMessage("Ordre des photos mis à jour.");
+  }
+
   const activePublicImage = publicImageUrl?.trim() || primaryImageUrl?.trim() || null;
   const usesCustomPublicImage =
     Boolean(publicImageUrl?.trim()) &&
@@ -188,8 +203,8 @@ export default function VehiclePhotosManager({
     <div className="space-y-4">
       <p className="text-sm de-muted">
         <strong>Site internet</strong> — jusqu&apos;à {MAX_VEHICLE_PHOTOS} photos
-        par véhicule. Choisissez la couverture catalogue et réglez le cadrage.
-        Compression automatique avant envoi.
+        par véhicule. Rangez-les avec les flèches (1 = première de la galerie).
+        Choisissez aussi la couverture catalogue et le cadrage.
       </p>
 
       {activePublicImage && (
@@ -326,21 +341,25 @@ export default function VehiclePhotosManager({
         <p className="de-empty">Aucune photo enregistrée</p>
       ) : (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {images.map((image) => {
+          {images.map((image, index) => {
             const isDeleting = deletingId === image.id;
             const isPublicCover = image.image_url === activePublicImage;
+            const canReorder = !image.id.startsWith("legacy-");
 
             return (
               <div key={image.id} className="de-card-inner overflow-hidden p-0">
                 <div className="relative h-36 bg-muted">
                   <StorageImage
                     src={image.image_url}
-                    alt="Photo véhicule"
+                    alt={`Photo ${index + 1}`}
                     fill
                     sizes="240px"
                   />
+                  <span className="absolute left-2 top-2 de-badge">
+                    {index + 1}/{images.length}
+                  </span>
                   {image.is_primary && (
-                    <span className="absolute left-2 top-2 de-badge de-badge--confirmed">
+                    <span className="absolute left-2 bottom-2 de-badge de-badge--confirmed">
                       Principale
                     </span>
                   )}
@@ -376,6 +395,30 @@ export default function VehiclePhotosManager({
                     </>
                   ) : (
                     <div className="flex flex-col gap-2">
+                      {canReorder && images.length > 1 && (
+                        <div className="flex gap-2">
+                          <button
+                            type="button"
+                            disabled={pending || index === 0}
+                            onClick={() => handleMove(image, "up")}
+                            className="de-btn de-btn-ghost flex-1 text-xs"
+                            aria-label="Monter la photo"
+                          >
+                            <ArrowUp size={14} className="mr-1 inline" />
+                            Monter
+                          </button>
+                          <button
+                            type="button"
+                            disabled={pending || index === images.length - 1}
+                            onClick={() => handleMove(image, "down")}
+                            className="de-btn de-btn-ghost flex-1 text-xs"
+                            aria-label="Descendre la photo"
+                          >
+                            <ArrowDown size={14} className="mr-1 inline" />
+                            Descendre
+                          </button>
+                        </div>
+                      )}
                       {!isPublicCover && (
                         <button
                           type="button"
