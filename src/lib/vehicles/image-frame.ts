@@ -41,6 +41,30 @@ export function normalizeVehicleImageFrame(
   };
 }
 
+/** Lit le cadrage stocké sur une ligne vehicle_images (ou équivalent). */
+export function frameFromImageColumns(row?: {
+  image_fit?: string | null;
+  image_position_x?: number | null;
+  image_position_y?: number | null;
+  image_scale?: number | null;
+} | null): VehicleImageFrame {
+  return normalizeVehicleImageFrame({
+    fit: row?.image_fit === "contain" ? "contain" : "cover",
+    positionX: row?.image_position_x ?? DEFAULT_VEHICLE_IMAGE_FRAME.positionX,
+    positionY: row?.image_position_y ?? DEFAULT_VEHICLE_IMAGE_FRAME.positionY,
+    scale: row?.image_scale ?? DEFAULT_VEHICLE_IMAGE_FRAME.scale,
+  });
+}
+
+export function imageFrameToColumns(frame: VehicleImageFrame) {
+  return {
+    image_fit: frame.fit,
+    image_position_x: frame.positionX,
+    image_position_y: frame.positionY,
+    image_scale: frame.scale,
+  };
+}
+
 /** Styles CSS pour object-fit / object-position / zoom. */
 export function vehicleImageFrameStyle(frame?: Partial<VehicleImageFrame> | null) {
   const normalized = normalizeVehicleImageFrame(frame);

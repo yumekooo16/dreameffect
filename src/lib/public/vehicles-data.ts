@@ -21,6 +21,7 @@ import { toPublicVehicleStatus } from "@/src/lib/public/vehicle-status";
 import {
   DEFAULT_VEHICLE_IMAGE_FRAME,
   MAX_VEHICLE_PHOTOS,
+  frameFromImageColumns,
   normalizeVehicleImageFrame,
   type VehicleImageFrame,
 } from "@/src/lib/vehicles/image-frame";
@@ -235,7 +236,8 @@ function resolveImageFrame(row: PublicVehicleRow): VehicleImageFrame {
 
 function buildPublicCoverImages(
   vehicleId: string,
-  coverUrl: string | null
+  coverUrl: string | null,
+  coverFrame?: VehicleImageFrame
 ): PublicVehicleImage[] {
   if (!coverUrl) return [];
 
@@ -244,19 +246,23 @@ function buildPublicCoverImages(
       id: `public-${vehicleId}`,
       image_url: coverUrl,
       is_primary: true,
+      imageFrame: coverFrame ?? DEFAULT_VEHICLE_IMAGE_FRAME,
     },
   ];
 }
 
 async function fetchPublicGalleryImages(
   vehicleId: string,
-  coverUrl: string | null
+  coverUrl: string | null,
+  coverFrame?: VehicleImageFrame
 ): Promise<PublicVehicleImage[]> {
   const supabase = createCatalogClient();
 
-  const withOrder = await supabase
+  const withFrame = await supabase
     .from("vehicle_images")
-    .select("id, image_url, is_primary, sort_order, created_at")
+    .select(
+      "id, image_url, is_primary, sort_order, created_at, image_fit, image_position_x, image_position_y, image_scale"
+    )
     .eq("vehicle_id", vehicleId)
     .order("sort_order", { ascending: true })
     .order("created_at", { ascending: true })
@@ -268,41 +274,68 @@ async function fetchPublicGalleryImages(
     is_primary: boolean | null;
     created_at?: string | null;
     sort_order?: number | null;
+    image_fit?: string | null;
+    image_position_x?: number | null;
+    image_position_y?: number | null;
+    image_scale?: number | null;
   };
 
-  let data: GalleryRow[] | null = withOrder.data as GalleryRow[] | null;
+  let data: GalleryRow[] | null = withFrame.data as GalleryRow[] | null;
 
-  if (withOrder.error) {
-    if (!isMissingColumnError(withOrder.error.message)) {
-      return buildPublicCoverImages(vehicleId, coverUrl);
+  if (withFrame.error) {
+    if (!isMissingColumnError(withFrame.error.message)) {
+      return buildPublicCoverImages(vehicleId, coverUrl, coverFrame);
     }
 
-    const legacy = await supabase
+    const withOrder = await supabase
       .from("vehicle_images")
-      .select("id, image_url, is_primary, created_at")
+      .select("id, image_url, is_primary, sort_order, created_at")
       .eq("vehicle_id", vehicleId)
-      .order("is_primary", { ascending: false })
+      .order("sort_order", { ascending: true })
       .order("created_at", { ascending: true })
       .limit(MAX_VEHICLE_PHOTOS);
 
-    if (legacy.error || !legacy.data?.length) {
-      return buildPublicCoverImages(vehicleId, coverUrl);
+    if (!withOrder.error && withOrder.data?.length) {
+      data = withOrder.data as GalleryRow[];
+    } else {
+      const legacy = await supabase
+        .from("vehicle_images")
+        .select("id, image_url, is_primary, created_at")
+        .eq("vehicle_id", vehicleId)
+        .order("is_primary", { ascending: false })
+        .order("created_at", { ascending: true })
+        .limit(MAX_VEHICLE_PHOTOS);
+
+      if (legacy.error || !legacy.data?.length) {
+        return buildPublicCoverImages(vehicleId, coverUrl, coverFrame);
+      }
+      data = legacy.data as GalleryRow[];
     }
-    data = legacy.data as GalleryRow[];
   }
 
   if (!data?.length) {
-    return buildPublicCoverImages(vehicleId, coverUrl);
+    return buildPublicCoverImages(vehicleId, coverUrl, coverFrame);
   }
 
   const images = data
     .filter((row) => Boolean(row.image_url?.trim()))
     .slice(0, MAX_VEHICLE_PHOTOS)
-    .map((row) => ({
-      id: String(row.id),
-      image_url: String(row.image_url),
-      is_primary: Boolean(row.is_primary),
-    }));
+    .map((row) => {
+      const hasOwnFrame =
+        row.image_fit != null ||
+        row.image_position_x != null ||
+        row.image_position_y != null ||
+        row.image_scale != null;
+
+      return {
+        id: String(row.id),
+        image_url: String(row.image_url),
+        is_primary: Boolean(row.is_primary),
+        imageFrame: hasOwnFrame
+          ? frameFromImageColumns(row)
+          : coverFrame ?? DEFAULT_VEHICLE_IMAGE_FRAME,
+      };
+    });
 
   // Couverture catalogue absente de la galerie : on l'ajoute en dernière position
   // sans écraser l'ordre manuel choisi en admin.
@@ -311,13 +344,14 @@ async function fetchPublicGalleryImages(
       id: `public-${vehicleId}`,
       image_url: coverUrl,
       is_primary: false,
+      imageFrame: coverFrame ?? DEFAULT_VEHICLE_IMAGE_FRAME,
     });
   }
 
   const capped = images.slice(0, MAX_VEHICLE_PHOTOS);
 
   if (capped.length === 0) {
-    return buildPublicCoverImages(vehicleId, coverUrl);
+    return buildPublicCoverImages(vehicleId, coverUrl, coverFrame);
   }
 
   return capped.map((image, index) => ({
@@ -381,7 +415,11 @@ export async function fetchPublicVehicleBySlug(
 
   const base = mapPublicVehicle(row);
   const coverUrl = resolvePublicCoverImage(row);
-  const images = await fetchPublicGalleryImages(row.id, coverUrl);
+  const images = await fetchPublicGalleryImages(
+    row.id,
+    coverUrl,
+    base.imageFrame
+  );
 
   return {
     ...base,

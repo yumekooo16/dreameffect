@@ -101,6 +101,23 @@ async function fetchVehicleImages(
   supabase: Awaited<ReturnType<typeof createClient>>,
   vehicleId: string
 ): Promise<VehicleImageRow[]> {
+  const withFrame = await supabase
+    .from("vehicle_images")
+    .select(
+      "id, vehicle_id, image_url, is_primary, sort_order, created_at, image_fit, image_position_x, image_position_y, image_scale"
+    )
+    .eq("vehicle_id", vehicleId)
+    .order("sort_order", { ascending: true })
+    .order("created_at", { ascending: true });
+
+  if (!withFrame.error) {
+    return (withFrame.data ?? []) as VehicleImageRow[];
+  }
+
+  if (!isMissingColumnError(withFrame.error.message)) {
+    return [];
+  }
+
   const withOrder = await supabase
     .from("vehicle_images")
     .select("id, vehicle_id, image_url, is_primary, sort_order, created_at")
