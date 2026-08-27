@@ -35,6 +35,8 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     optimizePackageImports: ["recharts", "react-day-picker"],
+    /** Doit couvrir les uploads photo admin (FormData + middleware/proxy). */
+    proxyClientMaxBodySize: "10mb",
     serverActions: {
       bodySizeLimit: "10mb",
     },

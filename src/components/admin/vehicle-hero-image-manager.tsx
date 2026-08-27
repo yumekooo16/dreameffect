@@ -5,6 +5,10 @@ import { useRouter } from "next/navigation";
 import { Trash2, Upload } from "lucide-react";
 import StorageImage from "@/src/components/admin/storage-image";
 import {
+  formatUploadError,
+  prepareImageForUpload,
+} from "@/src/lib/admin/prepare-image-upload";
+import {
   deleteVehicleHeroImage,
   uploadVehicleHeroImage,
 } from "@/src/lib/admin/vehicles-actions";
@@ -40,8 +44,10 @@ export default function VehicleHeroImageManager({
 
       setError(result.error ?? "Une erreur est survenue");
       return false;
-    } catch {
-      setError("Impossible de traiter la demande. Réessayez.");
+    } catch (err) {
+      setError(
+        formatUploadError(err, "Impossible de traiter la demande. Réessayez.")
+      );
       return false;
     } finally {
       setPending(false);
@@ -58,11 +64,24 @@ export default function VehicleHeroImageManager({
       return;
     }
 
-    const formData = new FormData();
-    formData.append("file", file);
+    setPending(true);
+    setError(null);
+    setMessage(null);
 
-    const ok = await runAction(() => uploadVehicleHeroImage(vehicleId, formData));
-    if (ok) setMessage("Image hero premium enregistrée.");
+    try {
+      const prepared = await prepareImageForUpload(file, { preferPng: true });
+      const formData = new FormData();
+      formData.append("file", prepared);
+
+      const ok = await runAction(() =>
+        uploadVehicleHeroImage(vehicleId, formData)
+      );
+      if (ok) setMessage("Image hero premium enregistrée.");
+    } catch (err) {
+      setError(formatUploadError(err, "Impossible de préparer l'image."));
+      setPending(false);
+    }
+
     if (inputRef.current) inputRef.current.value = "";
   }
 
@@ -79,6 +98,7 @@ export default function VehicleHeroImageManager({
       <p className="text-sm de-muted">
         PNG détouré, fond transparent — affiché uniquement dans l&apos;espace
         propriétaire (hero premium). Ne remplace pas l&apos;image du site internet.
+        Compression automatique avant envoi.
       </p>
 
       <div className="de-card-inner overflow-hidden p-0">

@@ -17,14 +17,60 @@ import {
   type VehicleProPricing,
 } from "@/src/lib/revenue/pro-pricing";
 import { isMissingColumnError } from "@/src/lib/vehicles/db-columns";
+import { isRedirectError } from "next/dist/client/components/redirect-error";
 
 const BUCKET = "vehicle-images";
+const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
+const ALLOWED_EXTENSIONS = new Set(["jpg", "jpeg", "png", "webp", "gif"]);
 
 type ActionResult = {
   success: boolean;
   error?: string;
   id?: string;
 };
+
+function sanitizeImageExtension(fileName: string, mimeType?: string): string {
+  const fromName = fileName.split(".").pop()?.toLowerCase() ?? "";
+  if (ALLOWED_EXTENSIONS.has(fromName)) {
+    return fromName === "jpeg" ? "jpg" : fromName;
+  }
+
+  if (mimeType?.includes("png")) return "png";
+  if (mimeType?.includes("webp")) return "webp";
+  if (mimeType?.includes("gif")) return "gif";
+  return "jpg";
+}
+
+function isUploadableImage(value: FormDataEntryValue | null): value is File {
+  return (
+    typeof File !== "undefined" &&
+    value instanceof File &&
+    value.size > 0 &&
+    (value.type.startsWith("image/") || Boolean(value.name))
+  );
+}
+
+function mapUploadFailure(error: unknown, fallback: string): string {
+  const message =
+    error instanceof Error
+      ? error.message.trim()
+      : typeof error === "object" &&
+          error !== null &&
+          "message" in error &&
+          typeof (error as { message: unknown }).message === "string"
+        ? (error as { message: string }).message.trim()
+        : "";
+
+  if (!message) return fallback;
+
+  if (/bucket|not found|No such/i.test(message)) {
+    return "Bucket Storage « vehicle-images » introuvable ou inaccessible. Vérifiez Supabase Storage.";
+  }
+  if (/row-level security|RLS|permission|policy/i.test(message)) {
+    return "Permission refusée (RLS). Vérifiez les politiques Storage / vehicle_images.";
+  }
+  return message;
+}
 
 export type VehicleFormData = {
   owner_id: string;
@@ -347,18 +393,17 @@ export async function uploadVehiclePhoto(
 
     const file = formData.get("file");
 
-    if (!(file instanceof File) || file.size === 0) {
-      return { success: false, error: "Fichier invalide" };
+    if (!isUploadableImage(file)) {
+      return { success: false, error: "Fichier invalide ou format non supporté" };
     }
 
-    if (file.size > 10 * 1024 * 1024) {
+    if (file.size > MAX_UPLOAD_BYTES) {
       return { success: false, error: "Photo trop lourde (maximum 10 Mo)" };
     }
 
     const admin = createAdminClient();
-    const supabase = await createClient();
 
-    const extension = file.name.split(".").pop()?.toLowerCase() || "jpg";
+    const extension = sanitizeImageExtension(file.name, file.type);
     const storagePath = `${vehicleId}/${Date.now()}.${extension}`;
     const buffer = Buffer.from(await file.arrayBuffer());
 
@@ -370,17 +415,17 @@ export async function uploadVehiclePhoto(
       });
 
     if (uploadError) {
-      return { success: false, error: uploadError.message };
+      return { success: false, error: mapUploadFailure(uploadError, uploadError.message) };
     }
 
-    const { data: existing } = await supabase
+    const { data: existing } = await admin
       .from("vehicle_images")
       .select("id")
       .eq("vehicle_id", vehicleId);
 
     const isFirst = !existing?.length;
 
-    const { error: insertError } = await supabase.from("vehicle_images").insert({
+    const { error: insertError } = await admin.from("vehicle_images").insert({
       vehicle_id: vehicleId,
       image_url: storagePath,
       is_primary: isFirst,
@@ -388,11 +433,14 @@ export async function uploadVehiclePhoto(
 
     if (insertError) {
       await admin.storage.from(BUCKET).remove([storagePath]);
-      return { success: false, error: insertError.message };
+      return {
+        success: false,
+        error: mapUploadFailure(insertError, insertError.message),
+      };
     }
 
     if (isFirst) {
-      await supabase
+      await admin
         .from("vehicles")
         .update({
           image_url: storagePath,
@@ -404,13 +452,11 @@ export async function uploadVehiclePhoto(
     revalidateVehiclePaths(vehicleId);
     return { success: true };
   } catch (error) {
+    if (isRedirectError(error)) throw error;
     console.error("[uploadVehiclePhoto]", error);
     return {
       success: false,
-      error:
-        error instanceof Error
-          ? error.message
-          : "Impossible d'ajouter la photo pour le moment",
+      error: mapUploadFailure(error, "Impossible d'ajouter la photo pour le moment"),
     };
   }
 }
@@ -585,22 +631,21 @@ export async function uploadVehicleHeroImage(
 
     const file = formData.get("file");
 
-    if (!(file instanceof File) || file.size === 0) {
-      return { success: false, error: "Fichier invalide" };
+    if (!isUploadableImage(file)) {
+      return { success: false, error: "Fichier invalide ou format non supporté" };
     }
 
-    if (file.size > 10 * 1024 * 1024) {
+    if (file.size > MAX_UPLOAD_BYTES) {
       return { success: false, error: "Image trop lourde (maximum 10 Mo)" };
     }
 
     const admin = createAdminClient();
-    const supabase = await createClient();
 
-    const extension = file.name.split(".").pop()?.toLowerCase() || "png";
+    const extension = sanitizeImageExtension(file.name, file.type);
     const storagePath = `${vehicleId}/hero-${Date.now()}.${extension}`;
     const buffer = Buffer.from(await file.arrayBuffer());
 
-    const { data: existingVehicle } = await supabase
+    const { data: existingVehicle } = await admin
       .from("vehicles")
       .select("hero_image_url")
       .eq("id", vehicleId)
@@ -614,10 +659,10 @@ export async function uploadVehicleHeroImage(
       });
 
     if (uploadError) {
-      return { success: false, error: uploadError.message };
+      return { success: false, error: mapUploadFailure(uploadError, uploadError.message) };
     }
 
-    const { error: updateError } = await supabase
+    const { error: updateError } = await admin
       .from("vehicles")
       .update({
         hero_image_url: storagePath,
@@ -634,7 +679,10 @@ export async function uploadVehicleHeroImage(
             "Colonne hero_image_url absente — exécutez la migration SQL 20260731200000_vehicle_hero_image.sql",
         };
       }
-      return { success: false, error: updateError.message };
+      return {
+        success: false,
+        error: mapUploadFailure(updateError, updateError.message),
+      };
     }
 
     const previousPath = existingVehicle?.hero_image_url?.trim();
@@ -645,13 +693,11 @@ export async function uploadVehicleHeroImage(
     revalidateVehiclePaths(vehicleId);
     return { success: true };
   } catch (error) {
+    if (isRedirectError(error)) throw error;
     console.error("[uploadVehicleHeroImage]", error);
     return {
       success: false,
-      error:
-        error instanceof Error
-          ? error.message
-          : "Impossible d'ajouter l'image pour le moment",
+      error: mapUploadFailure(error, "Impossible d'ajouter l'image pour le moment"),
     };
   }
 }
