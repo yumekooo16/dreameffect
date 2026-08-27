@@ -20,6 +20,8 @@ import { isMissingColumnError } from "@/src/lib/vehicles/db-columns";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 import {
   MAX_VEHICLE_PHOTOS,
+  frameFromImageColumns,
+  imageFrameToColumns,
   normalizeVehicleImageFrame,
   type VehicleImageFrame,
 } from "@/src/lib/vehicles/image-frame";
@@ -691,13 +693,33 @@ export async function setVehiclePublicPhoto(
 ): Promise<ActionResult> {
   await requireAdmin();
   const supabase = await createClient();
+  const admin = createAdminClient();
+
+  const { data: imageRow } = await admin
+    .from("vehicle_images")
+    .select(
+      "image_fit, image_position_x, image_position_y, image_scale"
+    )
+    .eq("vehicle_id", vehicleId)
+    .eq("image_url", imagePath)
+    .maybeSingle();
+
+  const payload: Record<string, unknown> = {
+    public_image_url: imagePath,
+    updated_at: new Date().toISOString(),
+  };
+
+  if (imageRow) {
+    const frame = frameFromImageColumns(imageRow);
+    payload.public_image_fit = frame.fit;
+    payload.public_image_position_x = frame.positionX;
+    payload.public_image_position_y = frame.positionY;
+    payload.public_image_scale = frame.scale;
+  }
 
   const { error } = await supabase
     .from("vehicles")
-    .update({
-      public_image_url: imagePath,
-      updated_at: new Date().toISOString(),
-    })
+    .update(payload)
     .eq("id", vehicleId);
 
   if (error) {
@@ -773,6 +795,87 @@ export async function updateVehiclePublicImageFrame(
         };
       }
       return { success: false, error: mapUploadFailure(error, error.message) };
+    }
+
+    revalidateVehiclePaths(vehicleId);
+    return { success: true };
+  } catch (error) {
+    if (isRedirectError(error)) throw error;
+    return {
+      success: false,
+      error: mapUploadFailure(error, "Impossible d'enregistrer le cadrage"),
+    };
+  }
+}
+
+export async function updateVehicleImageFrame(
+  vehicleId: string,
+  imageId: string,
+  frameInput: Partial<VehicleImageFrame>
+): Promise<ActionResult> {
+  try {
+    await requireAdmin();
+
+    if (imageId.startsWith("legacy-")) {
+      return updateVehiclePublicImageFrame(vehicleId, frameInput);
+    }
+
+    const frame = normalizeVehicleImageFrame(frameInput);
+    const admin = createAdminClient();
+    const columns = imageFrameToColumns(frame);
+
+    const { data: image, error: fetchError } = await admin
+      .from("vehicle_images")
+      .select("id, image_url")
+      .eq("id", imageId)
+      .eq("vehicle_id", vehicleId)
+      .maybeSingle();
+
+    if (fetchError) {
+      return { success: false, error: fetchError.message };
+    }
+    if (!image) {
+      return { success: false, error: "Photo introuvable" };
+    }
+
+    const { error } = await admin
+      .from("vehicle_images")
+      .update(columns)
+      .eq("id", imageId)
+      .eq("vehicle_id", vehicleId);
+
+    if (error) {
+      if (isMissingColumnError(error.message)) {
+        return {
+          success: false,
+          error:
+            "Colonnes de cadrage photo absentes — exécutez la migration SQL vehicle_images_per_image_frame sur Supabase.",
+        };
+      }
+      return { success: false, error: mapUploadFailure(error, error.message) };
+    }
+
+    const { data: vehicle } = await admin
+      .from("vehicles")
+      .select("public_image_url, image_url")
+      .eq("id", vehicleId)
+      .maybeSingle();
+
+    const coverUrl =
+      vehicle?.public_image_url?.trim() || vehicle?.image_url?.trim() || null;
+    const isCover = Boolean(coverUrl && image.image_url === coverUrl);
+
+    if (isCover) {
+      await admin
+        .from("vehicles")
+        .update({
+          public_image_fit: frame.fit,
+          public_image_position_x: frame.positionX,
+          public_image_position_y: frame.positionY,
+          public_image_scale: frame.scale,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", vehicleId);
     }
 
     revalidateVehiclePaths(vehicleId);

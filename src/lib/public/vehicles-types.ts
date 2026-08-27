@@ -6,6 +6,7 @@ export type PublicVehicleImage = {
   id: string;
   image_url: string;
   is_primary: boolean;
+  imageFrame?: VehicleImageFrame;
 };
 
 /** Véhicule affiché dans le catalogue public. */

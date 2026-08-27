@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import {
   ArrowDown,
   ArrowUp,
+  Crop,
   Globe,
   Star,
   Trash2,
@@ -21,13 +22,14 @@ import {
   moveVehiclePhoto,
   setVehiclePrimaryPhoto,
   setVehiclePublicPhoto,
-  updateVehiclePublicImageFrame,
+  updateVehicleImageFrame,
   uploadVehiclePhoto,
 } from "@/src/lib/admin/vehicles-actions";
 import type { VehicleImageRow } from "@/src/lib/admin/vehicles-types";
 import {
   DEFAULT_VEHICLE_IMAGE_FRAME,
   MAX_VEHICLE_PHOTOS,
+  frameFromImageColumns,
   normalizeVehicleImageFrame,
   vehicleImageFrameClassName,
   vehicleImageFrameStyle,
@@ -36,6 +38,20 @@ import {
 } from "@/src/lib/vehicles/image-frame";
 
 const MAX_FILE_SIZE_MB = 10;
+
+function resolveImageFrame(
+  image: VehicleImageRow | null | undefined,
+  fallback?: Partial<VehicleImageFrame> | null
+): VehicleImageFrame {
+  if (!image) return normalizeVehicleImageFrame(fallback);
+  const hasOwn =
+    image.image_fit != null ||
+    image.image_position_x != null ||
+    image.image_position_y != null ||
+    image.image_scale != null;
+  if (hasOwn) return frameFromImageColumns(image);
+  return normalizeVehicleImageFrame(fallback);
+}
 
 export default function VehiclePhotosManager({
   vehicleId,
@@ -56,15 +72,42 @@ export default function VehiclePhotosManager({
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
-  const [frame, setFrame] = useState<VehicleImageFrame>(() =>
-    normalizeVehicleImageFrame(imageFrame)
-  );
+  const [framingId, setFramingId] = useState<string | null>(null);
+  const [frame, setFrame] = useState<VehicleImageFrame>(DEFAULT_VEHICLE_IMAGE_FRAME);
   const [framePending, startFrameTransition] = useTransition();
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const activePublicImage =
+    publicImageUrl?.trim() || primaryImageUrl?.trim() || null;
+
+  const defaultFramingId = useMemo(() => {
+    if (images.length === 0) return null;
+    const cover = activePublicImage
+      ? images.find((image) => image.image_url === activePublicImage)
+      : undefined;
+    return cover?.id ?? images[0]?.id ?? null;
+  }, [images, activePublicImage]);
+
+  const framingImage =
+    images.find((image) => image.id === framingId) ??
+    images.find((image) => image.id === defaultFramingId) ??
+    null;
+
   useEffect(() => {
-    setFrame(normalizeVehicleImageFrame(imageFrame));
-  }, [imageFrame]);
+    if (!framingId && defaultFramingId) {
+      setFramingId(defaultFramingId);
+    } else if (
+      framingId &&
+      images.length > 0 &&
+      !images.some((image) => image.id === framingId)
+    ) {
+      setFramingId(defaultFramingId);
+    }
+  }, [framingId, defaultFramingId, images]);
+
+  useEffect(() => {
+    setFrame(resolveImageFrame(framingImage, imageFrame));
+  }, [framingImage, imageFrame]);
 
   useEffect(() => {
     return () => {
@@ -99,11 +142,11 @@ export default function VehiclePhotosManager({
     }
   }
 
-  function scheduleFrameSave(next: VehicleImageFrame) {
+  function scheduleFrameSave(imageId: string, next: VehicleImageFrame) {
     if (saveTimer.current) clearTimeout(saveTimer.current);
     saveTimer.current = setTimeout(() => {
       startFrameTransition(async () => {
-        const result = await updateVehiclePublicImageFrame(vehicleId, next);
+        const result = await updateVehicleImageFrame(vehicleId, imageId, next);
         if (result.success) {
           setMessage("Cadrage enregistré.");
           setError(null);
@@ -116,9 +159,10 @@ export default function VehiclePhotosManager({
   }
 
   function updateFrame(partial: Partial<VehicleImageFrame>) {
+    if (!framingImage) return;
     setFrame((prev) => {
       const next = normalizeVehicleImageFrame({ ...prev, ...partial });
-      scheduleFrameSave(next);
+      scheduleFrameSave(framingImage.id, next);
       return next;
     });
   }
@@ -194,7 +238,6 @@ export default function VehiclePhotosManager({
     if (ok) setMessage("Ordre des photos mis à jour.");
   }
 
-  const activePublicImage = publicImageUrl?.trim() || primaryImageUrl?.trim() || null;
   const usesCustomPublicImage =
     Boolean(publicImageUrl?.trim()) &&
     publicImageUrl?.trim() !== primaryImageUrl?.trim();
@@ -203,43 +246,48 @@ export default function VehiclePhotosManager({
     <div className="space-y-4">
       <p className="text-sm de-muted">
         <strong>Site internet</strong> — jusqu&apos;à {MAX_VEHICLE_PHOTOS} photos
-        par véhicule. Rangez-les avec les flèches (1 = première de la galerie).
-        Choisissez aussi la couverture catalogue et le cadrage.
+        par véhicule. Rangez-les avec les flèches, puis{" "}
+        <strong>Cadrez chaque photo</strong> (accueil, galerie, cartes).
       </p>
 
-      {activePublicImage && (
+      {framingImage && (
         <div className="de-card-inner space-y-4 p-3">
           <div className="flex flex-wrap items-start gap-4">
             <div className="relative h-28 w-40 overflow-hidden rounded-md bg-muted">
               <StorageImage
-                src={activePublicImage}
-                alt="Aperçu site web"
+                src={framingImage.image_url}
+                alt="Aperçu cadrage"
                 fill
                 sizes="160px"
                 className={vehicleImageFrameClassName(frame)}
                 style={vehicleImageFrameStyle(frame)}
               />
             </div>
-            <div className="min-w-0 flex-1 space-y-3">
+            <div className="min-w-0 flex-1 space-y-2">
               <div>
-                <p className="de-label">Image affichée sur le site</p>
+                <p className="de-label">Cadrage de la photo sélectionnée</p>
                 <p className="text-sm de-muted">
-                  {usesCustomPublicImage
-                    ? "Photo dédiée au site public"
-                    : "Photo principale (par défaut)"}
+                  Appliqué sur l&apos;accueil, la galerie et le catalogue.
                   {framePending ? " · enregistrement…" : ""}
                 </p>
               </div>
-              {usesCustomPublicImage && (
-                <button
-                  type="button"
-                  disabled={pending}
-                  onClick={handleClearPublic}
-                  className="de-btn de-btn-ghost text-xs"
-                >
-                  Utiliser la principale
-                </button>
-              )}
+              {framingImage.image_url === activePublicImage ? (
+                <p className="text-xs de-muted">
+                  Cette photo est aussi la couverture site web.
+                  {usesCustomPublicImage ? "" : " (principale)"}
+                </p>
+              ) : null}
+              {usesCustomPublicImage &&
+                framingImage.image_url === activePublicImage && (
+                  <button
+                    type="button"
+                    disabled={pending}
+                    onClick={handleClearPublic}
+                    className="de-btn de-btn-ghost text-xs"
+                  >
+                    Utiliser la principale comme couverture
+                  </button>
+                )}
             </div>
           </div>
 
@@ -306,7 +354,7 @@ export default function VehiclePhotosManager({
             onClick={() => {
               const reset = DEFAULT_VEHICLE_IMAGE_FRAME;
               setFrame(reset);
-              scheduleFrameSave(reset);
+              scheduleFrameSave(framingImage.id, reset);
             }}
           >
             Réinitialiser le cadrage
@@ -345,15 +393,22 @@ export default function VehiclePhotosManager({
             const isDeleting = deletingId === image.id;
             const isPublicCover = image.image_url === activePublicImage;
             const canReorder = !image.id.startsWith("legacy-");
+            const isFraming = framingImage?.id === image.id;
+            const thumbFrame = resolveImageFrame(image, imageFrame);
 
             return (
-              <div key={image.id} className="de-card-inner overflow-hidden p-0">
+              <div
+                key={image.id}
+                className={`de-card-inner overflow-hidden p-0${isFraming ? " ring-2 ring-[var(--blue-soft)]" : ""}`}
+              >
                 <div className="relative h-36 bg-muted">
                   <StorageImage
                     src={image.image_url}
                     alt={`Photo ${index + 1}`}
                     fill
                     sizes="240px"
+                    className={vehicleImageFrameClassName(thumbFrame)}
+                    style={vehicleImageFrameStyle(thumbFrame)}
                   />
                   <span className="absolute left-2 top-2 de-badge">
                     {index + 1}/{images.length}
@@ -395,6 +450,15 @@ export default function VehiclePhotosManager({
                     </>
                   ) : (
                     <div className="flex flex-col gap-2">
+                      <button
+                        type="button"
+                        disabled={pending}
+                        onClick={() => setFramingId(image.id)}
+                        className={`de-btn flex-1 text-xs${isFraming ? " de-btn-primary" : " de-btn-ghost"}`}
+                      >
+                        <Crop size={14} className="mr-1 inline" />
+                        {isFraming ? "En cours de cadrage" : "Cadrer"}
+                      </button>
                       {canReorder && images.length > 1 && (
                         <div className="flex gap-2">
                           <button

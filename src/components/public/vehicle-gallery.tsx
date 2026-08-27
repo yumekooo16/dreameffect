@@ -28,6 +28,8 @@ export default function VehicleGallery({
     );
   }
 
+  const activeFrame = active.imageFrame ?? frame ?? null;
+
   return (
     <div className="de-vehicle-gallery">
       <div className="de-vehicle-gallery-main">
@@ -35,7 +37,7 @@ export default function VehicleGallery({
           src={active.image_url}
           alt={alt}
           priority
-          frame={frame}
+          frame={activeFrame}
         />
       </div>
 
@@ -56,7 +58,7 @@ export default function VehicleGallery({
                 <VehicleImage
                   src={image.image_url}
                   alt=""
-                  frame={frame}
+                  frame={image.imageFrame ?? frame}
                 />
               </button>
             );

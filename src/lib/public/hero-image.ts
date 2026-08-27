@@ -8,6 +8,7 @@ import {
 } from "@/src/lib/public/narrative-visuals";
 import {
   DEFAULT_VEHICLE_IMAGE_FRAME,
+  frameFromImageColumns,
   type VehicleImageFrame,
 } from "@/src/lib/vehicles/image-frame";
 import { isMissingColumnError } from "@/src/lib/vehicles/db-columns";
@@ -88,24 +89,29 @@ export async function collectNarrativeVisualPool(
 
   try {
     const supabase = createAdminClient();
-    const { data, error } = await supabase
+    const withFrame = await supabase
       .from("vehicle_images")
-      .select("vehicle_id, image_url")
+      .select(
+        "vehicle_id, image_url, image_fit, image_position_x, image_position_y, image_scale"
+      )
       .in("vehicle_id", vehicleIds)
       .order("sort_order", { ascending: true })
       .limit(NARRATIVE_GALLERY_LIMIT);
 
-    if (!error && data) {
-      for (const row of data) {
-        const path = typeof row.image_url === "string" ? row.image_url.trim() : "";
-        if (!path) continue;
-        const frame =
-          frameByVehicleId.get(String(row.vehicle_id)) ??
-          DEFAULT_VEHICLE_IMAGE_FRAME;
-        const visual = homeVisualFromUrl(path, frame);
-        if (visual) byUrl.set(visual.url, visual);
-      }
-    } else if (error && isMissingColumnError(error.message)) {
+    type PoolRow = {
+      vehicle_id: string;
+      image_url: string | null;
+      image_fit?: string | null;
+      image_position_x?: number | null;
+      image_position_y?: number | null;
+      image_scale?: number | null;
+    };
+
+    let rows: PoolRow[] | null = null;
+
+    if (!withFrame.error && withFrame.data) {
+      rows = withFrame.data as PoolRow[];
+    } else if (withFrame.error && isMissingColumnError(withFrame.error.message)) {
       const legacy = await supabase
         .from("vehicle_images")
         .select("vehicle_id, image_url")
@@ -114,15 +120,25 @@ export async function collectNarrativeVisualPool(
         .limit(NARRATIVE_GALLERY_LIMIT);
 
       if (!legacy.error && legacy.data) {
-        for (const row of legacy.data) {
-          const path = typeof row.image_url === "string" ? row.image_url.trim() : "";
-          if (!path) continue;
-          const frame =
-            frameByVehicleId.get(String(row.vehicle_id)) ??
+        rows = legacy.data as PoolRow[];
+      }
+    }
+
+    if (rows) {
+      for (const row of rows) {
+        const path = typeof row.image_url === "string" ? row.image_url.trim() : "";
+        if (!path) continue;
+        const hasOwnFrame =
+          row.image_fit != null ||
+          row.image_position_x != null ||
+          row.image_position_y != null ||
+          row.image_scale != null;
+        const frame = hasOwnFrame
+          ? frameFromImageColumns(row)
+          : frameByVehicleId.get(String(row.vehicle_id)) ??
             DEFAULT_VEHICLE_IMAGE_FRAME;
-          const visual = homeVisualFromUrl(path, frame);
-          if (visual) byUrl.set(visual.url, visual);
-        }
+        const visual = homeVisualFromUrl(path, frame);
+        if (visual) byUrl.set(visual.url, visual);
       }
     }
   } catch {
