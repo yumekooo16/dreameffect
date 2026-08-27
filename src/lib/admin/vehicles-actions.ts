@@ -18,6 +18,11 @@ import {
 } from "@/src/lib/revenue/pro-pricing";
 import { isMissingColumnError } from "@/src/lib/vehicles/db-columns";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
+import {
+  MAX_VEHICLE_PHOTOS,
+  normalizeVehicleImageFrame,
+  type VehicleImageFrame,
+} from "@/src/lib/vehicles/image-frame";
 
 const BUCKET = "vehicle-images";
 const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
@@ -403,6 +408,18 @@ export async function uploadVehiclePhoto(
 
     const admin = createAdminClient();
 
+    const { data: existing } = await admin
+      .from("vehicle_images")
+      .select("id")
+      .eq("vehicle_id", vehicleId);
+
+    if ((existing?.length ?? 0) >= MAX_VEHICLE_PHOTOS) {
+      return {
+        success: false,
+        error: `Maximum ${MAX_VEHICLE_PHOTOS} photos par véhicule (pour garder le site fluide).`,
+      };
+    }
+
     const extension = sanitizeImageExtension(file.name, file.type);
     const storagePath = `${vehicleId}/${Date.now()}.${extension}`;
     const buffer = Buffer.from(await file.arrayBuffer());
@@ -417,11 +434,6 @@ export async function uploadVehiclePhoto(
     if (uploadError) {
       return { success: false, error: mapUploadFailure(uploadError, uploadError.message) };
     }
-
-    const { data: existing } = await admin
-      .from("vehicle_images")
-      .select("id")
-      .eq("vehicle_id", vehicleId);
 
     const isFirst = !existing?.length;
 
@@ -620,6 +632,48 @@ export async function clearVehiclePublicPhoto(
 
   revalidateVehiclePaths(vehicleId);
   return { success: true };
+}
+
+export async function updateVehiclePublicImageFrame(
+  vehicleId: string,
+  frameInput: Partial<VehicleImageFrame>
+): Promise<ActionResult> {
+  try {
+    await requireAdmin();
+    const frame = normalizeVehicleImageFrame(frameInput);
+    const admin = createAdminClient();
+
+    const { error } = await admin
+      .from("vehicles")
+      .update({
+        public_image_fit: frame.fit,
+        public_image_position_x: frame.positionX,
+        public_image_position_y: frame.positionY,
+        public_image_scale: frame.scale,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", vehicleId);
+
+    if (error) {
+      if (isMissingColumnError(error.message)) {
+        return {
+          success: false,
+          error:
+            "Colonnes de cadrage absentes — exécutez la migration SQL 20260827120000_vehicle_public_image_frame.sql",
+        };
+      }
+      return { success: false, error: mapUploadFailure(error, error.message) };
+    }
+
+    revalidateVehiclePaths(vehicleId);
+    return { success: true };
+  } catch (error) {
+    if (isRedirectError(error)) throw error;
+    return {
+      success: false,
+      error: mapUploadFailure(error, "Impossible d'enregistrer le cadrage"),
+    };
+  }
 }
 
 export async function uploadVehicleHeroImage(

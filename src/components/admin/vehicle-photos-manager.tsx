@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Globe, Star, Trash2, Upload } from "lucide-react";
 import StorageImage from "@/src/components/admin/storage-image";
@@ -13,9 +13,19 @@ import {
   deleteVehiclePhoto,
   setVehiclePrimaryPhoto,
   setVehiclePublicPhoto,
+  updateVehiclePublicImageFrame,
   uploadVehiclePhoto,
 } from "@/src/lib/admin/vehicles-actions";
 import type { VehicleImageRow } from "@/src/lib/admin/vehicles-types";
+import {
+  DEFAULT_VEHICLE_IMAGE_FRAME,
+  MAX_VEHICLE_PHOTOS,
+  normalizeVehicleImageFrame,
+  vehicleImageFrameClassName,
+  vehicleImageFrameStyle,
+  type PublicImageFit,
+  type VehicleImageFrame,
+} from "@/src/lib/vehicles/image-frame";
 
 const MAX_FILE_SIZE_MB = 10;
 
@@ -24,11 +34,13 @@ export default function VehiclePhotosManager({
   images,
   publicImageUrl,
   primaryImageUrl,
+  imageFrame,
 }: {
   vehicleId: string;
   images: VehicleImageRow[];
   publicImageUrl?: string | null;
   primaryImageUrl?: string | null;
+  imageFrame?: Partial<VehicleImageFrame> | null;
 }) {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -36,6 +48,23 @@ export default function VehiclePhotosManager({
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+  const [frame, setFrame] = useState<VehicleImageFrame>(() =>
+    normalizeVehicleImageFrame(imageFrame)
+  );
+  const [framePending, startFrameTransition] = useTransition();
+  const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    setFrame(normalizeVehicleImageFrame(imageFrame));
+  }, [imageFrame]);
+
+  useEffect(() => {
+    return () => {
+      if (saveTimer.current) clearTimeout(saveTimer.current);
+    };
+  }, []);
+
+  const atLimit = images.length >= MAX_VEHICLE_PHOTOS;
 
   async function runAction(action: () => Promise<{ success: boolean; error?: string }>) {
     setMessage(null);
@@ -62,9 +91,39 @@ export default function VehiclePhotosManager({
     }
   }
 
+  function scheduleFrameSave(next: VehicleImageFrame) {
+    if (saveTimer.current) clearTimeout(saveTimer.current);
+    saveTimer.current = setTimeout(() => {
+      startFrameTransition(async () => {
+        const result = await updateVehiclePublicImageFrame(vehicleId, next);
+        if (result.success) {
+          setMessage("Cadrage enregistré.");
+          setError(null);
+          router.refresh();
+        } else {
+          setError(result.error ?? "Impossible d'enregistrer le cadrage");
+        }
+      });
+    }, 450);
+  }
+
+  function updateFrame(partial: Partial<VehicleImageFrame>) {
+    setFrame((prev) => {
+      const next = normalizeVehicleImageFrame({ ...prev, ...partial });
+      scheduleFrameSave(next);
+      return next;
+    });
+  }
+
   async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    if (atLimit) {
+      setError(`Maximum ${MAX_VEHICLE_PHOTOS} photos par véhicule.`);
+      if (inputRef.current) inputRef.current.value = "";
+      return;
+    }
 
     if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
       setError(`Photo trop lourde (max ${MAX_FILE_SIZE_MB} Mo).`);
@@ -128,40 +187,115 @@ export default function VehiclePhotosManager({
   return (
     <div className="space-y-4">
       <p className="text-sm de-muted">
-        <strong>Site internet</strong> — choisissez quelle photo apparaît sur le
-        catalogue public (<code>/vehicules</code>). L&apos;image hero ci-dessous
-        sert uniquement à l&apos;espace propriétaire. Les photos sont compressées
-        automatiquement avant l&apos;envoi (JPG/PNG/WebP recommandés).
+        <strong>Site internet</strong> — jusqu&apos;à {MAX_VEHICLE_PHOTOS} photos
+        par véhicule. Choisissez la couverture catalogue et réglez le cadrage.
+        Compression automatique avant envoi.
       </p>
 
       {activePublicImage && (
-        <div className="de-card-inner flex flex-wrap items-center gap-4 p-3">
-          <div className="relative h-16 w-24 overflow-hidden rounded-md bg-muted">
-            <StorageImage
-              src={activePublicImage}
-              alt="Aperçu site web"
-              fill
-              sizes="96px"
-            />
+        <div className="de-card-inner space-y-4 p-3">
+          <div className="flex flex-wrap items-start gap-4">
+            <div className="relative h-28 w-40 overflow-hidden rounded-md bg-muted">
+              <StorageImage
+                src={activePublicImage}
+                alt="Aperçu site web"
+                fill
+                sizes="160px"
+                className={vehicleImageFrameClassName(frame)}
+                style={vehicleImageFrameStyle(frame)}
+              />
+            </div>
+            <div className="min-w-0 flex-1 space-y-3">
+              <div>
+                <p className="de-label">Image affichée sur le site</p>
+                <p className="text-sm de-muted">
+                  {usesCustomPublicImage
+                    ? "Photo dédiée au site public"
+                    : "Photo principale (par défaut)"}
+                  {framePending ? " · enregistrement…" : ""}
+                </p>
+              </div>
+              {usesCustomPublicImage && (
+                <button
+                  type="button"
+                  disabled={pending}
+                  onClick={handleClearPublic}
+                  className="de-btn de-btn-ghost text-xs"
+                >
+                  Utiliser la principale
+                </button>
+              )}
+            </div>
           </div>
-          <div className="min-w-0 flex-1">
-            <p className="de-label">Image affichée sur le site</p>
-            <p className="text-sm de-muted">
-              {usesCustomPublicImage
-                ? "Photo dédiée au site public"
-                : "Photo principale (par défaut)"}
-            </p>
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            <label className="block text-sm">
+              <span className="de-label">Mode d&apos;affichage</span>
+              <select
+                className="de-input mt-1 w-full"
+                value={frame.fit}
+                onChange={(e) =>
+                  updateFrame({ fit: e.target.value as PublicImageFit })
+                }
+              >
+                <option value="cover">Remplir le cadre (recadre)</option>
+                <option value="contain">Voir toute la photo</option>
+              </select>
+            </label>
+            <label className="block text-sm">
+              <span className="de-label">Zoom ({frame.scale}%)</span>
+              <input
+                type="range"
+                min={100}
+                max={150}
+                step={1}
+                value={frame.scale}
+                className="mt-3 w-full"
+                onChange={(e) =>
+                  updateFrame({ scale: Number(e.target.value) })
+                }
+              />
+            </label>
+            <label className="block text-sm">
+              <span className="de-label">Position horizontale ({frame.positionX}%)</span>
+              <input
+                type="range"
+                min={0}
+                max={100}
+                step={1}
+                value={frame.positionX}
+                className="mt-3 w-full"
+                onChange={(e) =>
+                  updateFrame({ positionX: Number(e.target.value) })
+                }
+              />
+            </label>
+            <label className="block text-sm">
+              <span className="de-label">Position verticale ({frame.positionY}%)</span>
+              <input
+                type="range"
+                min={0}
+                max={100}
+                step={1}
+                value={frame.positionY}
+                className="mt-3 w-full"
+                onChange={(e) =>
+                  updateFrame({ positionY: Number(e.target.value) })
+                }
+              />
+            </label>
           </div>
-          {usesCustomPublicImage && (
-            <button
-              type="button"
-              disabled={pending}
-              onClick={handleClearPublic}
-              className="de-btn de-btn-ghost text-xs"
-            >
-              Utiliser la principale
-            </button>
-          )}
+          <button
+            type="button"
+            className="de-btn de-btn-ghost text-xs"
+            onClick={() => {
+              const reset = DEFAULT_VEHICLE_IMAGE_FRAME;
+              setFrame(reset);
+              scheduleFrameSave(reset);
+            }}
+          >
+            Réinitialiser le cadrage
+          </button>
         </div>
       )}
 
@@ -175,12 +309,16 @@ export default function VehiclePhotosManager({
         />
         <button
           type="button"
-          disabled={pending}
+          disabled={pending || atLimit}
           onClick={() => inputRef.current?.click()}
           className="de-btn de-btn-primary inline-flex items-center gap-2"
         >
           <Upload size={16} strokeWidth={1.75} />
-          {pending ? "Traitement…" : "Ajouter une photo"}
+          {pending
+            ? "Traitement…"
+            : atLimit
+              ? `${MAX_VEHICLE_PHOTOS}/${MAX_VEHICLE_PHOTOS} photos`
+              : `Ajouter une photo (${images.length}/${MAX_VEHICLE_PHOTOS})`}
         </button>
       </div>
 

@@ -152,6 +152,13 @@ export default async function AdminVehicleDetailPage({
           images={images}
           publicImageUrl={vehicle.public_image_url}
           primaryImageUrl={vehicle.image_url}
+          imageFrame={{
+            fit:
+              vehicle.public_image_fit === "contain" ? "contain" : "cover",
+            positionX: vehicle.public_image_position_x ?? 50,
+            positionY: vehicle.public_image_position_y ?? 50,
+            scale: vehicle.public_image_scale ?? 100,
+          }}
         />
       </Section>
 

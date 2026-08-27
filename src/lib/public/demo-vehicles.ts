@@ -17,6 +17,7 @@ export const DEMO_VEHICLES: PublicVehicle[] = [
       "Compacte sportive, 400 ch — idéale pour un week-end dans l'Oise. Véhicule préparé avant chaque location.",
     image_url:
       "https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?auto=format&fit=crop&w=1600&q=80",
+    imageFrame: { fit: "cover", positionX: 50, positionY: 50, scale: 100 },
     pricing: {
       price_24h_weekday: 280,
       price_24h_weekend: 340,
@@ -42,6 +43,7 @@ export const DEMO_VEHICLES: PublicVehicle[] = [
       "Performance compacte, finitions premium. Disponible à Gisors et dans l'Eure.",
     image_url:
       "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?auto=format&fit=crop&w=1600&q=80",
+    imageFrame: { fit: "cover", positionX: 50, positionY: 50, scale: 100 },
     pricing: {
       price_24h_weekday: 320,
       price_24h_weekend: 390,
@@ -67,6 +69,7 @@ export const DEMO_VEHICLES: PublicVehicle[] = [
       "SUV sportif, confort et agilité. Parfait pour un déplacement pro ou un séjour en famille.",
     image_url:
       "https://images.unsplash.com/photo-1503376780353-7ad465976fd2?auto=format&fit=crop&w=1600&q=80",
+    imageFrame: { fit: "cover", positionX: 50, positionY: 50, scale: 100 },
     pricing: {
       price_24h_weekday: 420,
       price_24h_weekend: 490,
@@ -92,6 +95,7 @@ export const DEMO_VEHICLES: PublicVehicle[] = [
       "Compacte iconique, 320 ch et transmission intégrale. Sobriété assumée, performance redoutable.",
     image_url:
       "https://images.unsplash.com/photo-1542362567-b07e54358753?auto=format&fit=crop&w=1600&q=80",
+    imageFrame: { fit: "cover", positionX: 50, positionY: 50, scale: 100 },
     pricing: {
       price_24h_weekday: 260,
       price_24h_weekend: 310,
@@ -117,6 +121,7 @@ export const DEMO_VEHICLES: PublicVehicle[] = [
       "Design épuré, habitacle haut de gamme. Location premium Beauvais et Oise.",
     image_url:
       "https://images.unsplash.com/photo-1519641471654-76ce5427db85?auto=format&fit=crop&w=1600&q=80",
+    imageFrame: { fit: "cover", positionX: 50, positionY: 50, scale: 100 },
     pricing: {
       price_24h_weekday: 520,
       price_24h_weekend: 590,

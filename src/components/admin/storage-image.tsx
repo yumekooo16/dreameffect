@@ -1,10 +1,12 @@
 import Image from "next/image";
+import type { CSSProperties } from "react";
 import { resolveVehicleImageUrl } from "@/src/lib/image-url";
 
 type StorageImageProps = {
   src?: string | null;
   alt: string;
   className?: string;
+  style?: CSSProperties;
   sizes?: string;
   priority?: boolean;
 } & (
@@ -17,6 +19,7 @@ export default function StorageImage({
   src,
   alt,
   className = "object-cover",
+  style,
   sizes,
   priority = false,
   ...layout
@@ -39,6 +42,7 @@ export default function StorageImage({
     src: imageUrl,
     alt,
     className,
+    style,
     unoptimized: imageUrl.includes("supabase.co"),
     priority,
   };

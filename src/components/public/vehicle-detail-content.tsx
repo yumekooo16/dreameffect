@@ -58,7 +58,11 @@ export default function VehicleDetailContent({
         </Link>
 
         <div className="de-vehicle-detail-layout">
-          <VehicleGallery images={vehicle.images} alt={imageAlt} />
+          <VehicleGallery
+            images={vehicle.images}
+            alt={imageAlt}
+            frame={vehicle.imageFrame}
+          />
 
           <div className="de-vehicle-detail-panel">
             <div className="de-vehicle-detail-header">
