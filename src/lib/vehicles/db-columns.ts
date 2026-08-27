@@ -29,10 +29,16 @@ export const ADMIN_VEHICLE_BASE_SELECT_LEGACY =
   `id, owner_id, brand, model, version, year, plate, vin, color, mileage, status, image_url, daily_rate, ${VEHICLE_PRICING_COLUMNS}, fuel, transmission, power, location, description, slug, is_published, created_at, updated_at`;
 
 export const ADMIN_VEHICLE_FULL_SELECT =
-  `${ADMIN_VEHICLE_BASE_SELECT}, public_image_url, hero_image_url`;
+  `${ADMIN_VEHICLE_BASE_SELECT}, public_image_url, hero_image_url, public_image_fit, public_image_position_x, public_image_position_y, public_image_scale`;
 
 export const ADMIN_VEHICLE_FULL_SELECT_LEGACY =
   `${ADMIN_VEHICLE_BASE_SELECT_LEGACY}, public_image_url, hero_image_url`;
+
+export const ADMIN_VEHICLE_IMAGE_FRAME_SELECT =
+  "public_image_fit, public_image_position_x, public_image_position_y, public_image_scale";
+
+export const VEHICLE_PUBLIC_IMAGE_FRAME_COLUMNS =
+  "public_image_fit, public_image_position_x, public_image_position_y, public_image_scale";
 
 export const ADMIN_VEHICLE_PRICING_SELECT =
   `id, owner_id, brand, model, version, year, plate, vin, color, mileage, status, image_url, ${VEHICLE_PRICING_COLUMNS}, ${VEHICLE_PRO_PRICING_COLUMNS}, created_at, updated_at`;
@@ -56,6 +62,10 @@ export type PublicVehicleDbRow = {
   status: string;
   image_url?: string | null;
   public_image_url?: string | null;
+  public_image_fit?: string | null;
+  public_image_position_x?: number | null;
+  public_image_position_y?: number | null;
+  public_image_scale?: number | null;
   daily_rate?: number | null;
   price_24h_weekday?: number | null;
   price_24h_weekend?: number | null;
@@ -86,6 +96,10 @@ export function fillPublicVehicleRow(
     status: String(row.status),
     image_url: (row.image_url as string | null) ?? null,
     public_image_url: (row.public_image_url as string | null) ?? null,
+    public_image_fit: (row.public_image_fit as string | null) ?? null,
+    public_image_position_x: (row.public_image_position_x as number | null) ?? null,
+    public_image_position_y: (row.public_image_position_y as number | null) ?? null,
+    public_image_scale: (row.public_image_scale as number | null) ?? null,
     daily_rate: (row.daily_rate as number | null) ?? null,
     price_24h_weekday: (row.price_24h_weekday as number | null) ?? null,
     price_24h_weekend: (row.price_24h_weekend as number | null) ?? null,

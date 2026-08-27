@@ -52,7 +52,7 @@ export default function PublicVehicleCard({
           <VehicleImage
             src={vehicle.image_url}
             alt={alt}
-            className="object-cover"
+            frame={vehicle.imageFrame}
           />
           <span
             className={`de-badge de-lot-badge ${getPublicVehicleStatusBadgeClass(vehicle.status)}`}
@@ -82,7 +82,11 @@ export default function PublicVehicleCard({
   return (
     <Link href={href} className="de-keys-lot">
       <div className="de-keys-lot-thumb">
-        <VehicleImage src={vehicle.image_url} alt={alt} className="object-cover" />
+        <VehicleImage
+          src={vehicle.image_url}
+          alt={alt}
+          frame={vehicle.imageFrame}
+        />
       </div>
       <div>
         <p className="de-keys-car-brand">

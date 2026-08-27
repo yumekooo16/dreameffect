@@ -596,11 +596,12 @@
 }
 
 .de-keys-car-media img {
+  --de-img-scale: 1;
   transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .de-keys-car:hover .de-keys-car-media img {
-  transform: scale(1.03);
+  transform: scale(calc(var(--de-img-scale, 1) * 1.03));
 }
 
 .de-keys-car-body {

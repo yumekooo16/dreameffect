@@ -97,11 +97,29 @@ async function enrichOptionalVehicleImages(
 ): Promise<VehicleRow> {
   const { data, error } = await supabase
     .from("vehicles")
-    .select("public_image_url, hero_image_url")
+    .select(
+      "public_image_url, hero_image_url, public_image_fit, public_image_position_x, public_image_position_y, public_image_scale"
+    )
     .eq("id", vehicle.id)
     .maybeSingle();
 
-  if (error?.message.includes("does not exist") || error || !data) {
+  if (error?.message.includes("does not exist")) {
+    const legacy = await supabase
+      .from("vehicles")
+      .select("public_image_url, hero_image_url")
+      .eq("id", vehicle.id)
+      .maybeSingle();
+
+    if (legacy.error || !legacy.data) return vehicle;
+
+    return {
+      ...vehicle,
+      public_image_url: (legacy.data.public_image_url as string | null) ?? null,
+      hero_image_url: (legacy.data.hero_image_url as string | null) ?? null,
+    };
+  }
+
+  if (error || !data) {
     return vehicle;
   }
 
@@ -109,6 +127,12 @@ async function enrichOptionalVehicleImages(
     ...vehicle,
     public_image_url: (data.public_image_url as string | null) ?? null,
     hero_image_url: (data.hero_image_url as string | null) ?? null,
+    public_image_fit: (data.public_image_fit as string | null) ?? null,
+    public_image_position_x:
+      (data.public_image_position_x as number | null) ?? null,
+    public_image_position_y:
+      (data.public_image_position_y as number | null) ?? null,
+    public_image_scale: (data.public_image_scale as number | null) ?? null,
   };
 }
 

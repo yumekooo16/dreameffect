@@ -15,6 +15,10 @@ export type VehicleRow = {
   image_url?: string | null;
   hero_image_url?: string | null;
   public_image_url?: string | null;
+  public_image_fit?: string | null;
+  public_image_position_x?: number | null;
+  public_image_position_y?: number | null;
+  public_image_scale?: number | null;
   daily_rate?: number | null;
   price_24h_weekday?: number | null;
   price_24h_weekend?: number | null;

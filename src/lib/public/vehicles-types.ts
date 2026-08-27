@@ -1,5 +1,6 @@
 import type { PublicVehicleStatus } from "@/src/lib/public/vehicle-status";
 import type { VehiclePricing } from "@/src/lib/vehicles/pricing";
+import type { VehicleImageFrame } from "@/src/lib/vehicles/image-frame";
 
 export type PublicVehicleImage = {
   id: string;
@@ -21,6 +22,7 @@ export type PublicVehicle = {
   location?: string | null;
   description?: string | null;
   image_url?: string | null;
+  imageFrame: VehicleImageFrame;
   /** @deprecated Préférer pricing + getLowestRentalPrice */
   daily_rate?: number | null;
   pricing: VehiclePricing;
@@ -48,6 +50,11 @@ export type PublicVehicleRow = {
   color: string | null;
   status: string;
   image_url: string | null;
+  public_image_url?: string | null;
+  public_image_fit?: string | null;
+  public_image_position_x?: number | null;
+  public_image_position_y?: number | null;
+  public_image_scale?: number | null;
   daily_rate: number | null;
   price_24h_weekday: number | null;
   price_24h_weekend: number | null;
