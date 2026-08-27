@@ -5,6 +5,10 @@ import { useRouter } from "next/navigation";
 import { Globe, Star, Trash2, Upload } from "lucide-react";
 import StorageImage from "@/src/components/admin/storage-image";
 import {
+  formatUploadError,
+  prepareImageForUpload,
+} from "@/src/lib/admin/prepare-image-upload";
+import {
   clearVehiclePublicPhoto,
   deleteVehiclePhoto,
   setVehiclePrimaryPhoto,
@@ -48,8 +52,10 @@ export default function VehiclePhotosManager({
 
       setError(result.error ?? "Une erreur est survenue");
       return false;
-    } catch {
-      setError("Impossible de traiter la demande. Réessayez.");
+    } catch (err) {
+      setError(
+        formatUploadError(err, "Impossible de traiter la demande. Réessayez.")
+      );
       return false;
     } finally {
       setPending(false);
@@ -66,11 +72,22 @@ export default function VehiclePhotosManager({
       return;
     }
 
-    const formData = new FormData();
-    formData.append("file", file);
+    setPending(true);
+    setError(null);
+    setMessage(null);
 
-    const ok = await runAction(() => uploadVehiclePhoto(vehicleId, formData));
-    if (ok) setMessage("Photo ajoutée.");
+    try {
+      const prepared = await prepareImageForUpload(file);
+      const formData = new FormData();
+      formData.append("file", prepared);
+
+      const ok = await runAction(() => uploadVehiclePhoto(vehicleId, formData));
+      if (ok) setMessage("Photo ajoutée.");
+    } catch (err) {
+      setError(formatUploadError(err, "Impossible de préparer la photo."));
+      setPending(false);
+    }
+
     if (inputRef.current) inputRef.current.value = "";
   }
 
@@ -113,7 +130,8 @@ export default function VehiclePhotosManager({
       <p className="text-sm de-muted">
         <strong>Site internet</strong> — choisissez quelle photo apparaît sur le
         catalogue public (<code>/vehicules</code>). L&apos;image hero ci-dessous
-        sert uniquement à l&apos;espace propriétaire.
+        sert uniquement à l&apos;espace propriétaire. Les photos sont compressées
+        automatiquement avant l&apos;envoi (JPG/PNG/WebP recommandés).
       </p>
 
       {activePublicImage && (
@@ -151,7 +169,7 @@ export default function VehiclePhotosManager({
         <input
           ref={inputRef}
           type="file"
-          accept="image/*"
+          accept="image/jpeg,image/png,image/webp,image/gif,.jpg,.jpeg,.png,.webp"
           className="hidden"
           onChange={handleUpload}
         />
