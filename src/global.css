@@ -2693,7 +2693,9 @@ button.de-list-item {
 }
 
 .de-hero-visual-image {
+  --de-img-scale: 1;
   object-position: center 40%;
+  transform: scale(var(--de-img-scale, 1));
 }
 
 .de-hero-visual-overlay {

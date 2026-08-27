@@ -12,7 +12,7 @@ import { withDemoFleetFallback } from "@/src/lib/public/demo-vehicles";
 import { fetchPublicVehicles } from "@/src/lib/public/vehicles-data";
 import { HOME_KEYWORDS, formatServiceAreaLabel } from "@/src/lib/public/local-seo";
 import { buildPageMetadata, faqPageJsonLd } from "@/src/lib/public/seo";
-import { pickNarrativeVisuals, resolveHeroImageUrl } from "@/src/lib/public/hero-image";
+import { pickNarrativeVisuals, resolveHeroVisual } from "@/src/lib/public/hero-image";
 
 export const dynamic = "force-dynamic";
 
@@ -26,17 +26,21 @@ export const metadata: Metadata = buildPageMetadata({
 
 export default async function HomePage() {
   const vehicles = withDemoFleetFallback(await fetchPublicVehicles());
-  const heroImageUrl = resolveHeroImageUrl(vehicles);
-  const narrativeVisuals = pickNarrativeVisuals(vehicles);
+  const heroVisual = resolveHeroVisual(vehicles);
+  const narrativeVisuals = pickNarrativeVisuals(
+    vehicles,
+    3,
+    heroVisual?.url
+  );
 
   return (
     <>
       <JsonLd data={faqPageJsonLd([...HOME_FAQ_ITEMS])} />
-      <HeroSection imageUrl={heroImageUrl} />
+      <HeroSection imageUrl={heroVisual?.url} imageFrame={heroVisual?.frame} />
       <HomeCitiesSection />
       <HomeFigures />
       <VehiclesPreview vehicles={vehicles} />
-      <HowItWorksSection visualUrls={narrativeVisuals} />
+      <HowItWorksSection visuals={narrativeVisuals} />
       <HomeReviewsSection />
       <HomeFaqSection />
       <HomeCtaSection />

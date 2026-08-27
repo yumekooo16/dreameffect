@@ -3,12 +3,14 @@ import { ArrowRight, MessageCircle } from "lucide-react";
 import HeroBackground from "@/src/components/public/hero-background";
 import { CONTACT_WHATSAPP_URL } from "@/src/lib/public/contact";
 import { PUBLIC_ROUTES, SITE_NAME } from "@/src/lib/public/site";
+import type { VehicleImageFrame } from "@/src/lib/vehicles/image-frame";
 
 type HeroSectionProps = {
   imageUrl?: string | null;
+  imageFrame?: VehicleImageFrame | null;
 };
 
-export default function HeroSection({ imageUrl }: HeroSectionProps) {
+export default function HeroSection({ imageUrl, imageFrame }: HeroSectionProps) {
   return (
     <section className="de-keys-hero" aria-labelledby="home-hero-title">
       <div className="de-keys-hero-copy">
@@ -46,7 +48,7 @@ export default function HeroSection({ imageUrl }: HeroSectionProps) {
       </div>
 
       <div className="de-keys-media">
-        <HeroBackground imageUrl={imageUrl} />
+        <HeroBackground imageUrl={imageUrl} frame={imageFrame} />
         <p className="de-keys-media-cap">Flotte entretenue · Remise sous 24 h</p>
       </div>
     </section>
