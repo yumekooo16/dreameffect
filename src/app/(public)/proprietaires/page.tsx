@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import OwnersHero from "@/src/components/public/owners-hero";
 import OwnersContent from "@/src/components/public/owners-content";
 import JsonLd from "@/src/components/public/json-ld";
@@ -11,13 +12,15 @@ import {
 } from "@/src/lib/public/seo";
 import { withDemoFleetFallback } from "@/src/lib/public/demo-vehicles";
 import { fetchPublicVehicles } from "@/src/lib/public/vehicles-data";
-import { resolveHeroImageUrl } from "@/src/lib/public/hero-image";
+import { resolveHeroVisual } from "@/src/lib/public/hero-image";
 import {
   OWNERS_KEYWORDS,
   areaServedJsonLd,
   formatServiceAreaLabel,
 } from "@/src/lib/public/local-seo";
 import { PUBLIC_ROUTES, SITE_URL } from "@/src/lib/public/site";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Confier votre véhicule",
@@ -45,8 +48,10 @@ function ownersServiceJsonLd() {
 }
 
 export default async function OwnersPage() {
+  await connection();
+
   const vehicles = withDemoFleetFallback(await fetchPublicVehicles());
-  const heroImageUrl = resolveHeroImageUrl(vehicles);
+  const heroVisual = resolveHeroVisual(vehicles);
 
   return (
     <div className="de-owners-page">
@@ -60,7 +65,11 @@ export default async function OwnersPage() {
           ownersServiceJsonLd(),
         ]}
       />
-      <OwnersHero imageUrl={heroImageUrl} vehicles={vehicles} />
+      <OwnersHero
+        imageUrl={heroVisual?.url}
+        imageFrame={heroVisual?.frame}
+        vehicles={vehicles}
+      />
       <OwnersContent />
     </div>
   );

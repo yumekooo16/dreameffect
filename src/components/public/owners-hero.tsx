@@ -6,17 +6,26 @@ import OwnersFigures from "@/src/components/public/owners-figures";
 import { resolveVehicleImageUrl } from "@/src/lib/image-url";
 import type { PublicVehicle } from "@/src/lib/public/vehicles-types";
 import { PUBLIC_ROUTES, SITE_NAME } from "@/src/lib/public/site";
+import type { VehicleImageFrame } from "@/src/lib/vehicles/image-frame";
 
 type OwnersHeroProps = {
   imageUrl?: string | null;
+  imageFrame?: VehicleImageFrame | null;
   vehicles?: PublicVehicle[];
 };
 
-export default function OwnersHero({ imageUrl, vehicles = [] }: OwnersHeroProps) {
+export default function OwnersHero({
+  imageUrl,
+  imageFrame,
+  vehicles = [],
+}: OwnersHeroProps) {
+  const heroUrl = imageUrl ? resolveVehicleImageUrl(imageUrl) ?? imageUrl : null;
   const stripUrls = vehicles
-    .slice(0, 3)
-    .map((v) => resolveVehicleImageUrl(v.image_url))
-    .filter(Boolean) as string[];
+    .map((vehicle) => resolveVehicleImageUrl(vehicle.image_url))
+    .filter((url): url is string => Boolean(url))
+    .filter((url) => url !== heroUrl)
+    .filter((url, index, list) => list.indexOf(url) === index)
+    .slice(0, 3);
 
   return (
     <>
@@ -47,7 +56,7 @@ export default function OwnersHero({ imageUrl, vehicles = [] }: OwnersHeroProps)
           <p className="de-keys-sign">{SITE_NAME}</p>
         </div>
         <div className="de-keys-media">
-          <HeroBackground imageUrl={imageUrl} />
+          <HeroBackground imageUrl={imageUrl} frame={imageFrame} />
           <p className="de-keys-media-cap">Gestion locative · Clé en main</p>
         </div>
       </section>
