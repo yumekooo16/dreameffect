@@ -26,7 +26,7 @@ export default function OwnerHeader() {
         >
           <Image
             src="/logo-de.png"
-            alt=""
+            alt="DreamEffect"
             width={36}
             height={36}
             className="de-app-header-logo"
