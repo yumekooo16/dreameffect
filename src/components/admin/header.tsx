@@ -82,7 +82,7 @@ export default function AdminHeader() {
         <Link href="/admin" className="de-app-header-brand" aria-label="Administration">
           <Image
             src="/logo-de.png"
-            alt=""
+            alt="DreamEffect"
             width={36}
             height={36}
             className="de-app-header-logo"

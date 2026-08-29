@@ -32,7 +32,7 @@ export default function PublicHeader() {
           >
             <Image
               src="/logo-de.png"
-              alt=""
+              alt="DreamEffect"
               width={44}
               height={44}
               className="de-maison-header-logo"
