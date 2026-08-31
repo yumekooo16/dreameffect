@@ -145,21 +145,14 @@
   display: inline-flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 1.2mm;
+  gap: 1.5mm;
 }
 
-.de-flyer-snap-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 3.2mm;
-  height: 3.2mm;
-  border-radius: 0.4mm;
-  background: #fffc00;
-  color: #000;
-  font-size: 2mm;
-  font-weight: 700;
-  line-height: 1;
+.de-flyer-app-icon {
+  width: 4.2mm;
+  height: 4.2mm;
+  flex-shrink: 0;
+  display: block;
 }
 
 .de-flyer-title-wrap {

@@ -1,24 +1,9 @@
 import Image from "next/image";
-import {
-  AtSign,
-  FileText,
-  Mail,
-  MessageCircle,
-} from "lucide-react";
+import { FileText } from "lucide-react";
+import { FlyerContactIcon } from "@/src/components/public/flyer-social-icons";
 import type { BMW_SERIE2_FLYER } from "@/src/lib/public/flyers/bmw-serie-2";
 
 export type VehicleFlyerData = typeof BMW_SERIE2_FLYER;
-
-function ContactIcon({ kind }: { kind: VehicleFlyerData["contacts"][number]["kind"] }) {
-  if (kind === "email") return <Mail size={11} strokeWidth={2} aria-hidden />;
-  if (kind === "instagram") return <AtSign size={11} strokeWidth={2} aria-hidden />;
-  if (kind === "whatsapp") return <MessageCircle size={11} strokeWidth={2} aria-hidden />;
-  return (
-    <span className="de-flyer-snap-icon" aria-hidden>
-      S
-    </span>
-  );
-}
 
 export default function VehicleFlyer({ data }: { data: VehicleFlyerData }) {
   return (
@@ -56,7 +41,7 @@ export default function VehicleFlyer({ data }: { data: VehicleFlyerData }) {
           <ul className="de-flyer-contacts">
             {data.contacts.map((item) => (
               <li key={item.kind}>
-                <ContactIcon kind={item.kind} />
+                <FlyerContactIcon kind={item.kind} className="de-flyer-app-icon" />
                 <span>{item.label}</span>
               </li>
             ))}
