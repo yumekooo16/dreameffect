@@ -1,16 +1,16 @@
-/* Flyer véhicule — impression A4, DA DreamEffect (bleu nuit + laiton) */
+/* Flyer A4 — une page, photo plein fond, DA DreamEffect */
 
 .de-flyer-shell {
   min-height: 100dvh;
-  background: #060b14;
+  background: #05080f;
   color: #f2f5f9;
   font-family: var(--font-body, "Source Sans 3", ui-sans-serif, sans-serif);
-  padding: 1rem 1rem 2rem;
+  padding: 1rem;
 }
 
 .de-flyer-toolbar {
-  max-width: 32rem;
-  margin: 0 auto 1rem;
+  max-width: 210mm;
+  margin: 0 auto 0.75rem;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -44,47 +44,70 @@
   opacity: 0.9;
 }
 
+/* Canvas A4 (210 × 297 mm) */
 .de-flyer {
-  --flyer-brass: #c4ad84;
-  --flyer-brass-soft: #d9c6a2;
-  --flyer-blue: #3e5c7d;
-  --flyer-blue-soft: #7a9bc4;
-  --flyer-bg: #0b1524;
-  --flyer-surface: #122033;
+  --flyer-w: 210mm;
+  --flyer-h: 297mm;
+  --flyer-brass: #d9c6a2;
+  --flyer-line: rgba(238, 242, 247, 0.88);
 
   position: relative;
-  width: 100%;
-  max-width: 32rem;
+  width: min(100%, var(--flyer-w));
+  aspect-ratio: 210 / 297;
   margin-inline: auto;
-  background:
-    radial-gradient(120% 80% at 50% 0%, rgba(62, 92, 125, 0.22), transparent 55%),
-    linear-gradient(180deg, #0e1726 0%, var(--flyer-bg) 38%, #08101c 100%);
-  border: 1px solid rgba(184, 160, 120, 0.35);
-  box-shadow:
-    0 24px 80px rgba(0, 0, 0, 0.45),
-    inset 0 1px 0 rgba(238, 242, 247, 0.06);
   overflow: hidden;
+  background: #0b1524;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
 }
 
-.de-flyer-top {
+.de-flyer-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.de-flyer-bg-img {
+  object-fit: cover;
+  object-position: center 42%;
+}
+
+.de-flyer-bg-shade {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(6, 10, 18, 0.92) 0%, rgba(6, 10, 18, 0.35) 28%, rgba(6, 10, 18, 0.2) 48%, rgba(6, 10, 18, 0.72) 72%, rgba(6, 10, 18, 0.96) 100%),
+    linear-gradient(90deg, rgba(6, 10, 18, 0.55) 0%, transparent 42%, rgba(6, 10, 18, 0.35) 100%);
+}
+
+.de-flyer-sheet {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 5mm 7mm 5mm;
+  box-sizing: border-box;
+}
+
+.de-flyer-head {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 0.75rem;
-  padding: 1rem 1rem 0.75rem;
-  border-bottom: 1px solid rgba(184, 160, 120, 0.35);
+  gap: 4mm;
+  padding-bottom: 3mm;
+  border-bottom: 1px solid var(--flyer-line);
 }
 
 .de-flyer-brand {
   display: flex;
   align-items: center;
-  gap: 0.65rem;
+  gap: 2.5mm;
   min-width: 0;
 }
 
 .de-flyer-logo {
-  width: 2.75rem;
-  height: 2.75rem;
+  width: 10mm;
+  height: 10mm;
   object-fit: contain;
   flex-shrink: 0;
 }
@@ -92,18 +115,19 @@
 .de-flyer-wordmark {
   margin: 0;
   font-family: var(--font-display, "Newsreader", Georgia, serif);
-  font-size: 1.05rem;
+  font-size: 4.2mm;
   font-weight: 500;
-  letter-spacing: 0.04em;
-  line-height: 1.1;
+  letter-spacing: 0.03em;
+  line-height: 1.05;
+  color: #fff;
 }
 
 .de-flyer-tagline {
-  margin: 0.15rem 0 0;
-  font-size: 0.62rem;
+  margin: 0.8mm 0 0;
+  font-size: 2.4mm;
   font-style: italic;
-  color: #b8c0cc;
-  line-height: 1.25;
+  color: rgba(238, 242, 247, 0.82);
+  line-height: 1.2;
 }
 
 .de-flyer-contacts {
@@ -111,142 +135,115 @@
   margin: 0;
   padding: 0;
   display: grid;
-  gap: 0.28rem;
-  font-size: 0.58rem;
+  gap: 1mm;
+  font-size: 2.35mm;
   text-align: right;
+  color: #fff;
 }
 
-.de-flyer-contacts a {
+.de-flyer-contacts li {
   display: inline-flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 0.35rem;
-  color: #eef2f7;
-  text-decoration: none;
+  gap: 1.5mm;
 }
 
-.de-flyer-contacts a:hover {
-  color: var(--flyer-brass-soft);
+.de-flyer-app-icon {
+  width: 4.2mm;
+  height: 4.2mm;
+  flex-shrink: 0;
+  display: block;
 }
 
-.de-flyer-snap-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 0.875rem;
-  height: 0.875rem;
-  border-radius: 0.15rem;
-  background: #fffc00;
-  color: #000;
-  font-size: 0.55rem;
-  font-weight: 700;
-  line-height: 1;
-}
-
-.de-flyer-title-block {
+.de-flyer-title-wrap {
   display: flex;
   align-items: stretch;
-  gap: 0.65rem;
-  padding: 0.85rem 1rem 0.35rem;
+  gap: 3mm;
+  margin-top: 5mm;
 }
 
 .de-flyer-title-rule {
-  width: 2px;
-  background: linear-gradient(180deg, var(--flyer-brass-soft), var(--flyer-blue-soft));
-  border-radius: 1px;
+  width: 0.6mm;
+  background: var(--flyer-line);
+  flex-shrink: 0;
 }
 
 .de-flyer-brand-line {
   margin: 0;
-  font-family: var(--font-display, "Newsreader", Georgia, serif);
-  font-size: clamp(2rem, 8vw, 2.35rem);
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  line-height: 0.95;
+  font-family: var(--font-body, "Source Sans 3", sans-serif);
+  font-size: 14mm;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 0.92;
+  color: #fff;
 }
 
 .de-flyer-model-line {
-  margin: 0.15rem 0 0;
-  font-family: var(--font-display, "Newsreader", Georgia, serif);
-  font-size: clamp(1.35rem, 5vw, 1.55rem);
-  font-weight: 500;
-  letter-spacing: 0.18em;
-  color: var(--flyer-brass-soft);
+  margin: 1.5mm 0 0;
+  font-family: var(--font-body, "Source Sans 3", sans-serif);
+  font-size: 8mm;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  line-height: 1;
+  color: #fff;
 }
 
-.de-flyer-hero {
-  position: relative;
-  height: 14.5rem;
-  margin: 0.35rem 1rem 0;
-  border: 1px solid rgba(184, 160, 120, 0.25);
-  overflow: hidden;
+.de-flyer-spacer {
+  flex: 1;
+  min-height: 8mm;
 }
 
-.de-flyer-hero-img {
-  object-fit: cover;
-  object-position: center 58%;
-}
-
-.de-flyer-hero-overlay {
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(180deg, rgba(11, 21, 36, 0.15) 0%, rgba(11, 21, 36, 0.55) 72%, rgba(11, 21, 36, 0.92) 100%),
-    linear-gradient(90deg, rgba(11, 21, 36, 0.35) 0%, transparent 45%, rgba(11, 21, 36, 0.2) 100%);
-}
-
-.de-flyer-body {
+.de-flyer-bottom {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.75rem;
-  padding: 0.85rem 1rem 0.5rem;
+  gap: 5mm;
+  align-items: end;
+  margin-bottom: 4mm;
 }
 
 .de-flyer-specs {
   position: relative;
-  padding-left: 0.65rem;
+  padding-left: 3mm;
 }
 
 .de-flyer-specs-rule {
   position: absolute;
   left: 0;
-  top: 0.1rem;
-  bottom: 0.1rem;
-  width: 2px;
-  background: linear-gradient(180deg, var(--flyer-brass-soft), transparent);
+  top: 0;
+  bottom: 0;
+  width: 0.6mm;
+  background: var(--flyer-line);
 }
 
-.de-flyer-specs dl {
+.de-flyer-specs ul {
+  list-style: none;
   margin: 0;
+  padding: 0;
 }
 
-.de-flyer-spec-row {
-  margin-bottom: 0.45rem;
+.de-flyer-specs li {
+  margin-bottom: 1.8mm;
+  font-size: 2.65mm;
+  line-height: 1.25;
+  letter-spacing: 0.06em;
+  color: #fff;
 }
 
-.de-flyer-spec-row dt {
-  margin: 0;
-  font-size: 0.55rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #9aa5b4;
-}
-
-.de-flyer-spec-row dd {
-  margin: 0.05rem 0 0;
-  font-size: 0.72rem;
+.de-flyer-spec-label {
   font-weight: 600;
-  letter-spacing: 0.04em;
+}
+
+.de-flyer-spec-value {
+  font-weight: 700;
 }
 
 .de-flyer-pricing h2 {
-  margin: 0 0 0.45rem;
-  font-family: var(--font-display, "Newsreader", Georgia, serif);
-  font-size: 0.95rem;
-  font-weight: 500;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--flyer-brass-soft);
+  margin: 0 0 2mm;
+  font-family: var(--font-body, "Source Sans 3", sans-serif);
+  font-size: 3.2mm;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: #fff;
 }
 
 .de-flyer-pricing ul {
@@ -259,79 +256,66 @@
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  gap: 0.35rem;
-  margin-bottom: 0.28rem;
-  font-size: 0.58rem;
-  line-height: 1.25;
+  gap: 2mm;
+  margin-bottom: 1.4mm;
+  font-size: 2.45mm;
+  line-height: 1.2;
+  color: #fff;
 }
 
 .de-flyer-pricing li::before {
   content: "•";
-  color: var(--flyer-brass-soft);
-  margin-right: 0.2rem;
+  margin-right: 1mm;
   flex-shrink: 0;
 }
 
-.de-flyer-pricing li span {
+.de-flyer-pricing li span:first-of-type {
   flex: 1;
-  color: #d5dbe3;
+  letter-spacing: 0.04em;
 }
 
 .de-flyer-pricing li strong {
-  font-size: 0.62rem;
-  font-weight: 700;
+  font-size: 2.55mm;
+  font-weight: 800;
   white-space: nowrap;
 }
 
-.de-flyer-deposit {
-  margin: 0.55rem 0 0;
-  padding-top: 0.45rem;
-  border-top: 1px solid rgba(184, 160, 120, 0.25);
-  font-size: 0.62rem;
-  color: #eef2f7;
+.de-flyer-deposit-row {
+  margin-top: 1mm;
+  padding-top: 1mm;
 }
 
-.de-flyer-deposit strong {
-  font-size: 0.72rem;
-}
-
-.de-flyer-footer {
+.de-flyer-foot {
   display: flex;
   align-items: center;
-  gap: 0.55rem;
-  margin: 0.35rem 1rem 0.75rem;
-  padding: 0.55rem 0.65rem;
-  border: 1px solid rgba(184, 160, 120, 0.28);
-  background: rgba(18, 32, 51, 0.65);
-  color: #eef2f7;
+  gap: 2.5mm;
+  padding-top: 2.5mm;
+  border-top: 1px solid rgba(238, 242, 247, 0.35);
+  color: #fff;
 }
 
-.de-flyer-footer p {
+.de-flyer-foot p {
   margin: 0;
-  font-size: 0.52rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  line-height: 1.35;
-}
-
-.de-flyer-qr-hint {
-  margin: 0;
-  padding: 0 1rem 1rem;
-  font-size: 0.62rem;
-  text-align: center;
-  color: #9aa5b4;
-}
-
-.de-flyer-link {
-  color: var(--flyer-brass-soft);
-  text-decoration: underline;
-  text-underline-offset: 2px;
+  font-size: 2.35mm;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  line-height: 1.3;
 }
 
 @media print {
   @page {
     size: A4 portrait;
-    margin: 8mm;
+    margin: 0;
+  }
+
+  html,
+  body {
+    width: 210mm;
+    height: 297mm;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    background: #0b1524 !important;
   }
 
   .no-print {
@@ -340,23 +324,32 @@
 
   .de-flyer-shell {
     padding: 0;
-    background: #fff;
+    margin: 0;
+    min-height: 0;
+    background: #0b1524;
   }
 
   .de-flyer {
+    width: 210mm;
+    height: 297mm;
     max-width: none;
-    width: 100%;
+    aspect-ratio: auto;
+    margin: 0;
     box-shadow: none;
-    border-color: rgba(184, 160, 120, 0.5);
+    page-break-after: avoid;
+    page-break-inside: avoid;
+    break-inside: avoid;
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
   }
 
-  .de-flyer-hero {
-    height: 11.5cm;
+  .de-flyer-sheet {
+    height: 297mm;
   }
+}
 
-  .de-flyer-qr-hint {
-    display: none;
+@media screen and (max-width: 480px) {
+  .de-flyer-shell {
+    padding: 0.5rem;
   }
 }
