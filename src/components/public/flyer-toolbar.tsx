@@ -15,7 +15,7 @@ export default function FlyerToolbar() {
         onClick={() => window.print()}
       >
         <Printer size={16} strokeWidth={1.75} aria-hidden />
-        Télécharger / imprimer (PDF)
+        Télécharger PDF (1 page A4)
       </button>
     </div>
   );

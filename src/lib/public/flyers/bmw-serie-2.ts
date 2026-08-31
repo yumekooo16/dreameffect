@@ -1,7 +1,7 @@
 import { CONTACT_EMAIL, CONTACT_PHONE } from "@/src/lib/public/contact";
 import { SITE_URL } from "@/src/lib/public/site";
 
-/** Contenu flyer BMW Série 2 — aligné catalogue + visuel fourni. */
+/** Contenu flyer BMW Série 2 — aligné visuel fourni. */
 export const BMW_SERIE2_FLYER = {
   slug: "bmw-serie-2",
   heroImage: "/flyers/bmw-serie-2.jpg",
@@ -9,22 +9,22 @@ export const BMW_SERIE2_FLYER = {
   brandLine: "BMW",
   modelLine: "SÉRIE 2",
   specs: [
-    { label: "Marque", value: "BMW" },
-    { label: "Couleur", value: "Gris" },
-    { label: "Motorisation", value: "136 ch" },
-    { label: "Kilométrage inclus", value: "200 km" },
-    { label: "Km supplémentaire", value: "1,50 €" },
+    { label: "MARQUE", value: "BMW" },
+    { label: "COULEUR", value: "GRIS" },
+    { label: "MOTORISATION", value: "136-CH" },
+    { label: "KILOMÉTRAGE INCLUS", value: "200/KM" },
+    { label: "KM SUPPLÉMENTAIRE", value: "1,50€" },
   ],
   pricing: [
-    { label: "24 h (lundi–jeudi)", value: "120 €" },
-    { label: "24 h week-end", value: "250 €" },
-    { label: "48 h week-end", value: "350 €" },
-    { label: "72 h week-end", value: "420 €" },
-    { label: "Semaine (7 jours)", value: "650 €" },
+    { label: "24H (LUNDI-JEUDI)", value: "120€" },
+    { label: "24H WEEK-END", value: "250€" },
+    { label: "48H WEEK-END", value: "350€" },
+    { label: "72H WEEK-END", value: "420€" },
+    { label: "SEMAINE (7 JOURS)", value: "650€" },
   ],
-  deposit: "2 000 €",
+  deposit: "2 000€",
   requirements:
-    "Permis · Pièce d'identité valide · Justificatif de domicile (- 3 mois)",
+    "PERMIS • PIÈCE D'IDENTITÉ VALIDE • JUSTIFICATIF DE DOMICILE - 3 MOIS",
   contacts: [
     { kind: "email" as const, label: CONTACT_EMAIL, href: `mailto:${CONTACT_EMAIL}` },
     { kind: "instagram" as const, label: "_dreameffect", href: "https://instagram.com/_dreameffect" },
