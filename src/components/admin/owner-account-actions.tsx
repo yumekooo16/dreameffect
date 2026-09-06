@@ -56,18 +56,17 @@ export default function OwnerAccountActions({
       const result = await resendOwnerInvite(ownerId);
 
       if (result.success) {
-        if (result.emailSent) {
-          setMessage(
-            "Invitation renvoyée sur l'email du propriétaire. S'il ne la reçoit pas, utilisez « Générer un lien » via un second clic après quelques minutes, ou vérifiez les indésirables."
-          );
-        } else if (result.inviteLink) {
-          setMessage(
-            "Le mail automatique n'a pas pu partir. Copiez le lien ci-dessous et transférez-le au propriétaire (email / WhatsApp)."
-          );
+        // Toujours afficher le lien si présent (secours si le mail n'arrive pas)
+        if (result.inviteLink) {
           setInviteLink(result.inviteLink);
-        } else {
-          setMessage("Invitation traitée.");
         }
+
+        setMessage(
+          result.warning ??
+            (result.emailSent
+              ? "Invitation renvoyée par email. Conservez aussi le lien ci-dessous si le mail n'arrive pas (indésirables)."
+              : "Copiez le lien ci-dessous et envoyez-le au propriétaire (email / WhatsApp).")
+        );
         router.refresh();
       } else {
         setError(result.error ?? "Impossible de renvoyer l'invitation.");

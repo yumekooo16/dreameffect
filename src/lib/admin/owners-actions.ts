@@ -11,6 +11,7 @@ import {
   OWNER_INVITE_NEXT_PATH,
   validateRealOwnerEmail,
 } from "@/src/lib/auth/email";
+import { SITE_URL } from "@/src/lib/public/site";
 
 type ActionResult = {
   success: boolean;
@@ -25,12 +26,29 @@ type InviteActionResult = ActionResult & {
   warning?: string;
 };
 
+function buildAppInviteLink(hashedToken: string) {
+  // Lien applicatif : verifyOtp(token_hash) sur /auth/callback — compatible PKCE SSR.
+  // Plus fiable que action_link Supabase qui redirige en flux implicite (#access_token).
+  const url = new URL(`${SITE_URL}/auth/callback`);
+  url.searchParams.set("token_hash", hashedToken);
+  url.searchParams.set("type", "invite");
+  url.searchParams.set("next", OWNER_INVITE_NEXT_PATH);
+  return url.toString();
+}
+
 function extractInviteLink(
   linkData: {
-    properties?: { action_link?: string };
+    properties?: { action_link?: string; hashed_token?: string };
     action_link?: string;
+    hashed_token?: string;
   } | null
 ) {
+  const hashedToken =
+    linkData?.properties?.hashed_token ?? linkData?.hashed_token;
+  if (hashedToken) {
+    return buildAppInviteLink(hashedToken);
+  }
+
   return (
     linkData?.properties?.action_link ??
     linkData?.action_link ??
@@ -440,9 +458,8 @@ export async function resendOwnerInvite(
 
   const email = normalizeEmail(authData.user.email);
   const redirectTo = authCallbackUrl(OWNER_INVITE_NEXT_PATH);
-  let emailSent = false;
 
-  // 1) Relance invite (échoue souvent si le compte existe déjà)
+  // Relance mail invite (échoue souvent si le compte existe déjà)
   const { error: inviteError } = await admin.auth.admin.inviteUserByEmail(
     email,
     {
@@ -455,37 +472,22 @@ export async function resendOwnerInvite(
     }
   );
 
-  if (!inviteError) {
-    emailSent = true;
-  } else {
-    // 2) Magic link — envoie un vrai mail pour un compte existant
-    const { error: otpError } = await admin.auth.signInWithOtp({
-      email,
-      options: {
-        emailRedirectTo: redirectTo,
-        shouldCreateUser: false,
-      },
-    });
+  const emailSent = !inviteError;
 
-    if (!otpError) {
-      emailSent = true;
-    }
-  }
+  // Toujours fournir un lien manuel fiable (token_hash → /auth/callback).
+  // On ne s'appuie PAS sur signInWithOtp côté serveur : sous PKCE le navigateur
+  // du propriétaire n'a pas le code_verifier → faux positif « mail renvoyé ».
+  const generated = await generateOwnerInviteLink(email, redirectTo);
+  const inviteLink = generated.inviteLink;
 
-  // Lien manuel seulement si le mail n'est pas parti (évite d'invalider le token emailé)
-  let inviteLink: string | undefined;
-  if (!emailSent) {
-    const generated = await generateOwnerInviteLink(email, redirectTo);
-    inviteLink = generated.inviteLink;
-    if (!inviteLink) {
-      return {
-        success: false,
-        error:
-          inviteError?.message ||
-          generated.error?.message ||
-          "Impossible de renvoyer l'invitation",
-      };
-    }
+  if (!emailSent && !inviteLink) {
+    return {
+      success: false,
+      error:
+        inviteError?.message ||
+        generated.error?.message ||
+        "Impossible de renvoyer l'invitation",
+    };
   }
 
   revalidateOwnerPaths(ownerId);
@@ -494,6 +496,9 @@ export async function resendOwnerInvite(
     id: ownerId,
     emailSent,
     inviteLink,
+    warning: emailSent
+      ? "Email renvoyé si le SMTP Supabase est configuré. Conservez aussi le lien ci-dessous au cas où."
+      : "Le mail automatique n'a pas pu partir. Copiez le lien et envoyez-le au propriétaire (WhatsApp / SMS).",
   };
 }
 

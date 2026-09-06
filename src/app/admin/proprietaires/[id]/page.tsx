@@ -50,8 +50,9 @@ export default async function AdminOwnerDetailPage({
           <p className="mt-1 de-muted">
             Le propriétaire doit ouvrir le mail, accepter l&apos;invitation,
             puis choisir son mot de passe. Si le message n&apos;arrive pas
-            (indésirables), utilisez « Renvoyer l&apos;invitation email » dans
-            la section Compte.
+            (indésirables), cliquez « Renvoyer l&apos;invitation email » dans
+            Compte : un lien copiable s&apos;affiche pour l&apos;envoyer par
+            WhatsApp / SMS.
           </p>
         </div>
       )}
