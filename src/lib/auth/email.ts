@@ -45,8 +45,27 @@ export function validateRealOwnerEmail(raw: string): string | null {
 /** Destination après acceptation d'une invitation (choix du mot de passe). */
 export const OWNER_INVITE_NEXT_PATH = "/auth/definir-mot-de-passe";
 
-/** URL de retour après invitation / confirmation email Supabase. */
-export function authCallbackUrl(nextPath = OWNER_INVITE_NEXT_PATH) {
-  const next = nextPath.startsWith("/") ? nextPath : `/${nextPath}`;
-  return `${SITE_URL}/auth/callback?next=${encodeURIComponent(next)}`;
+/**
+ * URL de retour Auth (courte, sans query).
+ * Important Safari/iOS : le redirect_to ne doit pas être trop long ni passer
+ * par une redirection apex→www (sinon le #access_token est perdu).
+ * Le callback bascule ensuite vers OWNER_INVITE_NEXT_PATH par défaut.
+ */
+export function authCallbackUrl(_nextPath = OWNER_INVITE_NEXT_PATH) {
+  return `${SITE_URL}/auth/callback`;
+}
+
+/**
+ * Lien d'invitation court pour iPhone/Safari/WhatsApp.
+ * Évite le ConfirmationURL Supabase (JWT dans le hash = URL trop longue).
+ *
+ * Template email Supabase (Authentication → Emails → Invite) recommandé :
+ *   {{ .SiteURL }}/auth/callback?token_hash={{ .TokenHash }}&type=invite
+ * Site URL dashboard : https://www.dreameffect.fr
+ */
+export function buildOwnerInviteAppLink(tokenHash: string) {
+  const url = new URL(`${SITE_URL}/auth/callback`);
+  url.searchParams.set("token_hash", tokenHash);
+  url.searchParams.set("type", "invite");
+  return url.toString();
 }

@@ -150,6 +150,10 @@ export default function OwnerAccountActions({
             className="de-input w-full text-xs"
             onFocus={(e) => e.currentTarget.select()}
           />
+          <p className="text-xs de-muted">
+            À envoyer par WhatsApp/SMS sur iPhone — Safari refuse souvent le
+            lien trop long du mail.
+          </p>
         </div>
       )}
       {error && <p className="text-sm text-destructive">{error}</p>}

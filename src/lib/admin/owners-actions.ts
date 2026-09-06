@@ -7,11 +7,11 @@ import { requireAdmin } from "@/src/lib/admin/auth";
 import type { OwnerFormData } from "@/src/lib/admin/owners-types";
 import {
   authCallbackUrl,
+  buildOwnerInviteAppLink,
   normalizeEmail,
   OWNER_INVITE_NEXT_PATH,
   validateRealOwnerEmail,
 } from "@/src/lib/auth/email";
-import { SITE_URL } from "@/src/lib/public/site";
 
 type ActionResult = {
   success: boolean;
@@ -26,16 +26,6 @@ type InviteActionResult = ActionResult & {
   warning?: string;
 };
 
-function buildAppInviteLink(hashedToken: string) {
-  // Lien applicatif : verifyOtp(token_hash) sur /auth/callback — compatible PKCE SSR.
-  // Plus fiable que action_link Supabase qui redirige en flux implicite (#access_token).
-  const url = new URL(`${SITE_URL}/auth/callback`);
-  url.searchParams.set("token_hash", hashedToken);
-  url.searchParams.set("type", "invite");
-  url.searchParams.set("next", OWNER_INVITE_NEXT_PATH);
-  return url.toString();
-}
-
 function extractInviteLink(
   linkData: {
     properties?: { action_link?: string; hashed_token?: string };
@@ -45,8 +35,10 @@ function extractInviteLink(
 ) {
   const hashedToken =
     linkData?.properties?.hashed_token ?? linkData?.hashed_token;
+  // Toujours préférer le lien court token_hash (Safari/iOS refuse souvent
+  // les ConfirmationURL Supabase avec JWT dans le fragment).
   if (hashedToken) {
-    return buildAppInviteLink(hashedToken);
+    return buildOwnerInviteAppLink(hashedToken);
   }
 
   return (
@@ -414,12 +406,20 @@ export async function createOwnerAccount(
       }
     }
 
+    // Lien court token_hash : obligatoire pour Safari/iPhone (le mail
+    // Supabase par défaut envoie un ConfirmationURL trop long).
+    const { inviteLink } = await generateOwnerInviteLink(email, redirectTo);
+
     revalidateOwnerPaths(ownerId);
     return {
       success: true,
       id: ownerId,
       invited: true,
       emailSent: true,
+      inviteLink,
+      warning: inviteLink
+        ? "Sur iPhone/Safari, n'utilisez pas le lien du mail s'il refuse de s'ouvrir : copiez le lien ci-dessous et envoyez-le par WhatsApp/SMS."
+        : undefined,
     };
   } catch (error) {
     const message =
@@ -497,7 +497,7 @@ export async function resendOwnerInvite(
     emailSent,
     inviteLink,
     warning: emailSent
-      ? "Email renvoyé si le SMTP Supabase est configuré. Conservez aussi le lien ci-dessous au cas où."
+      ? "Un email a été demandé. Sur iPhone/Safari, préférez le lien copiable ci-dessous (WhatsApp/SMS) — le lien du mail peut être refusé."
       : "Le mail automatique n'a pas pu partir. Copiez le lien et envoyez-le au propriétaire (WhatsApp / SMS).",
   };
 }

@@ -48,11 +48,10 @@ export default async function AdminOwnerDetailPage({
         <div className="rounded-lg border border-[var(--blue-border)] bg-[color-mix(in_srgb,var(--blue-soft)_12%,transparent)] p-4 text-sm">
           <p className="font-medium">Invitation envoyée</p>
           <p className="mt-1 de-muted">
-            Le propriétaire doit ouvrir le mail, accepter l&apos;invitation,
-            puis choisir son mot de passe. Si le message n&apos;arrive pas
-            (indésirables), cliquez « Renvoyer l&apos;invitation email » dans
-            Compte : un lien copiable s&apos;affiche pour l&apos;envoyer par
-            WhatsApp / SMS.
+            Sur iPhone/Safari, le lien du mail peut être refusé (« impossible
+            d&apos;ouvrir la page »). Dans ce cas, cliquez « Renvoyer
+            l&apos;invitation » ci-dessous, copiez le lien affiché, et
+            envoyez-le par WhatsApp ou SMS.
           </p>
         </div>
       )}

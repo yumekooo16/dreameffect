@@ -54,8 +54,17 @@ const nextConfig: NextConfig = {
         destination: "/politique-de-confidentialite",
         permanent: true,
       },
+      // Auth : ne PAS rediriger apex → www. Les invitations Supabase
+      // renvoient #access_token=… ; une 308/301 supprime le fragment et
+      // Safari/iOS échoue (« impossible d'ouvrir la page ») ou perd la session.
       {
-        source: "/:path*",
+        source: "/",
+        has: [{ type: "host", value: "dreameffect.fr" }],
+        destination: "https://www.dreameffect.fr/",
+        permanent: true,
+      },
+      {
+        source: "/:path((?!auth/).+)",
         has: [{ type: "host", value: "dreameffect.fr" }],
         destination: "https://www.dreameffect.fr/:path*",
         permanent: true,
