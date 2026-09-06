@@ -56,15 +56,22 @@ export default function OwnerAccountActions({
       const result = await resendOwnerInvite(ownerId);
 
       if (result.success) {
-        setMessage(
-          result.inviteLink
-            ? "Lien d'invitation généré — transférez-le au propriétaire (email / WhatsApp) s'il n'a pas reçu le mail."
-            : "Invitation renvoyée sur l'email du propriétaire."
-        );
-        setInviteLink(result.inviteLink ?? null);
+        if (result.emailSent) {
+          setMessage(
+            "Invitation renvoyée sur l'email du propriétaire. S'il ne la reçoit pas, utilisez « Générer un lien » via un second clic après quelques minutes, ou vérifiez les indésirables."
+          );
+        } else if (result.inviteLink) {
+          setMessage(
+            "Le mail automatique n'a pas pu partir. Copiez le lien ci-dessous et transférez-le au propriétaire (email / WhatsApp)."
+          );
+          setInviteLink(result.inviteLink);
+        } else {
+          setMessage("Invitation traitée.");
+        }
         router.refresh();
       } else {
         setError(result.error ?? "Impossible de renvoyer l'invitation.");
+        if (result.inviteLink) setInviteLink(result.inviteLink);
       }
     });
   }
@@ -79,7 +86,8 @@ export default function OwnerAccountActions({
         <div className="space-y-2 rounded-lg border border-[var(--blue-border)] p-3">
           <p className="text-sm">
             Email {email ? <strong>{email}</strong> : ""} non vérifié — le
-            propriétaire doit accepter l&apos;invitation.
+            propriétaire doit accepter l&apos;invitation puis choisir son mot
+            de passe.
           </p>
           <button
             type="button"
