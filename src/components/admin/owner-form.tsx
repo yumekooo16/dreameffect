@@ -49,13 +49,13 @@ export default function OwnerForm({ cancelHref }: { cancelHref: string }) {
         setInviteLink(result.inviteLink);
         setSuccess(
           result.warning ??
-            "Compte créé. Transférez le lien d'invitation au propriétaire."
+            "Compte créé. Copiez le lien ci-dessous et envoyez-le au propriétaire (WhatsApp recommandé sur iPhone)."
         );
-        // Laisse le temps de copier le lien, puis ouvre la fiche
+        // Laisse le temps de copier le lien (Safari/iPhone)
         window.setTimeout(() => {
           router.push(`/admin/proprietaires/${result.id}`);
           router.refresh();
-        }, 2500);
+        }, 12000);
         return;
       }
 
@@ -240,8 +240,8 @@ export default function OwnerForm({ cancelHref }: { cancelHref: string }) {
             onFocus={(e) => e.currentTarget.select()}
           />
           <p className="text-xs de-muted">
-            Envoyez ce lien au propriétaire (email / WhatsApp). Il pourra
-            vérifier son adresse et choisir son mot de passe.
+            Sur iPhone, envoyez ce lien par WhatsApp ou SMS (le lien du mail
+            Supabase est souvent trop long pour Safari).
           </p>
         </div>
       )}
