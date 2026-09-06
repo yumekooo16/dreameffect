@@ -20,6 +20,7 @@ export default function OwnerForm({ cancelHref }: { cancelHref: string }) {
   const [form, setForm] = useState<OwnerFormData>(defaultForm);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [inviteLink, setInviteLink] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
   function updateField<K extends keyof OwnerFormData>(
@@ -33,19 +34,35 @@ export default function OwnerForm({ cancelHref }: { cancelHref: string }) {
     e.preventDefault();
     setError(null);
     setSuccess(null);
+    setInviteLink(null);
 
     startTransition(async () => {
       const result = await createOwnerAccount(form);
 
-      if (!result.success) {
+      if (!result.success || !result.id) {
         setError(result.error ?? "Une erreur est survenue");
+        if (result.inviteLink) setInviteLink(result.inviteLink);
+        return;
+      }
+
+      if (result.inviteLink) {
+        setInviteLink(result.inviteLink);
+        setSuccess(
+          result.warning ??
+            "Compte créé. Transférez le lien d'invitation au propriétaire."
+        );
+        // Laisse le temps de copier le lien, puis ouvre la fiche
+        window.setTimeout(() => {
+          router.push(`/admin/proprietaires/${result.id}`);
+          router.refresh();
+        }, 2500);
         return;
       }
 
       setSuccess(
         "Invitation envoyée sur l'email du propriétaire. Il devra cliquer le lien pour vérifier son adresse et choisir son mot de passe."
       );
-      router.push(`/admin/proprietaires/${result.id}`);
+      router.push(`/admin/proprietaires/${result.id}?invited=1`);
       router.refresh();
     });
   }
@@ -213,6 +230,21 @@ export default function OwnerForm({ cancelHref }: { cancelHref: string }) {
 
       {error && <p className="text-sm text-destructive">{error}</p>}
       {success && <p className="text-sm text-[var(--blue-soft)]">{success}</p>}
+      {inviteLink && (
+        <div className="space-y-2 rounded-lg border border-[var(--blue-border)] p-3">
+          <p className="de-label">Lien d&apos;invitation à transmettre</p>
+          <input
+            readOnly
+            value={inviteLink}
+            className="de-input w-full text-xs"
+            onFocus={(e) => e.currentTarget.select()}
+          />
+          <p className="text-xs de-muted">
+            Envoyez ce lien au propriétaire (email / WhatsApp). Il pourra
+            vérifier son adresse et choisir son mot de passe.
+          </p>
+        </div>
+      )}
 
       <div className="flex flex-wrap gap-2">
         <button

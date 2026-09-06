@@ -42,8 +42,11 @@ export function validateRealOwnerEmail(raw: string): string | null {
   return null;
 }
 
+/** Destination après acceptation d'une invitation (choix du mot de passe). */
+export const OWNER_INVITE_NEXT_PATH = "/auth/definir-mot-de-passe";
+
 /** URL de retour après invitation / confirmation email Supabase. */
-export function authCallbackUrl(nextPath = "/espace-proprietaire") {
+export function authCallbackUrl(nextPath = OWNER_INVITE_NEXT_PATH) {
   const next = nextPath.startsWith("/") ? nextPath : `/${nextPath}`;
   return `${SITE_URL}/auth/callback?next=${encodeURIComponent(next)}`;
 }

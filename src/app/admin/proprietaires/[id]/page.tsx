@@ -18,11 +18,14 @@ function ownerName(firstName?: string | null, lastName?: string | null) {
 
 export default async function AdminOwnerDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ invited?: string }>;
 }) {
   await requireAdmin();
   const { id } = await params;
+  const { invited } = await searchParams;
   const data = await fetchOwnerDetail(id);
 
   if (!data) {
@@ -31,6 +34,7 @@ export default async function AdminOwnerDetailPage({
 
   const { owner, vehicles, reservations, revenue, isActive, emailConfirmed } =
     data;
+  const justInvited = invited === "1" && !emailConfirmed;
   const whatsappUrl = owner.phone
     ? buildWhatsAppUrl(
         owner.phone,
@@ -40,6 +44,18 @@ export default async function AdminOwnerDetailPage({
 
   return (
     <div className="space-y-8">
+      {justInvited && (
+        <div className="rounded-lg border border-[var(--blue-border)] bg-[color-mix(in_srgb,var(--blue-soft)_12%,transparent)] p-4 text-sm">
+          <p className="font-medium">Invitation envoyée</p>
+          <p className="mt-1 de-muted">
+            Le propriétaire doit ouvrir le mail, accepter l&apos;invitation,
+            puis choisir son mot de passe. Si le message n&apos;arrive pas
+            (indésirables), utilisez « Renvoyer l&apos;invitation email » dans
+            la section Compte.
+          </p>
+        </div>
+      )}
+
       <div>
         <Link
           href="/admin/proprietaires"

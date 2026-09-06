@@ -8,6 +8,7 @@ import type { OwnerFormData } from "@/src/lib/admin/owners-types";
 import {
   authCallbackUrl,
   normalizeEmail,
+  OWNER_INVITE_NEXT_PATH,
   validateRealOwnerEmail,
 } from "@/src/lib/auth/email";
 
@@ -16,6 +17,45 @@ type ActionResult = {
   error?: string;
   id?: string;
 };
+
+type InviteActionResult = ActionResult & {
+  invited?: boolean;
+  inviteLink?: string;
+  emailSent?: boolean;
+  warning?: string;
+};
+
+function extractInviteLink(
+  linkData: {
+    properties?: { action_link?: string };
+    action_link?: string;
+  } | null
+) {
+  return (
+    linkData?.properties?.action_link ??
+    linkData?.action_link ??
+    undefined
+  );
+}
+
+async function generateOwnerInviteLink(email: string, redirectTo: string) {
+  const admin = createAdminClient();
+  const { data: linkData, error: linkError } =
+    await admin.auth.admin.generateLink({
+      type: "invite",
+      email,
+      options: { redirectTo },
+    });
+
+  if (linkError) {
+    return { inviteLink: undefined as string | undefined, error: linkError };
+  }
+
+  return {
+    inviteLink: extractInviteLink(linkData),
+    error: null,
+  };
+}
 
 function revalidateOwnerPaths(ownerId?: string) {
   revalidatePath("/admin/proprietaires");
@@ -211,7 +251,7 @@ async function findAuthUserByEmail(email: string) {
 
 export async function createOwnerAccount(
   data: OwnerFormData
-): Promise<ActionResult & { invited?: boolean }> {
+): Promise<InviteActionResult> {
   await requireAdmin();
 
   const validationError = validateOwnerForm(data);
@@ -223,6 +263,7 @@ export async function createOwnerAccount(
   const firstName = data.first_name.trim();
   const lastName = data.last_name.trim();
   const phone = data.phone.trim() || null;
+  const redirectTo = authCallbackUrl(OWNER_INVITE_NEXT_PATH);
 
   try {
     const admin = createAdminClient();
@@ -257,6 +298,8 @@ export async function createOwnerAccount(
 
     // Invitation = vrai email + vérification obligatoire (le propriétaire
     // choisit son mot de passe via le lien reçu).
+    // Note Supabase : inviteUserByEmail n'utilise pas PKCE — les tokens
+    // arrivent dans le hash ; /auth/callback est une page client.
     const { data: invited, error: inviteError } =
       await admin.auth.admin.inviteUserByEmail(email, {
         data: {
@@ -264,10 +307,40 @@ export async function createOwnerAccount(
           last_name: lastName,
           role: "owner",
         },
-        redirectTo: authCallbackUrl("/espace-proprietaire"),
+        redirectTo,
       });
 
     if (inviteError || !invited.user) {
+      // Utilisateur orphelin éventuel (email SMTP en échec après création)
+      const orphan = await findAuthUserByEmail(email);
+      if (orphan && !orphan.email_confirmed_at) {
+        const revenueFields = revenueFieldsFromForm(data);
+        await admin.from("profiles").upsert(
+          {
+            id: orphan.id,
+            first_name: firstName || null,
+            last_name: lastName || null,
+            phone,
+            email,
+            role: "owner",
+            ...revenueFields,
+          },
+          { onConflict: "id" }
+        );
+
+        const { inviteLink } = await generateOwnerInviteLink(email, redirectTo);
+        revalidateOwnerPaths(orphan.id);
+        return {
+          success: true,
+          id: orphan.id,
+          invited: true,
+          emailSent: false,
+          inviteLink,
+          warning:
+            "Le mail automatique n'a pas pu partir. Copiez le lien d'invitation ci-dessous.",
+        };
+      }
+
       return {
         success: false,
         error:
@@ -324,7 +397,12 @@ export async function createOwnerAccount(
     }
 
     revalidateOwnerPaths(ownerId);
-    return { success: true, id: ownerId, invited: true };
+    return {
+      success: true,
+      id: ownerId,
+      invited: true,
+      emailSent: true,
+    };
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Erreur inattendue";
@@ -334,7 +412,7 @@ export async function createOwnerAccount(
 
 export async function resendOwnerInvite(
   ownerId: string
-): Promise<ActionResult & { inviteLink?: string }> {
+): Promise<InviteActionResult> {
   await requireAdmin();
 
   if (!ownerId.trim()) {
@@ -361,9 +439,10 @@ export async function resendOwnerInvite(
   }
 
   const email = normalizeEmail(authData.user.email);
-  const redirectTo = authCallbackUrl("/espace-proprietaire");
+  const redirectTo = authCallbackUrl(OWNER_INVITE_NEXT_PATH);
+  let emailSent = false;
 
-  // Relance l'email d'invitation (si le projet Auth/SMTP est configuré)
+  // 1) Relance invite (échoue souvent si le compte existe déjà)
   const { error: inviteError } = await admin.auth.admin.inviteUserByEmail(
     email,
     {
@@ -377,37 +456,44 @@ export async function resendOwnerInvite(
   );
 
   if (!inviteError) {
-    revalidateOwnerPaths(ownerId);
-    return { success: true, id: ownerId };
-  }
-
-  // Utilisateur déjà créé : générer un lien à transmettre (email / WhatsApp)
-  const { data: linkData, error: linkError } =
-    await admin.auth.admin.generateLink({
-      type: "invite",
+    emailSent = true;
+  } else {
+    // 2) Magic link — envoie un vrai mail pour un compte existant
+    const { error: otpError } = await admin.auth.signInWithOtp({
       email,
-      options: { redirectTo },
+      options: {
+        emailRedirectTo: redirectTo,
+        shouldCreateUser: false,
+      },
     });
 
-  if (linkError) {
-    return {
-      success: false,
-      error:
-        inviteError.message ||
-        linkError.message ||
-        "Impossible de renvoyer l'invitation",
-    };
+    if (!otpError) {
+      emailSent = true;
+    }
   }
 
-  const inviteLink =
-    linkData?.properties?.action_link ??
-    (linkData as { action_link?: string } | null)?.action_link;
+  // Lien manuel seulement si le mail n'est pas parti (évite d'invalider le token emailé)
+  let inviteLink: string | undefined;
+  if (!emailSent) {
+    const generated = await generateOwnerInviteLink(email, redirectTo);
+    inviteLink = generated.inviteLink;
+    if (!inviteLink) {
+      return {
+        success: false,
+        error:
+          inviteError?.message ||
+          generated.error?.message ||
+          "Impossible de renvoyer l'invitation",
+      };
+    }
+  }
 
   revalidateOwnerPaths(ownerId);
   return {
     success: true,
     id: ownerId,
-    inviteLink: inviteLink || undefined,
+    emailSent,
+    inviteLink,
   };
 }
 
