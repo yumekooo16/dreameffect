@@ -3866,6 +3866,105 @@ button.de-list-item {
   line-height: 1.5;
 }
 
+.de-booking-section--compact {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+}
+
+.de-booking-unit-hint {
+  font-weight: 400;
+  color: var(--text-muted);
+  font-size: 0.8em;
+}
+
+.de-booking-km-note {
+  margin-top: 1rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+.de-booking-docs {
+  margin-top: 1rem;
+}
+
+.de-booking-docs--muted {
+  margin-top: 1.25rem;
+  opacity: 0.92;
+}
+
+.de-booking-docs-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.de-booking-docs-list {
+  margin: 0.55rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.de-booking-docs-list li {
+  position: relative;
+  padding-left: 1rem;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+
+.de-booking-docs-list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.45em;
+  width: 0.35rem;
+  height: 0.35rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--blue-soft) 70%, transparent);
+}
+
+.de-vehicle-detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.85rem 1.15rem;
+  margin: 1.1rem 0 1.35rem;
+}
+
+.de-vehicle-detail-book-btn {
+  gap: 0.45rem;
+}
+
+.de-booking-sticky {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--dock-h, 4.25rem) + env(safe-area-inset-bottom, 0px) + 0.65rem);
+  z-index: 40;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+  padding: 0 1rem;
+}
+
+.de-booking-sticky-btn {
+  pointer-events: auto;
+  gap: 0.45rem;
+  box-shadow: 0 10px 30px color-mix(in srgb, #000 35%, transparent);
+}
+
+@media (min-width: 900px) {
+  .de-booking-sticky {
+    display: none;
+  }
+}
+
 .de-public-vehicle-card-gradient {
   position: absolute;
   left: 0;

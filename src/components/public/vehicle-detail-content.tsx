@@ -2,6 +2,7 @@ import Link from "next/link";
 import VehicleGallery from "@/src/components/public/vehicle-gallery";
 import VehiclePricingTable from "@/src/components/public/vehicle-pricing-table";
 import VehicleBookingPanel from "@/src/components/public/vehicle-booking-panel";
+import VehicleBookingStickyCta from "@/src/components/public/vehicle-booking-sticky-cta";
 import {
   formatPower,
   getFuelLabel,
@@ -49,6 +50,7 @@ export default function VehicleDetailContent({
     location: vehicle.location,
   });
   const fromPrice = formatPrice(getLowestRentalPrice(vehicle.pricing));
+  const canBook = vehicle.status === "available";
 
   return (
     <section className="de-section de-section-compact">
@@ -90,6 +92,21 @@ export default function VehicleDetailContent({
               </div>
             )}
 
+            <div className="de-vehicle-detail-actions">
+              <a
+                href="#reservation"
+                className="de-btn de-btn-primary de-vehicle-detail-book-btn"
+              >
+                Choisir mes dates
+              </a>
+              <Link
+                href={`${PUBLIC_ROUTES.calendar}?vehicule=${encodeURIComponent(vehicle.slug)}`}
+                className="de-keys-link"
+              >
+                Voir le calendrier flotte
+              </Link>
+            </div>
+
             <VehiclePricingTable pricing={vehicle.pricing} />
 
             <dl className="de-fleet-specs de-vehicle-detail-specs">
@@ -119,6 +136,8 @@ export default function VehicleDetailContent({
 
         <VehicleBookingPanel vehicle={vehicle} availability={availability} />
       </div>
+
+      <VehicleBookingStickyCta disabled={!canBook} />
     </section>
   );
 }

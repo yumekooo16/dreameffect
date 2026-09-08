@@ -12,10 +12,11 @@ import {
   fetchPublicVehicleBySlug,
   fetchPublicVehicles,
 } from "@/src/lib/public/vehicles-data";
+import type { PublicVehicleDetail } from "@/src/lib/public/vehicles-types";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Calendrier des réservations",
-  description: `Consultez les disponibilités de la flotte DreamEffect à ${formatServiceAreaLabel()}. Choisissez un véhicule et voyez les dates déjà réservées.`,
+  description: `Consultez les disponibilités de la flotte DreamEffect à ${formatServiceAreaLabel()}. Choisissez un véhicule, estimez votre location et envoyez votre demande.`,
   path: PUBLIC_ROUTES.calendar,
   keywords: [
     "calendrier réservation voiture",
@@ -40,6 +41,7 @@ export default async function CalendarPage({ searchParams }: PageProps) {
   const heroImageUrl = resolveHeroImageUrl(vehicles);
 
   let selectedSlug: string | null = null;
+  let selectedVehicle: PublicVehicleDetail | null = null;
   let availability = null;
 
   if (requestedSlug) {
@@ -48,10 +50,25 @@ export default async function CalendarPage({ searchParams }: PageProps) {
 
     if (published) {
       selectedSlug = published.slug;
+      selectedVehicle = published;
       availability = await fetchVehicleAvailability(published.id);
     } else if (fromList) {
       // Fallback démo : pas de vrai calendrier métier
       selectedSlug = fromList.slug;
+      selectedVehicle = {
+        ...fromList,
+        color: null,
+        images: fromList.image_url
+          ? [
+              {
+                id: `${fromList.id}-primary`,
+                image_url: fromList.image_url,
+                is_primary: true,
+                imageFrame: fromList.imageFrame,
+              },
+            ]
+          : [],
+      };
       availability = { blockedPeriods: [], maintenanceDays: [] };
     }
   }
@@ -69,7 +86,7 @@ export default async function CalendarPage({ searchParams }: PageProps) {
       />
       <PageHero
         title="Calendrier des réservations"
-        description="Choisissez un véhicule de la flotte, puis consultez les dates déjà réservées. Lien pratique pour Instagram et le partage rapide."
+        description="Choisissez un véhicule, consultez les dates libres, estimez votre location et envoyez votre demande — idéal depuis Instagram."
         imageUrl={heroImageUrl}
       />
       <section className="de-section de-section-compact">
@@ -77,6 +94,7 @@ export default async function CalendarPage({ searchParams }: PageProps) {
           <ReservationCalendar
             vehicles={vehicles}
             selectedSlug={selectedSlug}
+            selectedVehicle={selectedVehicle}
             availability={availability}
           />
         </div>
