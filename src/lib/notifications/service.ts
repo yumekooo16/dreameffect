@@ -8,7 +8,7 @@ export async function createNotification(
   supabase: SupabaseClient,
   payload: CreateNotificationInput
 ) {
-  await supabase.from("notifications").insert({
+  const { error } = await supabase.from("notifications").insert({
     profile_id: payload.profile_id,
     type: payload.type,
     title: payload.title,
@@ -18,6 +18,14 @@ export async function createNotification(
     related_id: payload.related_id,
     created_by: payload.created_by,
   });
+
+  if (error) {
+    console.error("[createNotification]", error.message, {
+      type: payload.type,
+      profile_id: payload.profile_id,
+    });
+    throw new Error(error.message);
+  }
 }
 
 export async function notifyAllAdmins(
@@ -32,10 +40,20 @@ export async function notifyAllAdmins(
     priority?: NotificationPriority;
   }
 ) {
-  const { data: admins } = await supabase
+  const { data: admins, error } = await supabase
     .from("profiles")
     .select("id")
     .eq("role", "admin");
+
+  if (error) {
+    console.error("[notifyAllAdmins:lookup]", error.message);
+    throw new Error(error.message);
+  }
+
+  if (!admins?.length) {
+    console.error("[notifyAllAdmins] aucun profil admin trouvé");
+    return;
+  }
 
   for (const admin of admins ?? []) {
     if (admin.id === payload.excludeProfileId) continue;
@@ -96,6 +114,24 @@ export async function notifySystemEvent(
     priority?: NotificationPriority;
   }
 ) {
+  const { data: admins, error } = await supabase
+    .from("profiles")
+    .select("id")
+    .eq("role", "admin");
+
+  if (error) {
+    console.error("[notifySystemEvent:lookup]", error.message);
+    throw new Error(error.message);
+  }
+
+  if (!admins?.length) {
+    console.error("[notifySystemEvent] aucun profil admin trouvé");
+    return;
+  }
+
+  const actorId = payload.ownerId ?? admins[0]?.id;
+  if (!actorId) return;
+
   if (payload.ownerId) {
     await createNotification(supabase, {
       profile_id: payload.ownerId,
@@ -103,24 +139,22 @@ export async function notifySystemEvent(
       title: payload.title,
       message: payload.message,
       related_id: payload.related_id,
-      created_by: payload.ownerId,
+      created_by: actorId,
       priority: payload.priority,
     });
   }
 
-  const { data: admins } = await supabase
-    .from("profiles")
-    .select("id")
-    .eq("role", "admin");
+  for (const admin of admins) {
+    // Évite le doublon si le propriétaire est aussi admin
+    if (admin.id === payload.ownerId) continue;
 
-  for (const admin of admins ?? []) {
     await createNotification(supabase, {
       profile_id: admin.id,
       type: payload.type,
       title: payload.title,
       message: payload.message,
       related_id: payload.related_id,
-      created_by: admin.id,
+      created_by: actorId,
       priority: payload.priority,
     });
   }
