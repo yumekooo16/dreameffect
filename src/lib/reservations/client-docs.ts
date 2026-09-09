@@ -77,8 +77,17 @@ export function isReservationDocType(value: string): value is ReservationDocType
   return RESERVATION_DOC_TYPES.some((item) => item.value === value);
 }
 
+export function resolvePublicSiteOrigin() {
+  // Sur les previews Vercel, le lien doit pointer vers le déploiement courant
+  // (sinon il tombe sur la prod où la route n'existe pas encore).
+  if (process.env.VERCEL_ENV === "preview" && process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL.replace(/^https?:\/\//, "")}`;
+  }
+  return SITE_URL;
+}
+
 export function buildDossierPublicUrl(token: string) {
-  return `${SITE_URL}/dossier/${token}`;
+  return `${resolvePublicSiteOrigin()}/dossier/${token}`;
 }
 
 export function buildDossierWhatsAppMessage({
