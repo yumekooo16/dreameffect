@@ -3,6 +3,61 @@ import type {
   CreateNotificationInput,
   NotificationPriority,
 } from "@/src/lib/notifications/types";
+import { SITE_URL } from "@/src/lib/public/site";
+
+function deepLinkForNotification(
+  type: string,
+  relatedId: string,
+  role?: string | null
+) {
+  const isOwner = role === "owner";
+
+  if (type.startsWith("reservation") || type.includes("reservation")) {
+    return isOwner
+      ? `${SITE_URL}/espace-proprietaire`
+      : `${SITE_URL}/admin/reservations/${relatedId}`;
+  }
+  if (type.startsWith("maintenance")) {
+    return isOwner
+      ? `${SITE_URL}/espace-proprietaire`
+      : `${SITE_URL}/admin/maintenance`;
+  }
+  if (type.includes("document")) {
+    return isOwner
+      ? `${SITE_URL}/espace-proprietaire`
+      : `${SITE_URL}/admin/documents`;
+  }
+  if (type === "contact_lead") {
+    return `${SITE_URL}/admin/contacts`;
+  }
+  return isOwner ? `${SITE_URL}/espace-proprietaire` : `${SITE_URL}/admin`;
+}
+
+async function dispatchPush(
+  supabase: SupabaseClient,
+  payload: CreateNotificationInput
+) {
+  try {
+    const { sendPushToProfile } = await import("@/src/lib/pwa/push-server");
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", payload.profile_id)
+      .maybeSingle();
+
+    await sendPushToProfile(supabase, payload.profile_id, {
+      title: payload.title,
+      body: payload.message,
+      url: deepLinkForNotification(
+        payload.type,
+        payload.related_id,
+        profile?.role
+      ),
+    });
+  } catch (error) {
+    console.error("[dispatchPush]", error);
+  }
+}
 
 export async function createNotification(
   supabase: SupabaseClient,
@@ -26,6 +81,8 @@ export async function createNotification(
     });
     throw new Error(error.message);
   }
+
+  await dispatchPush(supabase, payload);
 }
 
 export async function notifyAllAdmins(
@@ -145,7 +202,6 @@ export async function notifySystemEvent(
   }
 
   for (const admin of admins) {
-    // Évite le doublon si le propriétaire est aussi admin
     if (admin.id === payload.ownerId) continue;
 
     await createNotification(supabase, {

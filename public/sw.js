@@ -1,9 +1,9 @@
 /* DreamEffect — Service Worker PWA
  * Cache intelligent : assets statiques oui, données Supabase/API non.
- * Push notifications : architecture préparée (voir src/lib/pwa/push.ts).
+ * Push notifications : voir src/lib/pwa/push.ts + push-server.ts.
  */
 
-const CACHE_VERSION = "dreameffect-v3";
+const CACHE_VERSION = "dreameffect-v14";
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const OFFLINE_URL = "/offline";
 
@@ -112,7 +112,7 @@ self.addEventListener("fetch", (event) => {
   );
 });
 
-/* --- Push notifications (intégration future) --- */
+/* --- Push notifications --- */
 
 self.addEventListener("push", (event) => {
   if (!event.data) return;
@@ -132,7 +132,9 @@ self.addEventListener("push", (event) => {
     vibrate: [100, 50, 100],
   };
 
-  event.waitUntil(self.registration.showNotification(payload.title || "DreamEffect", options));
+  event.waitUntil(
+    self.registration.showNotification(payload.title || "DreamEffect", options)
+  );
 });
 
 self.addEventListener("notificationclick", (event) => {
@@ -144,6 +146,9 @@ self.addEventListener("notificationclick", (event) => {
       .matchAll({ type: "window", includeUncontrolled: true })
       .then((clientList) => {
         for (const client of clientList) {
+          if (client.url && "navigate" in client) {
+            return client.navigate(targetUrl).then((c) => (c ? c.focus() : undefined));
+          }
           if ("focus" in client) return client.focus();
         }
         return self.clients.openWindow(targetUrl);

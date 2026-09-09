@@ -1,6 +1,5 @@
 /**
- * Architecture push notifications — préparée pour intégration future.
- * Ne pas activer tant que les clés VAPID et le backend ne sont pas configurés.
+ * Push notifications client — DreamEffect PWA
  */
 
 export type PushPayload = {
@@ -15,11 +14,22 @@ const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
 
 export function isPushSupported(): boolean {
   if (typeof window === "undefined") return false;
-  return "serviceWorker" in navigator && "PushManager" in window;
+  return (
+    "serviceWorker" in navigator &&
+    "PushManager" in window &&
+    "Notification" in window
+  );
 }
 
 export function isVapidConfigured(): boolean {
-  return Boolean(VAPID_PUBLIC_KEY);
+  return Boolean(VAPID_PUBLIC_KEY?.trim());
+}
+
+export function getNotificationPermission(): NotificationPermission | "unsupported" {
+  if (typeof window === "undefined" || !("Notification" in window)) {
+    return "unsupported";
+  }
+  return Notification.permission;
 }
 
 /** Convertit une clé VAPID base64url en Uint8Array pour PushManager.subscribe */
@@ -34,24 +44,22 @@ export function urlBase64ToUint8Array(base64String: string): Uint8Array {
   return outputArray;
 }
 
-/**
- * Récupère l'enregistrement du service worker prêt pour les push.
- * À appeler depuis un composant client une fois les notifications activées.
- */
 export async function getPushReadyRegistration(): Promise<ServiceWorkerRegistration | null> {
   if (!isPushSupported()) return null;
   return navigator.serviceWorker.ready;
 }
 
-/**
- * Abonnement push — stub pour intégration future.
- * Brancher ici l'appel serveur (Server Action / API) pour persister la subscription.
- */
 export async function subscribeToPush(): Promise<PushSubscription | null> {
   if (!isPushSupported() || !isVapidConfigured()) return null;
 
+  const permission = await Notification.requestPermission();
+  if (permission !== "granted") return null;
+
   const registration = await getPushReadyRegistration();
   if (!registration) return null;
+
+  const existing = await registration.pushManager.getSubscription();
+  if (existing) return existing;
 
   return registration.pushManager.subscribe({
     userVisibleOnly: true,
@@ -59,4 +67,23 @@ export async function subscribeToPush(): Promise<PushSubscription | null> {
       VAPID_PUBLIC_KEY!
     ) as BufferSource,
   });
+}
+
+export async function unsubscribeFromPush(): Promise<boolean> {
+  const registration = await getPushReadyRegistration();
+  if (!registration) return false;
+  const existing = await registration.pushManager.getSubscription();
+  if (!existing) return true;
+  return existing.unsubscribe();
+}
+
+export function serializationPushSubscription(subscription: PushSubscription) {
+  const json = subscription.toJSON();
+  return {
+    endpoint: json.endpoint ?? subscription.endpoint,
+    keys: {
+      p256dh: json.keys?.p256dh ?? "",
+      auth: json.keys?.auth ?? "",
+    },
+  };
 }

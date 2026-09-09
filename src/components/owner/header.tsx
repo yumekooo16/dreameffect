@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import SignOutButton from "@/src/components/auth/sign-out-button";
+import PushEnableButton from "@/src/components/pwa/push-enable-button";
 import NotificationsBell from "./notifications-bell";
 
 function titleForPath(pathname: string) {
@@ -40,6 +41,7 @@ export default function OwnerHeader() {
         </Link>
 
         <div className="de-app-header-actions">
+          <PushEnableButton />
           <NotificationsBell />
           <SignOutButton className="de-btn de-btn-ghost de-app-header-signout text-xs" />
         </div>
