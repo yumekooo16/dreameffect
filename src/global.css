@@ -326,6 +326,47 @@ body {
   font-size: 0.7rem;
 }
 
+.de-push-enable {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.de-push-enable-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  min-width: 2.25rem;
+  min-height: 2.25rem;
+  padding: 0.4rem;
+}
+
+.de-push-enable--compact .de-push-enable-feedback {
+  position: absolute;
+  top: calc(100% + 0.35rem);
+  right: 0;
+  z-index: 40;
+  width: min(16rem, 70vw);
+  padding: 0.55rem 0.7rem;
+  border-radius: 0.65rem;
+  border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+  background: var(--surface, #fff);
+  box-shadow: 0 8px 24px color-mix(in srgb, #000 12%, transparent);
+}
+
+.de-push-enable-msg {
+  margin: 0;
+  font-size: 0.72rem;
+  color: var(--text);
+}
+
+.de-push-enable-error {
+  margin: 0;
+  font-size: 0.72rem;
+  color: color-mix(in srgb, #b42318 85%, var(--text));
+}
+
 .de-app-header-tabs {
   display: none;
   gap: 0.35rem;

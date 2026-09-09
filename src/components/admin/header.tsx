@@ -15,6 +15,7 @@ import {
   MessageSquare,
 } from "lucide-react";
 import NotificationsBell from "@/src/components/owner/notifications-bell";
+import PushEnableButton from "@/src/components/pwa/push-enable-button";
 
 const NAV_ITEMS = [
   {
@@ -96,6 +97,7 @@ export default function AdminHeader() {
         </Link>
 
         <div className="de-app-header-actions">
+          <PushEnableButton />
           <NotificationsBell />
           <SignOutButton className="de-btn de-btn-ghost de-app-header-signout text-xs" />
         </div>
