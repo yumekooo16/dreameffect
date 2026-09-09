@@ -2,6 +2,8 @@ import type { ReservationRow } from "@/src/lib/admin/dashboard-data";
 
 export type ReservationRecord = ReservationRow & {
   customer_email?: string | null;
+  customer_phone?: string | null;
+  docs_status?: string | null;
   pickup_location?: string | null;
   return_location?: string | null;
   created_at?: string | null;

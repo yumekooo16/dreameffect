@@ -5,6 +5,10 @@ import {
   fetchVehiclesForReservationForm,
 } from "@/src/lib/admin/reservations-data";
 import {
+  fetchActiveUploadToken,
+  fetchReservationClientDocuments,
+} from "@/src/lib/admin/reservation-docs-data";
+import {
   getReservationStatusBadgeClass,
   getReservationStatusLabel,
 } from "@/src/lib/reservations/status";
@@ -13,6 +17,7 @@ import Section from "@/src/components/owner/section";
 import VehicleImage from "@/src/components/owner/vehicle-image";
 import ReservationActionsPanel from "@/src/components/admin/reservation-actions";
 import ReservationDeleteButton from "@/src/components/admin/reservation-delete-button";
+import ReservationDocsPanel from "@/src/components/admin/reservation-docs-panel";
 
 function formatEuro(amount?: number | null) {
   return `${Number(amount ?? 0).toLocaleString("fr-FR")} €`;
@@ -43,6 +48,11 @@ export default async function ReservationDetailPage({
   if (!reservation) {
     notFound();
   }
+
+  const [documents, activeToken] = await Promise.all([
+    fetchReservationClientDocuments(reservation.id),
+    fetchActiveUploadToken(reservation.id),
+  ]);
 
   const { vehicles, revenueConfigs } = formData;
 
@@ -203,6 +213,15 @@ export default async function ReservationDetailPage({
             </p>
           </div>
         </div>
+      </Section>
+
+      <Section title="Documents locataire">
+        <ReservationDocsPanel
+          reservationId={reservation.id}
+          docsStatus={reservation.docs_status ?? "missing"}
+          documents={documents}
+          activeToken={activeToken}
+        />
       </Section>
 
       <Section title="Actions administrateur">

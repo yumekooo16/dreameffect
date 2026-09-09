@@ -98,17 +98,42 @@ export async function fetchReservationDetail(
   const { data: reservation, error } = await supabase
     .from("reservations")
     .select(
-      "id, vehicle_id, start_date, end_date, customer_name, customer_email, pickup_location, return_location, status, owner_amount, company_amount, total_price, distance_km, created_at, updated_at"
+      "id, vehicle_id, start_date, end_date, customer_name, customer_email, customer_phone, docs_status, pickup_location, return_location, status, owner_amount, company_amount, total_price, distance_km, created_at, updated_at"
     )
     .eq("id", reservationId)
     .single();
 
   if (error || !reservation) {
+    // Fallback si la migration dossier n'est pas encore appliquée
+    if (error?.message?.includes("docs_status") || error?.message?.includes("customer_phone")) {
+      const fallback = await supabase
+        .from("reservations")
+        .select(
+          "id, vehicle_id, start_date, end_date, customer_name, customer_email, pickup_location, return_location, status, owner_amount, company_amount, total_price, distance_km, created_at, updated_at"
+        )
+        .eq("id", reservationId)
+        .single();
+
+      if (fallback.error || !fallback.data) {
+        return null;
+      }
+
+      return buildReservationDetail(supabase, {
+        ...fallback.data,
+        docs_status: "missing",
+        customer_phone: null,
+      } as ReservationRecord);
+    }
     return null;
   }
 
-  const record = reservation as ReservationRecord;
+  return buildReservationDetail(supabase, reservation as ReservationRecord);
+}
 
+async function buildReservationDetail(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  record: ReservationRecord
+): Promise<ReservationDetail | null> {
   const { data: dashboardVehicle } = await supabase
     .from("owner_vehicle_dashboard")
     .select("vehicle_id, brand, model, image_url, owner_id")

@@ -8,6 +8,7 @@ const DISALLOW = [
   "/redirect",
   "/offline",
   "/api/",
+  "/dossier/",
 ];
 
 /** Crawlers IA — accès au site vitrine public (ChatGPT, Perplexity, etc.). */
