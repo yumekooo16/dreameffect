@@ -29,23 +29,23 @@ function extensionForMime(mime: string, filename: string) {
   return "jpg";
 }
 
-function isUploadBlob(value: FormDataEntryValue | null): value is Blob {
+function isUploadBlob(value: FormDataEntryValue | null): boolean {
+  if (value == null || typeof value === "string") return false;
+  const blob = value as Blob;
   return (
-    typeof value === "object" &&
-    value !== null &&
-    typeof (value as Blob).arrayBuffer === "function" &&
-    typeof (value as Blob).size === "number" &&
-    (value as Blob).size > 0
+    typeof blob.arrayBuffer === "function" &&
+    typeof blob.size === "number" &&
+    blob.size > 0
   );
 }
 
-function blobFilename(value: Blob, fallback: string) {
+function blobFilename(value: FormDataEntryValue, fallback: string) {
   if (value instanceof File && value.name) return value.name;
   return fallback;
 }
 
-function blobMime(value: Blob, filename: string) {
-  const typed = (value.type || "").toLowerCase();
+function blobMime(value: FormDataEntryValue, filename: string) {
+  const typed = value instanceof Blob ? (value.type || "").toLowerCase() : "";
   if (typed && typed !== "application/octet-stream") return typed;
   if (/\.pdf$/i.test(filename)) return "application/pdf";
   if (/\.png$/i.test(filename)) return "image/png";
@@ -98,7 +98,9 @@ export async function submitReservationDossier(
 
     for (const docType of RESERVATION_DOC_TYPES) {
       const value = formData.get(docType.fieldName);
-      if (!isUploadBlob(value)) continue;
+      if (!isUploadBlob(value) || value == null || typeof value === "string") {
+        continue;
+      }
 
       const filename = blobFilename(value, `${docType.value}.jpg`);
       const mime = blobMime(value, filename);
