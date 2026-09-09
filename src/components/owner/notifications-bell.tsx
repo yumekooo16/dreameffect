@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Bell } from "lucide-react";
 import { createClient } from "@/src/lib/supabase/client";
 import Notifications from "@/src/components/notifications";
@@ -18,29 +18,108 @@ type Notification = {
 export default function NotificationsBell() {
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [loaded, setLoaded] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [userId, setUserId] = useState<string | null>(null);
   const panelRef = useRef<HTMLDivElement>(null);
 
+  const refreshUnreadCount = useCallback(async (uid?: string | null) => {
+    const supabase = createClient();
+    const profileId =
+      uid ??
+      (await supabase.auth.getUser()).data.user?.id ??
+      null;
+    if (!profileId) return;
+
+    const { count } = await supabase
+      .from("notifications")
+      .select("id", { count: "exact", head: true })
+      .eq("profile_id", profileId)
+      .eq("is_read", false);
+
+    setUnreadCount(count ?? 0);
+  }, []);
+
+  const loadNotifications = useCallback(async () => {
+    setLoading(true);
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+
+    setUserId(user.id);
+
+    const { data } = await supabase
+      .from("notifications")
+      .select("id, type, title, message, is_read, priority, created_at")
+      .eq("profile_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(20);
+
+    if (data) {
+      setNotifications(data);
+      setUnreadCount(data.filter((n) => !n.is_read).length);
+    }
+    setLoading(false);
+  }, []);
+
   useEffect(() => {
-    async function loadCount() {
+    async function init() {
       const supabase = createClient();
       const {
         data: { user },
       } = await supabase.auth.getUser();
       if (!user) return;
-
-      const { count } = await supabase
-        .from("notifications")
-        .select("id", { count: "exact", head: true })
-        .eq("profile_id", user.id)
-        .eq("is_read", false);
-
-      setUnreadCount(count ?? 0);
+      setUserId(user.id);
+      await refreshUnreadCount(user.id);
     }
 
-    loadCount();
-  }, []);
+    void init();
+  }, [refreshUnreadCount]);
+
+  // Temps réel : nouvelle notif → badge + liste
+  useEffect(() => {
+    if (!userId) return;
+
+    const supabase = createClient();
+    const channel = supabase
+      .channel(`notifications-bell-${userId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "notifications",
+          filter: `profile_id=eq.${userId}`,
+        },
+        (payload) => {
+          const row = payload.new as Notification;
+          setNotifications((prev) => {
+            if (prev.some((n) => n.id === row.id)) return prev;
+            return [row, ...prev].slice(0, 20);
+          });
+          setUnreadCount((count) => count + (row.is_read ? 0 : 1));
+        }
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, [userId]);
+
+  // Polling de secours (onglet ouvert sans realtime)
+  useEffect(() => {
+    if (!userId) return;
+    const timer = window.setInterval(() => {
+      void refreshUnreadCount(userId);
+    }, 30_000);
+    return () => window.clearInterval(timer);
+  }, [userId, refreshUnreadCount]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -59,31 +138,10 @@ export default function NotificationsBell() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [open]);
 
-  async function loadNotifications() {
-    const supabase = createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) return;
-
-    const { data } = await supabase
-      .from("notifications")
-      .select("id, type, title, message, is_read, priority, created_at")
-      .eq("profile_id", user.id)
-      .order("created_at", { ascending: false })
-      .limit(15);
-
-    if (data) {
-      setNotifications(data);
-      setUnreadCount(data.filter((n) => !n.is_read).length);
-    }
-    setLoaded(true);
-  }
-
   async function handleOpen() {
     const next = !open;
     setOpen(next);
-    if (next && !loaded) {
+    if (next) {
       await loadNotifications();
     }
   }
@@ -158,7 +216,7 @@ export default function NotificationsBell() {
           </div>
 
           <div className="max-h-80 overflow-y-auto p-3">
-            {!loaded ? (
+            {loading && notifications.length === 0 ? (
               <p className="de-empty py-4 text-center">Chargement...</p>
             ) : (
               <Notifications

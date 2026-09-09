@@ -207,13 +207,13 @@ export async function submitReservationDossier(
 
     const { data: reservation } = await admin
       .from("reservations")
-      .select("id, customer_name, vehicles(brand, model)")
+      .select("id, customer_name, vehicle_id, vehicles(brand, model, owner_id)")
       .eq("id", tokenRow.reservation_id)
       .maybeSingle();
 
     const vehicleRaw = reservation?.vehicles as
-      | { brand: string; model: string }
-      | { brand: string; model: string }[]
+      | { brand: string; model: string; owner_id?: string }
+      | { brand: string; model: string; owner_id?: string }[]
       | null
       | undefined;
     const vehicle = Array.isArray(vehicleRaw) ? vehicleRaw[0] : vehicleRaw;
@@ -227,6 +227,7 @@ export async function submitReservationDossier(
 
     try {
       await notifySystemEvent(admin, {
+        ownerId: vehicle?.owner_id ?? null,
         type: "reservation_docs_uploaded",
         title:
           docsStatus === "complete"
@@ -238,6 +239,7 @@ export async function submitReservationDossier(
       });
     } catch (notifyError) {
       console.error("[submitReservationDossier:notify]", notifyError);
+      // L'upload a réussi : on ne bloque pas le client, mais on journalise fort.
     }
 
     revalidatePath(`/admin/reservations/${tokenRow.reservation_id}`);
