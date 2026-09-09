@@ -3,6 +3,8 @@ export type NotificationType =
   | "reservation_modified"
   | "reservation_status"
   | "reservation_cancelled"
+  | "reservation_docs_uploaded"
+  | "reservation_docs_link"
   | "rental_reminder_start"
   | "rental_reminder_end"
   | "maintenance_due"

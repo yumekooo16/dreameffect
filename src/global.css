@@ -4991,6 +4991,87 @@ button.de-list-item {
   font-size: 1.35rem;
 }
 
+.de-dossier-page {
+  max-width: 40rem;
+  display: grid;
+  gap: 2rem;
+}
+
+.de-dossier-summary {
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.de-dossier-vehicle {
+  margin-top: 0.4rem;
+  font-size: clamp(1.4rem, 3vw, 1.85rem);
+}
+
+.de-dossier-meta,
+.de-dossier-expiry,
+.de-dossier-note {
+  margin-top: 0.55rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+.de-dossier-form {
+  display: grid;
+  gap: 1.15rem;
+}
+
+.de-dossier-field {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.de-dossier-field-label {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.de-dossier-field-hint {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.de-dossier-pill {
+  display: inline-flex;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.de-dossier-submit {
+  width: 100%;
+  gap: 0.45rem;
+}
+
+.de-dossier-success,
+.de-dossier-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.de-dossier-success {
+  color: var(--blue-soft);
+}
+
+.de-dossier-error {
+  color: #fecaca;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .de-fleet-card:hover .de-fleet-card-image {
     transform: none;
