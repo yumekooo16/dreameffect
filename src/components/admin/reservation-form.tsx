@@ -126,7 +126,11 @@ export default function ReservationForm({
   }
 
   function toIso(value: string) {
-    return new Date(value).toISOString();
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) {
+      throw new Error("Date invalide — vérifiez le début et la fin");
+    }
+    return date.toISOString();
   }
 
   function handleSubmit(e: React.FormEvent) {
@@ -157,22 +161,31 @@ export default function ReservationForm({
     };
 
     startTransition(async () => {
-      const result =
-        mode === "create"
-          ? await createReservation(payload)
-          : await updateReservation(reservationId!, payload);
+      try {
+        const result =
+          mode === "create"
+            ? await createReservation(payload)
+            : await updateReservation(reservationId!, payload);
 
-      if (!result.success) {
-        setError(result.error ?? "Une erreur est survenue");
-        return;
+        if (!result.success) {
+          setError(result.error ?? "Une erreur est survenue");
+          return;
+        }
+
+        router.push(
+          mode === "create"
+            ? `/admin/reservations/${result.id}`
+            : `/admin/reservations/${reservationId}`
+        );
+        router.refresh();
+      } catch (err) {
+        console.error("[ReservationForm]", err);
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Impossible d'enregistrer la réservation. Réessayez."
+        );
       }
-
-      router.push(
-        mode === "create"
-          ? `/admin/reservations/${result.id}`
-          : `/admin/reservations/${reservationId}`
-      );
-      router.refresh();
     });
   }
 

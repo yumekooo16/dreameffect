@@ -49,10 +49,16 @@ export default async function ReservationDetailPage({
     notFound();
   }
 
-  const [documents, activeToken] = await Promise.all([
-    fetchReservationClientDocuments(reservation.id),
-    fetchActiveUploadToken(reservation.id),
-  ]);
+  let documents: Awaited<ReturnType<typeof fetchReservationClientDocuments>> = [];
+  let activeToken: Awaited<ReturnType<typeof fetchActiveUploadToken>> = null;
+  try {
+    [documents, activeToken] = await Promise.all([
+      fetchReservationClientDocuments(reservation.id),
+      fetchActiveUploadToken(reservation.id),
+    ]);
+  } catch (error) {
+    console.error("[ReservationDetailPage:docs]", error);
+  }
 
   const { vehicles, revenueConfigs } = formData;
 
