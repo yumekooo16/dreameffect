@@ -57,20 +57,44 @@ export async function fetchReservationClientDocuments(
     return [];
   }
 
-  const admin = createAdminClient();
   const rows = data ?? [];
+  if (rows.length === 0) return [];
+
+  let admin;
+  try {
+    admin = createAdminClient();
+  } catch (adminError) {
+    console.error("[fetchReservationClientDocuments:admin]", adminError);
+    return rows.map((row) => ({
+      ...row,
+      type_label: getReservationDocTypeLabel(row.type),
+      signed_url: null,
+    }));
+  }
 
   return Promise.all(
     rows.map(async (row) => {
-      const { data: signed } = await admin.storage
-        .from(RESERVATION_DOCS_BUCKET)
-        .createSignedUrl(row.storage_path, 60 * 30);
+      try {
+        const { data: signed } = await admin.storage
+          .from(RESERVATION_DOCS_BUCKET)
+          .createSignedUrl(row.storage_path, 60 * 30);
 
-      return {
-        ...row,
-        type_label: getReservationDocTypeLabel(row.type),
-        signed_url: signed?.signedUrl ?? null,
-      };
+        return {
+          ...row,
+          type_label: getReservationDocTypeLabel(row.type),
+          signed_url: signed?.signedUrl ?? null,
+        };
+      } catch (signedError) {
+        console.error(
+          "[fetchReservationClientDocuments:signedUrl]",
+          signedError
+        );
+        return {
+          ...row,
+          type_label: getReservationDocTypeLabel(row.type),
+          signed_url: null,
+        };
+      }
     })
   );
 }

@@ -25,6 +25,14 @@ type ActionResult = {
   id?: string;
 };
 
+async function safeNotify(label: string, task: () => Promise<void>) {
+  try {
+    await task();
+  } catch (error) {
+    console.error(`[reservations:${label}]`, error);
+  }
+}
+
 function revalidateReservationPaths(id?: string) {
   revalidatePath("/admin/reservations");
   revalidatePath("/admin");
@@ -249,11 +257,13 @@ export async function createReservation(
   const vehicle = await getVehicleInfo(reservation.vehicle_id);
 
   if (vehicle) {
-    await notifyReservationCreated(
-      supabase,
-      reservation as ReservationRecord,
-      vehicle,
-      user.id
+    await safeNotify("notifyReservationCreated", () =>
+      notifyReservationCreated(
+        supabase,
+        reservation as ReservationRecord,
+        vehicle,
+        user.id
+      )
     );
   }
 
@@ -329,12 +339,14 @@ export async function updateReservation(
 
   if (vehicle && existing) {
     if (existing.status !== reservation.status) {
-      await notifyReservationStatusChanged(
+      await safeNotify("notifyReservationStatusChanged", () =>
+        notifyReservationStatusChanged(
         supabase,
         reservation as ReservationRecord,
         vehicle,
         user.id,
         existing.status
+  )
       );
     } else if (
       reservationWasModified(
@@ -342,11 +354,13 @@ export async function updateReservation(
         reservation as ReservationRecord
       )
     ) {
-      await notifyReservationModified(
+      await safeNotify("notifyReservationModified", () =>
+        notifyReservationModified(
         supabase,
         reservation as ReservationRecord,
         vehicle,
         user.id
+  )
       );
     }
   }
@@ -405,12 +419,14 @@ async function updateReservationStatus(
   const vehicle = await getVehicleInfo(reservation.vehicle_id);
 
   if (vehicle && existing.status !== status) {
-    await notifyReservationStatusChanged(
+    await safeNotify("notifyReservationStatusChanged", () =>
+      notifyReservationStatusChanged(
       supabase,
       reservation as ReservationRecord,
       vehicle,
       user.id,
       existing.status
+  )
     );
   }
 
@@ -493,12 +509,14 @@ export async function finishReservation(
   const vehicle = await getVehicleInfo(reservation.vehicle_id);
 
   if (vehicle && existing.status !== "finished") {
-    await notifyReservationStatusChanged(
+    await safeNotify("notifyReservationStatusChanged", () =>
+      notifyReservationStatusChanged(
       supabase,
       reservation as ReservationRecord,
       vehicle,
       user.id,
       existing.status
+  )
     );
   }
 
