@@ -195,9 +195,12 @@ export async function submitReservationDossier(
 
     const docsStatus = computeDocsStatus((allDocs ?? []).map((row) => row.type));
 
+    const contractStatus =
+      docsStatus === "complete" ? "documents_received" : "awaiting_documents";
+
     await admin
       .from("reservations")
-      .update({ docs_status: docsStatus })
+      .update({ docs_status: docsStatus, contract_status: contractStatus })
       .eq("id", tokenRow.reservation_id);
 
     await admin

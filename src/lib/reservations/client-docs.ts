@@ -3,9 +3,15 @@ import { SITE_URL } from "@/src/lib/public/site";
 export const RESERVATION_DOC_TYPES = [
   {
     value: "id_card" as const,
-    label: "Pièce d'identité",
-    shortLabel: "CNI / passeport",
+    label: "CNI recto",
+    shortLabel: "CNI recto",
     fieldName: "id_card",
+  },
+  {
+    value: "id_card_back" as const,
+    label: "CNI verso",
+    shortLabel: "CNI verso",
+    fieldName: "id_card_back",
   },
   {
     value: "driving_license" as const,
@@ -33,7 +39,23 @@ export const RESERVATION_DOCS_STATUSES = [
 export type ReservationDocsStatus =
   (typeof RESERVATION_DOCS_STATUSES)[number]["value"];
 
+export const CONTRACT_PIPELINE_STATUSES = [
+  { value: "not_started" as const, label: "Non démarré" },
+  { value: "awaiting_documents" as const, label: "Documents en attente" },
+  { value: "documents_received" as const, label: "Documents reçus" },
+  { value: "analyzing" as const, label: "Analyse en cours" },
+  { value: "needs_review" as const, label: "Vérification requise" },
+  { value: "validated" as const, label: "Validé" },
+  { value: "contract_generated" as const, label: "Contrat généré" },
+  { value: "signed" as const, label: "Contrat signé" },
+  { value: "closed" as const, label: "Terminé" },
+] as const;
+
+export type ContractPipelineStatus =
+  (typeof CONTRACT_PIPELINE_STATUSES)[number]["value"];
+
 export const RESERVATION_DOCS_BUCKET = "reservation-documents";
+export const RESERVATION_CONTRACTS_BUCKET = "reservation-contracts";
 
 /** Durée de validité d'un lien d'upload (7 jours). */
 export const UPLOAD_TOKEN_TTL_MS = 7 * 24 * 60 * 60 * 1000;
@@ -57,6 +79,13 @@ export function getReservationDocTypeLabel(type: string) {
 export function getReservationDocsStatusLabel(status: string) {
   return (
     RESERVATION_DOCS_STATUSES.find((item) => item.value === status)?.label ??
+    status
+  );
+}
+
+export function getContractPipelineStatusLabel(status: string) {
+  return (
+    CONTRACT_PIPELINE_STATUSES.find((item) => item.value === status)?.label ??
     status
   );
 }
@@ -111,7 +140,7 @@ export function buildDossierWhatsAppMessage({
       : "Pour finaliser votre demande de location, merci de déposer vos documents via ce lien sécurisé :",
     dossierUrl,
     "",
-    "Pièces demandées : pièce d'identité, permis de conduire, justificatif de domicile (-3 mois).",
+    "Pièces demandées : CNI recto + verso, permis de conduire, justificatif de domicile (-3 mois).",
     "",
     "DreamEffect",
   ].join("\n");

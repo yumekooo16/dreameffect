@@ -35,8 +35,8 @@ export default async function DossierPage({ params }: PageProps) {
   return (
     <>
       <PageHero
-        title="Déposez vos documents"
-        description="Lien sécurisé DreamEffect — pièce d'identité, permis et justificatif de domicile."
+        title="Votre dossier de location"
+        description="Merci de transmettre les documents nécessaires à la préparation de votre contrat de location."
       />
       <section className="de-section de-section-compact">
         <div className="de-public-container de-dossier-page">

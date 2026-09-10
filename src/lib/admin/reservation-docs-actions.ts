@@ -86,6 +86,11 @@ export async function generateReservationDocsLink(
     ? `${vehicle.brand} ${vehicle.model}`
     : "véhicule";
 
+  await supabase
+    .from("reservations")
+    .update({ contract_status: "awaiting_documents" })
+    .eq("id", reservationId);
+
   const url = buildDossierPublicUrl(token);
   const whatsappMessage = buildDossierWhatsAppMessage({
     customerName: reservation.customer_name,
