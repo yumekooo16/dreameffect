@@ -89,21 +89,22 @@ export async function buildFilledContractPdf(
   };
 
   // En-tête société (mentions légales déjà validées côté site)
+  // Les blancs du PDF sont courts : on reste dans chaque zone d'underscores.
   draw(
-    { top: 48.1, bottom: 59.1, x: 250, maxWidth: 290, size: 7.5 },
+    { top: 48.1, bottom: 59.1, x: 250, maxWidth: 155, size: 7.5 },
     formatLegalAddress()
   );
   draw(
-    { top: 59.4, bottom: 70.4, x: 162.6, maxWidth: 48, size: 7.5 },
+    { top: 59.4, bottom: 70.4, x: 164, maxWidth: 28, size: 7 },
     LEGAL_ENTITY.legalForm
   );
   draw(
-    { top: 59.4, bottom: 70.4, x: 268, maxWidth: 42, size: 7.5 },
+    { top: 59.4, bottom: 70.4, x: 246, maxWidth: 28, size: 7 },
     LEGAL_ENTITY.capital.replace(/\s*€\s*$/i, "").trim()
   );
   draw(
-    { top: 59.4, bottom: 70.4, x: 355, maxWidth: 70, size: 7.5 },
-    LEGAL_ENTITY.siren
+    { top: 59.4, bottom: 70.4, x: 312, maxWidth: 28, size: 7 },
+    LEGAL_ENTITY.siren.replace(/\s/g, "").slice(0, 9)
   );
 
   // 1) Locataire
