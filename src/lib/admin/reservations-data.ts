@@ -137,7 +137,7 @@ async function buildReservationDetail(
 ): Promise<ReservationDetail | null> {
   const { data: dashboardVehicle } = await supabase
     .from("owner_vehicle_dashboard")
-    .select("vehicle_id, brand, model, image_url, owner_id, plate, vin, deposit")
+    .select("vehicle_id, brand, model, image_url, owner_id")
     .eq("vehicle_id", record.vehicle_id)
     .maybeSingle();
 
@@ -149,18 +149,46 @@ async function buildReservationDetail(
         .eq("id", record.vehicle_id)
         .maybeSingle();
 
-  const vehicle = dashboardVehicle
+  let vehicle = dashboardVehicle
     ? {
         id: dashboardVehicle.vehicle_id,
         brand: dashboardVehicle.brand,
         model: dashboardVehicle.model,
         image_url: dashboardVehicle.image_url,
         owner_id: dashboardVehicle.owner_id,
-        plate: dashboardVehicle.plate ?? null,
-        vin: dashboardVehicle.vin ?? null,
-        deposit: dashboardVehicle.deposit ?? null,
+        plate: null as string | null,
+        vin: null as string | null,
+        deposit: null as number | null,
       }
-    : rawVehicle;
+    : rawVehicle
+      ? {
+          id: rawVehicle.id,
+          brand: rawVehicle.brand,
+          model: rawVehicle.model,
+          image_url: rawVehicle.image_url,
+          owner_id: rawVehicle.owner_id,
+          plate: rawVehicle.plate ?? null,
+          vin: rawVehicle.vin ?? null,
+          deposit: rawVehicle.deposit ?? null,
+        }
+      : null;
+
+  // Enrichit plaque / caution depuis vehicles si la vue dashboard ne les expose pas
+  if (vehicle && (vehicle.plate == null || vehicle.deposit == null)) {
+    const { data: extras } = await supabase
+      .from("vehicles")
+      .select("plate, vin, deposit")
+      .eq("id", vehicle.id)
+      .maybeSingle();
+    if (extras) {
+      vehicle = {
+        ...vehicle,
+        plate: extras.plate ?? vehicle.plate,
+        vin: extras.vin ?? vehicle.vin,
+        deposit: extras.deposit ?? vehicle.deposit,
+      };
+    }
+  }
 
   if (!vehicle) {
     return null;

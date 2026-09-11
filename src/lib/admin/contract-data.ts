@@ -7,18 +7,9 @@ import {
   type FieldConfidence,
 } from "@/src/lib/contracts/fields";
 import { RESERVATION_CONTRACTS_BUCKET } from "@/src/lib/reservations/client-docs";
+import type { ReservationContractRow } from "@/src/lib/admin/contract-types";
 
-export type ReservationContractRow = {
-  id: string;
-  reservation_id: string;
-  status: string;
-  template_version: string;
-  storage_path: string | null;
-  file_name: string | null;
-  generated_at: string | null;
-  created_at: string;
-  signed_url: string | null;
-};
+export type { ReservationContractRow } from "@/src/lib/admin/contract-types";
 
 function emptyFields(reservationId: string): ExtractedFieldRecord[] {
   return CONTRACT_FIELD_DEFS.map((def) => ({

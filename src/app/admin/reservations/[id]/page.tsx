@@ -240,6 +240,7 @@ export default async function ReservationDetailPage({
       </Section>
 
       <Section title="Contrat de location">
+        {/* Isolé : une erreur contrat ne doit pas casser toute la fiche admin */}
         <ReservationContractPanel
           reservationId={reservation.id}
           contractStatus={reservation.contract_status ?? "not_started"}

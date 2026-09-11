@@ -21,7 +21,7 @@ import {
   type ExtractedFieldRecord,
 } from "@/src/lib/contracts/fields";
 import { getContractPipelineStatusLabel } from "@/src/lib/reservations/client-docs";
-import type { ReservationContractRow } from "@/src/lib/admin/contract-data";
+import type { ReservationContractRow } from "@/src/lib/admin/contract-types";
 
 type Props = {
   reservationId: string;
