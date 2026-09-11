@@ -88,9 +88,9 @@ export default function ReservationContractPanel({
             {getContractPipelineStatusLabel(contractStatus)}
           </p>
           <p className="mt-1 text-xs de-muted">
-            L&apos;IA extrait les données. Le PDF avocat officiel est rempli
-            uniquement sur les zones variables — aucune clause n&apos;est
-            rédigée ni modifiée.
+            Remplissez ce que vous pouvez (saisie manuelle OK). Les zones
+            vides restent vides sur le PDF — vous pourrez les noter à la main.
+            « Remplir le contrat » enregistre puis génère sans bloquer.
           </p>
         </div>
         {warnings.length > 0 && (
@@ -123,7 +123,9 @@ export default function ReservationContractPanel({
           type="button"
           className="de-btn de-btn-secondary"
           disabled={pending}
-          onClick={() => run(() => validateExtractedFields(reservationId))}
+          onClick={() =>
+            run(() => validateExtractedFields(reservationId, values))
+          }
         >
           <ShieldCheck className="size-4" />
           Valider les informations
@@ -132,7 +134,9 @@ export default function ReservationContractPanel({
           type="button"
           className="de-btn de-btn-primary"
           disabled={pending}
-          onClick={() => run(() => generateReservationContract(reservationId))}
+          onClick={() =>
+            run(() => generateReservationContract(reservationId, values))
+          }
         >
           <Sparkles className="size-4" />
           Remplir le contrat
