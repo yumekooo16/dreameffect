@@ -206,6 +206,32 @@ export async function saveExtractedFields(
   values: Record<string, string>
 ): Promise<ActionResult> {
   const { user } = await requireAdmin();
+  const saved = await upsertExtractedFieldValues(
+    reservationId,
+    user.id,
+    values
+  );
+  if (!saved.success) return saved;
+  revalidateReservation(reservationId);
+  return { success: true, message: "Informations enregistrées." };
+}
+
+const SUGGESTED_CONTRACT_FIELDS: ContractFieldName[] = [
+  "first_name",
+  "last_name",
+  "birth_date",
+  "address",
+  "postal_code",
+  "city",
+  "driving_license_number",
+];
+
+/** Persiste les valeurs du formulaire admin (saisie manuelle / corrections). */
+async function upsertExtractedFieldValues(
+  reservationId: string,
+  userId: string,
+  values: Record<string, string>
+): Promise<{ success: true } | { success: false; error: string }> {
   const admin = createAdminClient();
   const allowed = new Set(CONTRACT_FIELD_DEFS.map((item) => item.name));
 
@@ -223,7 +249,7 @@ export async function saveExtractedFields(
         status: "manual",
         needs_review: false,
         inconsistency_note: null,
-        validated_by: user.id,
+        validated_by: userId,
         validated_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       },
@@ -240,15 +266,24 @@ export async function saveExtractedFields(
     }
   }
 
-  revalidateReservation(reservationId);
-  return { success: true, message: "Informations enregistrées." };
+  return { success: true };
 }
 
 export async function validateExtractedFields(
-  reservationId: string
+  reservationId: string,
+  formValues?: Record<string, string>
 ): Promise<ActionResult> {
   const { user } = await requireAdmin();
   const admin = createAdminClient();
+
+  if (formValues) {
+    const saved = await upsertExtractedFieldValues(
+      reservationId,
+      user.id,
+      formValues
+    );
+    if (!saved.success) return saved;
+  }
 
   const { data: fields, error } = await admin
     .from("reservation_extracted_fields")
@@ -257,25 +292,13 @@ export async function validateExtractedFields(
 
   if (error) return { success: false, error: error.message };
 
-  const required: ContractFieldName[] = [
-    "first_name",
-    "last_name",
-    "birth_date",
-    "address",
-    "postal_code",
-    "city",
-    "driving_license_number",
-  ];
-
   const byName = new Map((fields ?? []).map((row) => [row.field_name, row]));
-  const missing = required.filter((name) => !byName.get(name)?.value?.trim());
-  if (missing.length > 0) {
-    return {
-      success: false,
-      error: `Champs obligatoires manquants : ${missing.join(", ")}`,
-    };
-  }
+  const missing = SUGGESTED_CONTRACT_FIELDS.filter(
+    (name) => !byName.get(name)?.value?.trim()
+  );
 
+  // Les trous ne bloquent plus : le PDF peut être généré avec des zones vides
+  // (à compléter à la main sur le papier si besoin).
   const conflicts = (fields ?? []).filter((row) => row.inconsistency_note);
   if (conflicts.length > 0) {
     return {
@@ -298,15 +321,32 @@ export async function validateExtractedFields(
 
   await setContractStatus(reservationId, "validated");
   revalidateReservation(reservationId);
-  return { success: true, message: "Informations validées." };
+  return {
+    success: true,
+    message:
+      missing.length > 0
+        ? `Informations validées (zones vides OK : ${missing.join(", ")}). Vous pouvez générer le PDF.`
+        : "Informations validées.",
+  };
 }
 
 export async function generateReservationContract(
-  reservationId: string
+  reservationId: string,
+  formValues?: Record<string, string>
 ): Promise<ActionResult> {
   const { user } = await requireAdmin();
   const supabase = await createClient();
   const admin = createAdminClient();
+
+  // Toujours repartir du formulaire admin s'il est fourni (évite l'écart UI ↔ DB).
+  if (formValues) {
+    const saved = await upsertExtractedFieldValues(
+      reservationId,
+      user.id,
+      formValues
+    );
+    if (!saved.success) return saved;
+  }
 
   const { data: reservation, error } = await supabase
     .from("reservations")
@@ -320,17 +360,6 @@ export async function generateReservationContract(
     return { success: false, error: "Réservation introuvable" };
   }
 
-  if (
-    reservation.contract_status !== "validated" &&
-    reservation.contract_status !== "contract_generated"
-  ) {
-    return {
-      success: false,
-      error:
-        "Validez d'abord les informations client avant de générer le contrat.",
-    };
-  }
-
   const { data: fields } = await admin
     .from("reservation_extracted_fields")
     .select("field_name, value")
@@ -339,6 +368,17 @@ export async function generateReservationContract(
   const values: Record<string, string | null> = {};
   for (const row of fields ?? []) {
     values[row.field_name] = row.value;
+  }
+
+  // Fallback léger depuis le nom réservation si prénom/nom vides.
+  if ((!values.first_name || !values.last_name) && reservation.customer_name) {
+    const parts = reservation.customer_name.trim().split(/\s+/);
+    if (parts.length >= 2) {
+      if (!values.first_name) values.first_name = parts.slice(0, -1).join(" ");
+      if (!values.last_name) values.last_name = parts[parts.length - 1] ?? null;
+    } else if (!values.last_name) {
+      values.last_name = reservation.customer_name.trim();
+    }
   }
 
   const vehicleRaw = reservation.vehicles as
@@ -432,11 +472,17 @@ export async function generateReservationContract(
     .from(RESERVATION_CONTRACTS_BUCKET)
     .createSignedUrl(storagePath, 60 * 30);
 
+  const blankCount = SUGGESTED_CONTRACT_FIELDS.filter(
+    (name) => !values[name]?.trim()
+  ).length;
+
   revalidateReservation(reservationId);
   return {
     success: true,
     message:
-      "Contrat officiel rempli (variables uniquement — clauses avocat inchangées).",
+      blankCount > 0
+        ? `Contrat généré (${blankCount} zone(s) volontairement vide(s) — à compléter à la main si besoin).`
+        : "Contrat officiel rempli (variables uniquement — clauses avocat inchangées).",
     downloadUrl: signed?.signedUrl,
   };
 }
