@@ -2,35 +2,31 @@
 
 ## Règle absolue
 
-Le système **n’écrit jamais** le contrat juridique.
+Le système **n’écrit jamais** le contrat juridique et **ne modifie jamais** une clause.
 Il extrait des données documents + réservation, les fait valider par un admin,
-puis produit une **fiche de remplissage PDF** (ou remplira un modèle officiel
-pourvu de placeholders).
+puis superpose **uniquement les variables** sur le PDF avocat officiel.
 
-## Brancher le contrat avocat officiel
+## Modèle officiel branché
 
-1. Prenez le contrat Word/PDF validé par l’avocat.
-2. Remplacez uniquement les zones variables par des placeholders, ex. :
-   - `{{last_name}}` `{{first_name}}` `{{birth_date}}` `{{address}}`
-   - `{{vehicle_label}}` `{{vehicle_plate}}` `{{start_date}}` `{{end_date}}`
-   - `{{total_price}}` `{{deposit}}`
-3. Déposez le fichier dans `contracts/templates/contrat-location-officiel.docx`
-   (ou PDF AcroForm fillable).
-4. Demandez à brancher le générateur sur ce modèle (remplacer
-   `buildFilledContractPdf` dans `src/lib/contracts/generate-pdf.ts`).
+Fichier : `contracts/templates/contrat-location-dreameffect-v2.pdf`
 
-Tant que le modèle officiel n’est pas branché, l’admin télécharge une
-**fiche de valeurs** à reporter manuellement dans le contrat avocat.
+Le générateur (`src/lib/contracts/generate-pdf.ts`) :
+
+1. charge ce PDF intact ;
+2. écrit les champs locataire / véhicule / dates / tarifs / caution dans les zones à underscores ;
+3. renseigne lieu + date sur la page signatures ;
+4. laisse toutes les pages de clauses juridiques inchangées.
 
 ## Pipeline
 
 Réservation → lien dossier client → upload docs → OCR (OpenAI optionnel) →
-vérification admin → génération PDF → téléchargement.
+vérification admin → génération PDF officiel rempli → téléchargement.
 
 ## Variables d’environnement
 
 - `OPENAI_API_KEY` (optionnel) : extraction automatique
 - Sans clé : saisie manuelle des champs dans l’admin
+- Mentions légales en-tête : `NEXT_PUBLIC_LEGAL_*` (voir `src/lib/public/legal.ts`)
 
 ## Migration SQL
 

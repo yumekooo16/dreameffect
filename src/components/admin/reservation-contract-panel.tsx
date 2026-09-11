@@ -88,8 +88,9 @@ export default function ReservationContractPanel({
             {getContractPipelineStatusLabel(contractStatus)}
           </p>
           <p className="mt-1 text-xs de-muted">
-            L&apos;IA extrait les données. Elle ne rédige ni ne modifie aucune
-            clause du contrat avocat.
+            L&apos;IA extrait les données. Le PDF avocat officiel est rempli
+            uniquement sur les zones variables — aucune clause n&apos;est
+            rédigée ni modifiée.
           </p>
         </div>
         {warnings.length > 0 && (

@@ -14,6 +14,13 @@ function getSupabaseHostname(): string | null {
 const supabaseHostname = getSupabaseHostname();
 
 const nextConfig: NextConfig = {
+  /** Inclure le PDF avocat officiel pour le remplissage serveur. */
+  outputFileTracingIncludes: {
+    "/admin/reservations/[id]": [
+      "./contracts/templates/contrat-location-dreameffect-v2.pdf",
+    ],
+    "/*": ["./contracts/templates/contrat-location-dreameffect-v2.pdf"],
+  },
   images: {
     remotePatterns: [
       ...(supabaseHostname

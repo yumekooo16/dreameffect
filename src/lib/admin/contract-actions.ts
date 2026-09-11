@@ -311,7 +311,7 @@ export async function generateReservationContract(
   const { data: reservation, error } = await supabase
     .from("reservations")
     .select(
-      "id, start_date, end_date, pickup_location, return_location, total_price, distance_km, customer_name, contract_status, vehicle_id, vehicles(brand, model, plate, vin, deposit)"
+      "id, start_date, end_date, pickup_location, return_location, total_price, distance_km, customer_name, contract_status, vehicle_id, vehicles(brand, model, plate, vin, deposit, color, mileage)"
     )
     .eq("id", reservationId)
     .maybeSingle();
@@ -348,6 +348,8 @@ export async function generateReservationContract(
         plate?: string | null;
         vin?: string | null;
         deposit?: number | null;
+        color?: string | null;
+        mileage?: number | null;
       }
     | {
         brand: string;
@@ -355,6 +357,8 @@ export async function generateReservationContract(
         plate?: string | null;
         vin?: string | null;
         deposit?: number | null;
+        color?: string | null;
+        mileage?: number | null;
       }[]
     | null;
   const vehicle = Array.isArray(vehicleRaw) ? vehicleRaw[0] : vehicleRaw;
@@ -367,10 +371,15 @@ export async function generateReservationContract(
     return_location: reservation.return_location,
     total_price: reservation.total_price,
     distance_km: reservation.distance_km,
+    vehicle_brand: vehicle?.brand ?? null,
+    vehicle_model: vehicle?.model ?? null,
     vehicle_label: vehicle ? `${vehicle.brand} ${vehicle.model}` : "Véhicule",
     vehicle_plate: vehicle?.plate ?? null,
     vehicle_vin: vehicle?.vin ?? null,
+    vehicle_color: vehicle?.color ?? null,
+    vehicle_mileage: vehicle?.mileage ?? null,
     deposit: vehicle?.deposit ?? null,
+    signed_at_place: "Beauvais",
   });
 
   const pdfBytes = await buildFilledContractPdf(payload);
@@ -427,7 +436,7 @@ export async function generateReservationContract(
   return {
     success: true,
     message:
-      "Fiche de remplissage générée. Reportez les valeurs dans le contrat avocat officiel (aucune clause n'a été rédigée par l'IA).",
+      "Contrat officiel rempli (variables uniquement — clauses avocat inchangées).",
     downloadUrl: signed?.signedUrl,
   };
 }
