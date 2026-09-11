@@ -18,6 +18,11 @@ import VehicleImage from "@/src/components/owner/vehicle-image";
 import ReservationActionsPanel from "@/src/components/admin/reservation-actions";
 import ReservationDeleteButton from "@/src/components/admin/reservation-delete-button";
 import ReservationDocsPanel from "@/src/components/admin/reservation-docs-panel";
+import ReservationContractPanel from "@/src/components/admin/reservation-contract-panel";
+import {
+  fetchExtractedFields,
+  fetchLatestReservationContract,
+} from "@/src/lib/admin/contract-data";
 
 function formatEuro(amount?: number | null) {
   return `${Number(amount ?? 0).toLocaleString("fr-FR")} €`;
@@ -51,10 +56,14 @@ export default async function ReservationDetailPage({
 
   let documents: Awaited<ReturnType<typeof fetchReservationClientDocuments>> = [];
   let activeToken: Awaited<ReturnType<typeof fetchActiveUploadToken>> = null;
+  let extractedFields: Awaited<ReturnType<typeof fetchExtractedFields>> = [];
+  let contract: Awaited<ReturnType<typeof fetchLatestReservationContract>> = null;
   try {
-    [documents, activeToken] = await Promise.all([
+    [documents, activeToken, extractedFields, contract] = await Promise.all([
       fetchReservationClientDocuments(reservation.id),
       fetchActiveUploadToken(reservation.id),
+      fetchExtractedFields(reservation.id),
+      fetchLatestReservationContract(reservation.id),
     ]);
   } catch (error) {
     console.error("[ReservationDetailPage:docs]", error);
@@ -227,6 +236,16 @@ export default async function ReservationDetailPage({
           docsStatus={reservation.docs_status ?? "missing"}
           documents={documents}
           activeToken={activeToken}
+        />
+      </Section>
+
+      <Section title="Contrat de location">
+        {/* Isolé : une erreur contrat ne doit pas casser toute la fiche admin */}
+        <ReservationContractPanel
+          reservationId={reservation.id}
+          contractStatus={reservation.contract_status ?? "not_started"}
+          fields={extractedFields}
+          contract={contract}
         />
       </Section>
 

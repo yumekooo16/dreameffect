@@ -4,6 +4,7 @@ export type ReservationRecord = ReservationRow & {
   customer_email?: string | null;
   customer_phone?: string | null;
   docs_status?: string | null;
+  contract_status?: string | null;
   pickup_location?: string | null;
   return_location?: string | null;
   created_at?: string | null;
@@ -24,6 +25,9 @@ export type ReservationDetail = ReservationListItem & {
     model: string;
     image_url?: string | null;
     owner_id: string;
+    plate?: string | null;
+    vin?: string | null;
+    deposit?: number | null;
   };
   owner: {
     id: string;

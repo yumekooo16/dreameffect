@@ -98,14 +98,14 @@ export async function fetchReservationDetail(
   const { data: reservation, error } = await supabase
     .from("reservations")
     .select(
-      "id, vehicle_id, start_date, end_date, customer_name, customer_email, customer_phone, docs_status, pickup_location, return_location, status, owner_amount, company_amount, total_price, distance_km, created_at, updated_at"
+      "id, vehicle_id, start_date, end_date, customer_name, customer_email, customer_phone, docs_status, contract_status, pickup_location, return_location, status, owner_amount, company_amount, total_price, distance_km, created_at, updated_at"
     )
     .eq("id", reservationId)
     .single();
 
   if (error || !reservation) {
     // Fallback si la migration dossier n'est pas encore appliquée
-    if (error?.message?.includes("docs_status") || error?.message?.includes("customer_phone")) {
+    if (error?.message?.includes("docs_status") || error?.message?.includes("customer_phone") || error?.message?.includes("contract_status")) {
       const fallback = await supabase
         .from("reservations")
         .select(
@@ -121,6 +121,7 @@ export async function fetchReservationDetail(
       return buildReservationDetail(supabase, {
         ...fallback.data,
         docs_status: "missing",
+        contract_status: "not_started",
         customer_phone: null,
       } as ReservationRecord);
     }
@@ -144,19 +145,50 @@ async function buildReservationDetail(
     ? { data: null }
     : await supabase
         .from("vehicles")
-        .select("id, brand, model, image_url, owner_id")
+        .select("id, brand, model, image_url, owner_id, plate, vin, deposit")
         .eq("id", record.vehicle_id)
         .maybeSingle();
 
-  const vehicle = dashboardVehicle
+  let vehicle = dashboardVehicle
     ? {
         id: dashboardVehicle.vehicle_id,
         brand: dashboardVehicle.brand,
         model: dashboardVehicle.model,
         image_url: dashboardVehicle.image_url,
         owner_id: dashboardVehicle.owner_id,
+        plate: null as string | null,
+        vin: null as string | null,
+        deposit: null as number | null,
       }
-    : rawVehicle;
+    : rawVehicle
+      ? {
+          id: rawVehicle.id,
+          brand: rawVehicle.brand,
+          model: rawVehicle.model,
+          image_url: rawVehicle.image_url,
+          owner_id: rawVehicle.owner_id,
+          plate: rawVehicle.plate ?? null,
+          vin: rawVehicle.vin ?? null,
+          deposit: rawVehicle.deposit ?? null,
+        }
+      : null;
+
+  // Enrichit plaque / caution depuis vehicles si la vue dashboard ne les expose pas
+  if (vehicle && (vehicle.plate == null || vehicle.deposit == null)) {
+    const { data: extras } = await supabase
+      .from("vehicles")
+      .select("plate, vin, deposit")
+      .eq("id", vehicle.id)
+      .maybeSingle();
+    if (extras) {
+      vehicle = {
+        ...vehicle,
+        plate: extras.plate ?? vehicle.plate,
+        vin: extras.vin ?? vehicle.vin,
+        deposit: extras.deposit ?? vehicle.deposit,
+      };
+    }
+  }
 
   if (!vehicle) {
     return null;
