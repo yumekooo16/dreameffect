@@ -146,11 +146,11 @@
   justify-content: center;
   gap: 0.2rem;
   min-height: 3rem;
-  padding: 0.5rem 0.35rem;
+  padding: 0.5rem 0.2rem;
   font-family: var(--font-body);
-  font-size: 0.6875rem;
+  font-size: 0.625rem;
   font-weight: 600;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--text-muted);
   transition: color 0.2s;
@@ -659,18 +659,49 @@
   border-top: 1px solid var(--line);
 }
 
+.de-keys-lot-wrap {
+  display: grid;
+  border-bottom: 1px solid var(--line);
+}
+
+.de-keys-lot-wrap .de-keys-lot {
+  border-bottom: none;
+}
+
 .de-keys-lot {
   display: grid;
   grid-template-columns: 5.5rem 1fr auto;
   gap: 1rem 1.25rem;
   align-items: center;
-  padding: 1.15rem 0;
+  padding: 1.15rem 0 0.35rem;
   border-bottom: 1px solid var(--line);
   color: inherit;
 }
 
 .de-keys-lot:hover {
   background: color-mix(in srgb, var(--brass) 4%, transparent);
+}
+
+.de-keys-lot-dispos {
+  display: inline-block;
+  width: fit-content;
+  margin: 0 0 0.85rem 6.75rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+  color: color-mix(in srgb, var(--brass) 88%, var(--ink));
+  text-decoration: none;
+}
+
+.de-keys-lot-dispos:hover {
+  text-decoration: underline;
+}
+
+.de-keys-car-dispos {
+  margin-top: 0.4rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--ink) 52%, transparent);
 }
 
 .de-keys-lot-thumb {
@@ -684,6 +715,10 @@
 @media (max-width: 640px) {
   .de-keys-lot {
     grid-template-columns: 1fr;
+  }
+
+  .de-keys-lot-dispos {
+    margin-left: 0;
   }
 }
 
@@ -1247,10 +1282,34 @@
   justify-items: start;
 }
 
+.de-maison .de-calendar-page__booking {
+  display: grid;
+  gap: 1rem;
+}
+
 .de-maison .de-calendar-page__actions {
   display: flex;
   flex-wrap: wrap;
   gap: 0.65rem;
+}
+
+.de-maison .de-booking-km-note,
+.de-maison .de-booking-docs-list li {
+  color: color-mix(in srgb, var(--ink) 68%, transparent);
+}
+
+.de-maison .de-booking-docs-list li::before {
+  background: var(--brass);
+}
+
+.de-maison .de-booking-sticky-btn {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--paper);
+}
+
+.de-maison .de-booking-summary-row--highlight dd {
+  color: var(--brass);
 }
 
 .de-maison .de-calendar-page__placeholder {

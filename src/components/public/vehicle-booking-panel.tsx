@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { DayPicker, type DateRange } from "react-day-picker";
 import { fr } from "react-day-picker/locale";
 import "react-day-picker/style.css";
-import { MessageCircle, AlertCircle } from "lucide-react";
+import { MessageCircle, AlertCircle, FileCheck2 } from "lucide-react";
 import { buildWhatsAppUrl, WHATSAPP_NUMBER } from "@/src/lib/constants";
 import {
   expandBlockedDateKeys,
@@ -16,27 +16,39 @@ import {
 } from "@/src/lib/dates/calendar-utils";
 import { buildBookingWhatsAppMessage } from "@/src/lib/public/booking-message";
 import {
-  estimateRentalTotal,
+  estimateBooking,
   formatEstimate,
-  getInformativeDailyRate,
 } from "@/src/lib/public/booking-estimate";
 import { formatPrice } from "@/src/lib/vehicles/pricing";
 import type { PublicVehicleDetail } from "@/src/lib/public/vehicles-types";
 import type { VehicleAvailability } from "@/src/lib/public/availability-data";
 import { getVehicleDisplayName } from "@/src/lib/public/vehicles-data";
 
+const BOOKING_DOCS = [
+  "Pièce d'identité",
+  "Permis de conduire",
+  "Justificatif de domicile (-3 mois)",
+] as const;
+
 type Props = {
   vehicle: PublicVehicleDetail;
   availability: VehicleAvailability;
+  /** Compact : moins de marge (ex. page calendrier). */
+  compact?: boolean;
 };
 
-export default function VehicleBookingPanel({ vehicle, availability }: Props) {
+export default function VehicleBookingPanel({
+  vehicle,
+  availability,
+  compact = false,
+}: Props) {
   const [range, setRange] = useState<DateRange | undefined>();
   const [error, setError] = useState<string | null>(null);
 
   const today = useMemo(() => startOfDay(new Date()), []);
   const vehicleName = getVehicleDisplayName(vehicle);
   const isVehicleUnavailable = vehicle.status !== "available";
+  const depositLabel = formatPrice(vehicle.pricing.deposit);
 
   const blockedKeys = useMemo(
     () =>
@@ -60,11 +72,17 @@ export default function VehicleBookingPanel({ vehicle, availability }: Props) {
       ? rentalDurationDays(range.from, range.to)
       : null;
 
-  const dailyRate = getInformativeDailyRate(vehicle.pricing);
   const estimate =
-    durationDays != null
-      ? estimateRentalTotal(vehicle.pricing, durationDays)
+    range?.from && range?.to && durationDays != null
+      ? estimateBooking(
+          vehicle.pricing,
+          range.from,
+          range.to,
+          durationDays
+        )
       : null;
+
+  const estimateTotalLabel = formatEstimate(estimate?.total ?? null);
 
   function handleRangeSelect(next: DateRange | undefined) {
     setError(null);
@@ -105,6 +123,10 @@ export default function VehicleBookingPanel({ vehicle, availability }: Props) {
       vehicleName,
       startDate: range.from,
       endDate: range.to,
+      durationDays,
+      estimateLabel: estimate?.label ?? null,
+      estimateTotal: estimateTotalLabel,
+      deposit: depositLabel,
     });
 
     const url = buildWhatsAppUrl(WHATSAPP_NUMBER, message);
@@ -112,14 +134,20 @@ export default function VehicleBookingPanel({ vehicle, availability }: Props) {
   }
 
   return (
-    <section className="de-booking-section" aria-labelledby="booking-title">
+    <section
+      id="reservation"
+      className={`de-booking-section${compact ? " de-booking-section--compact" : ""}`}
+      aria-labelledby="booking-title"
+    >
       <div className="de-booking-header">
+        <p className="de-label">Disponibilités</p>
         <h2 id="booking-title" className="de-display de-booking-title">
-          Réserver ce véhicule
+          Choisir vos dates
         </h2>
         <p className="de-booking-subtitle">
-          Choisissez vos dates, puis envoyez votre demande via WhatsApp. Aucun
-          paiement en ligne — notre équipe vous recontacte pour finaliser.
+          Sélectionnez la période, consultez l&apos;estimation et la caution,
+          puis envoyez votre demande sur WhatsApp. Aucun paiement en ligne —
+          nous confirmons ensemble.
         </p>
       </div>
 
@@ -198,23 +226,54 @@ export default function VehicleBookingPanel({ vehicle, availability }: Props) {
                     {durationDays === 1 ? "jour" : "jours"}
                   </dd>
                 </div>
-                {dailyRate != null && (
+                {estimate?.unitRate != null && estimate.unitLabel && (
                   <div className="de-booking-summary-row">
-                    <dt>Tarif journalier</dt>
-                    <dd>{formatPrice(dailyRate)}</dd>
+                    <dt>Base tarifaire</dt>
+                    <dd>
+                      {formatPrice(estimate.unitRate)}
+                      <span className="de-booking-unit-hint">
+                        {" "}
+                        / {estimate.unitLabel}
+                      </span>
+                    </dd>
                   </div>
                 )}
-                {estimate != null && (
+                {estimateTotalLabel && (
                   <div className="de-booking-summary-row de-booking-summary-row--highlight">
-                    <dt>Estimation</dt>
-                    <dd>{formatEstimate(estimate)}</dd>
+                    <dt>{estimate?.label ?? "Estimation"}</dt>
+                    <dd>{estimateTotalLabel}</dd>
+                  </div>
+                )}
+                {depositLabel && (
+                  <div className="de-booking-summary-row">
+                    <dt>Caution</dt>
+                    <dd>{depositLabel}</dd>
                   </div>
                 )}
               </dl>
 
+              <div className="de-booking-km-note">
+                <p>
+                  Forfait kilométrique inclus — le volume exact est confirmé
+                  avec votre réservation (pas d&apos;option km illimité).
+                </p>
+              </div>
+
+              <div className="de-booking-docs">
+                <p className="de-label de-booking-docs-title">
+                  <FileCheck2 className="size-3.5" aria-hidden />
+                  Documents à prévoir
+                </p>
+                <ul className="de-booking-docs-list">
+                  {BOOKING_DOCS.map((doc) => (
+                    <li key={doc}>{doc}</li>
+                  ))}
+                </ul>
+              </div>
+
               <p className="de-booking-disclaimer">
                 Estimation indicative — le tarif définitif vous sera communiqué
-                par DreamEffect.
+                par DreamEffect avant confirmation.
               </p>
 
               <button
@@ -224,7 +283,7 @@ export default function VehicleBookingPanel({ vehicle, availability }: Props) {
                 className="de-btn de-btn-primary de-booking-whatsapp-btn"
               >
                 <MessageCircle className="size-4" aria-hidden />
-                Réserver via WhatsApp
+                Envoyer ma demande
               </button>
             </div>
           ) : (
@@ -243,6 +302,25 @@ export default function VehicleBookingPanel({ vehicle, availability }: Props) {
                   </span>
                 </p>
               )}
+              {depositLabel && (
+                <p className="mt-4 text-sm de-muted">
+                  Caution habituelle :{" "}
+                  <span className="font-medium text-[var(--ink)]">
+                    {depositLabel}
+                  </span>
+                </p>
+              )}
+              <div className="de-booking-docs de-booking-docs--muted">
+                <p className="de-label de-booking-docs-title">
+                  <FileCheck2 className="size-3.5" aria-hidden />
+                  Documents à prévoir
+                </p>
+                <ul className="de-booking-docs-list">
+                  {BOOKING_DOCS.map((doc) => (
+                    <li key={doc}>{doc}</li>
+                  ))}
+                </ul>
+              </div>
             </div>
           )}
         </div>
