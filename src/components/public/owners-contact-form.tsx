@@ -163,6 +163,21 @@ export default function OwnersContactForm() {
 
   return (
     <form className="de-contact-form" onSubmit={handleSubmit} noValidate>
+      <div className="de-owner-wa-preview" aria-live="polite">
+        <p className="de-owner-wa-preview-label">Message WhatsApp</p>
+        <p className="de-owner-wa-preview-text">
+          {buildOwnerWhatsAppMessage({
+            firstName: form.firstName.trim() || "Wyatt",
+            lastName: form.lastName.trim() || "Charleston",
+            vehicle: form.vehicle.trim() || "RS3 2025",
+          })}
+        </p>
+        <p className="de-owner-wa-preview-note">
+          Le message libre ci-dessous n&apos;est pas envoyé sur WhatsApp — il
+          apparaît dans Contact (admin).
+        </p>
+      </div>
+
       <div className="de-form-row">
         <div className="de-form-field">
           <label htmlFor="owner-firstName" className="de-label">
