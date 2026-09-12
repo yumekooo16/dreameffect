@@ -2564,6 +2564,34 @@ button.de-list-item {
   color: var(--text-subtle);
 }
 
+.de-owner-wa-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.de-owner-wa-preview-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-subtle);
+}
+
+.de-owner-wa-preview-text {
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: var(--text);
+}
+
+.de-owner-wa-preview-note {
+  font-size: 0.75rem;
+  line-height: 1.45;
+  color: var(--text-subtle);
+}
+
 .de-contact-form-success {
   border-radius: calc(var(--radius) - 2px);
   border: 1px solid var(--blue-border);
