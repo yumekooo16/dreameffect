@@ -25,7 +25,7 @@ export const pwaConfig = {
   backgroundColor: "#0B1524",
 
   /** Version du cache service worker — incrémenter à chaque déploiement majeur */
-  cacheVersion: "dreameffect-v12",
+  cacheVersion: "dreameffect-v13",
 
   icons: {
     /** Fichier source — remplacer logo.png puis relancer `npm run generate-pwa-icons` */
@@ -36,6 +36,7 @@ export const pwaConfig = {
       "512": "/icons/icon-512x512.png",
       apple: "/icons/apple-touch-icon.png",
       maskable: "/icons/maskable-icon-512x512.png",
+      favicon16: "/icons/favicon-16x16.png",
       favicon32: "/icons/favicon-32x32.png",
     },
   },
