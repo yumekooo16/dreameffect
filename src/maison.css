@@ -193,7 +193,7 @@
 }
 
 @media (min-width: 960px) {
-  .de-keys-hero {
+  .de-keys-hero:not(.de-keys-hero--stage) {
     grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
     min-height: calc(100dvh - var(--header-h) - 1px);
   }
@@ -211,6 +211,128 @@
       transparent 55%
     ),
     var(--bg);
+}
+
+/* Accueil : plein écran, marque + photo */
+.de-keys-hero--stage {
+  position: relative;
+  isolation: isolate;
+  min-height: calc(100dvh - var(--header-h) - 1px);
+  overflow: hidden;
+  display: grid;
+  align-items: end;
+}
+
+.de-keys-hero-stage {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.de-keys-hero-stage .de-hero-visual {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.de-keys-hero-stage .de-hero-visual-image {
+  transform: scale(1.02);
+  animation: de-keys-hero-ken 18s ease-out forwards;
+}
+
+.de-keys-hero-stage .de-hero-visual-overlay {
+  background:
+    linear-gradient(
+      105deg,
+      color-mix(in srgb, var(--bg) 88%, transparent) 0%,
+      color-mix(in srgb, var(--bg) 62%, transparent) 42%,
+      color-mix(in srgb, var(--bg) 28%, transparent) 72%,
+      color-mix(in srgb, var(--bg) 18%, transparent) 100%
+    ),
+    linear-gradient(
+      to top,
+      color-mix(in srgb, var(--bg) 78%, transparent) 0%,
+      transparent 42%
+    );
+}
+
+.de-keys-hero--stage .de-keys-hero-copy {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 42rem);
+  padding-top: clamp(4.5rem, 14vh, 7rem);
+  background: transparent;
+  animation: de-keys-hero-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.de-keys-brand {
+  font-family: var(--font-display);
+  font-size: clamp(2.85rem, 8vw, 5.25rem);
+  font-weight: 500;
+  line-height: 0.92;
+  letter-spacing: -0.035em;
+  color: var(--text);
+  text-wrap: balance;
+}
+
+.de-keys-hero--stage .de-keys-kicker {
+  margin-top: 1.15rem;
+  animation: de-keys-hero-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.08s both;
+}
+
+.de-keys-hero--stage .de-keys-title {
+  margin-top: 0.85rem;
+  font-size: clamp(1.55rem, 3.2vw, 2.15rem);
+  max-width: 18ch;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: color-mix(in srgb, var(--text) 92%, transparent);
+  animation: de-keys-hero-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.14s both;
+}
+
+.de-keys-hero--stage .de-keys-lead,
+.de-keys-hero--stage .de-keys-actions {
+  animation: de-keys-hero-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both;
+}
+
+.de-keys-media-cap--stage {
+  position: static;
+  margin-top: 1.75rem;
+  color: color-mix(in srgb, var(--text) 72%, transparent);
+  animation: de-keys-hero-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.28s both;
+}
+
+@keyframes de-keys-hero-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes de-keys-hero-ken {
+  from {
+    transform: scale(1.08);
+  }
+  to {
+    transform: scale(1.02);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .de-keys-hero-stage .de-hero-visual-image,
+  .de-keys-hero--stage .de-keys-hero-copy,
+  .de-keys-hero--stage .de-keys-kicker,
+  .de-keys-hero--stage .de-keys-title,
+  .de-keys-hero--stage .de-keys-lead,
+  .de-keys-hero--stage .de-keys-actions,
+  .de-keys-media-cap--stage {
+    animation: none;
+  }
 }
 
 .de-keys-kicker {
@@ -333,6 +455,22 @@
 
 .de-keys-chip span {
   color: var(--brass);
+}
+
+.de-keys-chip:hover {
+  color: var(--text);
+  border-color: color-mix(in srgb, var(--brass) 45%, var(--line));
+}
+
+.de-keys-chip--muted {
+  border-style: dashed;
+  cursor: default;
+  opacity: 0.9;
+}
+
+.de-keys-chip--muted:hover {
+  color: var(--text-muted);
+  border-color: var(--line);
 }
 
 /* --- Section chrome ----------------------------------------- */
