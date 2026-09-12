@@ -237,6 +237,8 @@
 }
 
 .de-keys-hero-stage .de-hero-visual-image {
+  object-position: center center !important;
+  transform-origin: center center;
   transform: scale(1.02);
   animation: de-keys-hero-ken 18s ease-out forwards;
 }

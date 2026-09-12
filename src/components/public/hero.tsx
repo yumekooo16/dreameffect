@@ -12,13 +12,20 @@ type HeroSectionProps = {
 };
 
 export default function HeroSection({ imageUrl, imageFrame }: HeroSectionProps) {
+  const centeredFrame: VehicleImageFrame = {
+    fit: imageFrame?.fit === "contain" ? "contain" : "cover",
+    positionX: 50,
+    positionY: 50,
+    scale: imageFrame?.scale ?? 100,
+  };
+
   return (
     <section
       className="de-keys-hero de-keys-hero--stage"
       aria-labelledby="home-hero-brand"
     >
       <div className="de-keys-hero-stage" aria-hidden={imageUrl ? undefined : true}>
-        <HeroBackground imageUrl={imageUrl} frame={imageFrame} />
+        <HeroBackground imageUrl={imageUrl} frame={centeredFrame} />
       </div>
 
       <div className="de-keys-hero-copy">
