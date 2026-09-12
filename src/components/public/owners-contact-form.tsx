@@ -5,6 +5,10 @@ import { Send, CheckCircle2 } from "lucide-react";
 import GdprConsentField from "@/src/components/gdpr/gdpr-consent-field";
 import { buildWhatsAppUrl, WHATSAPP_NUMBER } from "@/src/lib/constants";
 import { submitContactLead } from "@/src/lib/public/contact-actions";
+import {
+  buildOwnerAdminMessage,
+  buildOwnerWhatsAppMessage,
+} from "@/src/lib/public/owner-whatsapp-message";
 
 type FormState = {
   firstName: string;
@@ -48,9 +52,7 @@ function validate(form: FormState): FormErrors {
 
   if (!form.vehicle.trim()) errors.vehicle = "Véhicule requis";
 
-  if (!form.message.trim()) {
-    errors.message = "Message requis";
-  } else if (form.message.trim().length < 10) {
+  if (form.message.trim() && form.message.trim().length < 10) {
     errors.message = "Minimum 10 caractères";
   }
 
@@ -59,22 +61,6 @@ function validate(form: FormState): FormErrors {
   }
 
   return errors;
-}
-
-function buildOwnerContactMessage(form: FormState) {
-  return [
-    "Bonjour DreamEffect,",
-    "",
-    "Je souhaite confier mon véhicule à votre gestion.",
-    "",
-    `Prénom : ${form.firstName.trim()}`,
-    `Nom : ${form.lastName.trim()}`,
-    `Téléphone : ${form.phone.trim()}`,
-    `Email : ${form.email.trim()}`,
-    `Véhicule : ${form.vehicle.trim()}`,
-    "",
-    form.message.trim(),
-  ].join("\n");
 }
 
 export default function OwnersContactForm() {
@@ -108,14 +94,13 @@ export default function OwnersContactForm() {
 
     setSubmitting(true);
 
-    const messageBody = [
-      `Véhicule : ${form.vehicle.trim()}`,
-      "",
-      form.message.trim(),
-    ].join("\n");
+    const messageBody = buildOwnerAdminMessage({
+      vehicle: form.vehicle,
+      message: form.message,
+    });
 
-    // Server action exige min. 20 caractères
-    const paddedMessage =
+    // Server action exige min. 20 caractères — le message libre n'y est pas obligatoire
+    const adminMessage =
       messageBody.length >= 20
         ? messageBody
         : `${messageBody}\n\n(Demande de gestion locative)`;
@@ -127,7 +112,7 @@ export default function OwnersContactForm() {
       phone: form.phone,
       topic: "owner",
       topicLabel: "Gestion locative — propriétaire",
-      message: paddedMessage,
+      message: adminMessage,
       gdprConsent: form.gdprConsent,
     });
 
@@ -138,7 +123,15 @@ export default function OwnersContactForm() {
       return;
     }
 
-    const url = buildWhatsAppUrl(WHATSAPP_NUMBER, buildOwnerContactMessage(form));
+    // WhatsApp : uniquement identité + véhicule (pas le message libre)
+    const url = buildWhatsAppUrl(
+      WHATSAPP_NUMBER,
+      buildOwnerWhatsAppMessage({
+        firstName: form.firstName,
+        lastName: form.lastName,
+        vehicle: form.vehicle,
+      })
+    );
     window.open(url, "_blank", "noopener,noreferrer");
     setSent(true);
     setForm(INITIAL);
@@ -153,9 +146,9 @@ export default function OwnersContactForm() {
           Demande enregistrée
         </h3>
         <p className="mt-2 text-sm leading-relaxed de-muted">
-          Vos coordonnées sont enregistrées côté DreamEffect. WhatsApp
-          s&apos;est ouvert avec votre message — il reste à appuyer sur
-          Envoyer.
+          Votre demande est enregistrée côté DreamEffect (y compris votre
+          message éventuel). WhatsApp s&apos;est ouvert avec un message court —
+          il reste à appuyer sur Envoyer.
         </p>
         <button
           type="button"
@@ -259,7 +252,8 @@ export default function OwnersContactForm() {
 
       <div className="de-form-field">
         <label htmlFor="owner-message" className="de-label">
-          Message
+          Message{" "}
+          <span className="de-form-optional">(facultatif — côté DreamEffect uniquement)</span>
         </label>
         <textarea
           id="owner-message"
@@ -267,7 +261,7 @@ export default function OwnersContactForm() {
           value={form.message}
           onChange={(e) => updateField("message", e.target.value)}
           className={`de-input de-textarea ${errors.message ? "de-input--error" : ""}`}
-          placeholder="Parlez-nous de votre véhicule, de vos disponibilités ou de vos questions…"
+          placeholder="Précisions pour notre équipe (disponibilités, questions…) — non envoyées sur WhatsApp"
         />
         {errors.message && (
           <p className="de-form-error">{errors.message}</p>
@@ -297,8 +291,8 @@ export default function OwnersContactForm() {
           {submitting ? "Envoi…" : "Envoyer ma demande"}
         </button>
         <p className="de-form-note">
-          La demande est enregistrée côté DreamEffect, puis WhatsApp s&apos;ouvre
-          pour finaliser l&apos;échange.
+          WhatsApp s&apos;ouvre avec votre nom et votre véhicule. Le message
+          libre reste visible dans Contact (admin).
         </p>
       </div>
     </form>
