@@ -24,14 +24,13 @@ export default function OwnersContent() {
               Confiez votre véhicule
             </h2>
             <p className="de-keys-lede">
-              Remplissez le formulaire : WhatsApp s&apos;ouvre avec un message
-              court (votre nom et votre véhicule). Vos précisions éventuelles
-              restent enregistrées côté DreamEffect.
+              Remplissez le formulaire. Nous vous recontactons rapidement pour
+              étudier votre projet ensemble.
             </p>
             <ul className="de-check-list de-owners-contact-points">
-              <li>WhatsApp : nom + véhicule uniquement</li>
-              <li>Message libre visible dans Contact (admin)</li>
               <li>Réponse sous 24 h en moyenne</li>
+              <li>Échange personnalisé sur votre véhicule</li>
+              <li>Aucun engagement sans votre accord</li>
             </ul>
           </div>
           <div>

@@ -146,9 +146,9 @@ export default function OwnersContactForm() {
           Demande enregistrée
         </h3>
         <p className="mt-2 text-sm leading-relaxed de-muted">
-          Votre demande est enregistrée côté DreamEffect (y compris votre
-          message éventuel). WhatsApp s&apos;est ouvert avec un message court —
-          il reste à appuyer sur Envoyer.
+          Vos coordonnées sont enregistrées côté DreamEffect. WhatsApp
+          s&apos;est ouvert avec votre message — il reste à appuyer sur
+          Envoyer.
         </p>
         <button
           type="button"
@@ -163,21 +163,6 @@ export default function OwnersContactForm() {
 
   return (
     <form className="de-contact-form" onSubmit={handleSubmit} noValidate>
-      <div className="de-owner-wa-preview" aria-live="polite">
-        <p className="de-owner-wa-preview-label">Message WhatsApp</p>
-        <p className="de-owner-wa-preview-text">
-          {buildOwnerWhatsAppMessage({
-            firstName: form.firstName.trim() || "Wyatt",
-            lastName: form.lastName.trim() || "Charleston",
-            vehicle: form.vehicle.trim() || "RS3 2025",
-          })}
-        </p>
-        <p className="de-owner-wa-preview-note">
-          Le message libre ci-dessous n&apos;est pas envoyé sur WhatsApp — il
-          apparaît dans Contact (admin).
-        </p>
-      </div>
-
       <div className="de-form-row">
         <div className="de-form-field">
           <label htmlFor="owner-firstName" className="de-label">
@@ -268,7 +253,7 @@ export default function OwnersContactForm() {
       <div className="de-form-field">
         <label htmlFor="owner-message" className="de-label">
           Message{" "}
-          <span className="de-form-optional">(facultatif — côté DreamEffect uniquement)</span>
+          <span className="de-form-optional">(facultatif)</span>
         </label>
         <textarea
           id="owner-message"
@@ -276,7 +261,7 @@ export default function OwnersContactForm() {
           value={form.message}
           onChange={(e) => updateField("message", e.target.value)}
           className={`de-input de-textarea ${errors.message ? "de-input--error" : ""}`}
-          placeholder="Précisions pour notre équipe (disponibilités, questions…) — non envoyées sur WhatsApp"
+          placeholder="Parlez-nous de votre véhicule, de vos disponibilités ou de vos questions…"
         />
         {errors.message && (
           <p className="de-form-error">{errors.message}</p>
@@ -306,8 +291,8 @@ export default function OwnersContactForm() {
           {submitting ? "Envoi…" : "Envoyer ma demande"}
         </button>
         <p className="de-form-note">
-          WhatsApp s&apos;ouvre avec votre nom et votre véhicule. Le message
-          libre reste visible dans Contact (admin).
+          La demande est enregistrée côté DreamEffect, puis WhatsApp s&apos;ouvre
+          pour finaliser l&apos;échange.
         </p>
       </div>
     </form>
