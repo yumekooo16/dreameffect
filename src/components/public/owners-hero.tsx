@@ -31,7 +31,7 @@ export default function OwnersHero({
     <>
       <section className="de-keys-hero" aria-labelledby="owners-hero-title">
         <div className="de-keys-hero-copy">
-          <p className="de-keys-kicker">Propriétaires · Beauvais · Gisors</p>
+          <p className="de-keys-kicker">Propriétaires · Beauvais · Gisors · IDF</p>
           <h1 id="owners-hero-title" className="de-keys-title">
             Votre véhicule travaille.
             <em> Vous n&apos;avez plus à le gérer.</em>

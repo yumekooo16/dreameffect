@@ -10,7 +10,7 @@ export const HOME_PROCESS_STEPS = [
   {
     step: "02",
     title: "On s'occupe de tout",
-    text: "Remise des clés à Beauvais, Gisors ou sur votre lieu de rendez-vous dans l'Oise et l'Eure. Véhicule préparé, nettoyé et contrôlé avant chaque location. Un interlocuteur unique du début à la fin.",
+    text: "Remise des clés à Beauvais, Gisors, en Île-de-France ou sur votre lieu de rendez-vous dans l'Oise et l'Eure. Véhicule préparé, nettoyé et contrôlé avant chaque location. Un interlocuteur unique du début à la fin.",
     visualAlt: "Remise de clés et préparation véhicule DreamEffect",
   },
   {

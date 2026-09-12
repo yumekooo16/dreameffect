@@ -21,8 +21,8 @@ import {
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "DreamEffect — Location & conciergerie Beauvais · Gisors",
-  description: `Agence de location et conciergerie automobile à Beauvais et Gisors (${formatServiceAreaLabel()}). Flotte haut de gamme, tarifs affichés, réservation WhatsApp. Gestion locative pour propriétaires.`,
+  title: "DreamEffect — Location & conciergerie Beauvais · Gisors · IDF",
+  description: `Agence de location et conciergerie automobile à Beauvais, Gisors et en Île-de-France (${formatServiceAreaLabel()}). Flotte haut de gamme, tarifs affichés, réservation WhatsApp. Gestion locative pour propriétaires.`,
   path: "/",
   keywords: [...HOME_KEYWORDS],
   absoluteTitle: true,
