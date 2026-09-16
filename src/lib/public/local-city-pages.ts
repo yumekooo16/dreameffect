@@ -4,11 +4,13 @@ export type LocalCitySlug =
   | "conciergerie-automobile-beauvais"
   | "conciergerie-automobile-gisors"
   | "agence-location-vehicule-beauvais"
-  | "agence-location-vehicule-gisors";
+  | "agence-location-vehicule-gisors"
+  | "location-vehicule-ile-de-france"
+  | "location-vehicule-aeroport-beauvais-tille";
 
 export type LocalCityPage = {
   slug: LocalCitySlug;
-  city: "Beauvais" | "Gisors";
+  city: "Beauvais" | "Gisors" | "Île-de-France" | "Tillé";
   kind: "conciergerie" | "location";
   path: `/${LocalCitySlug}`;
   metaTitle: string;
@@ -239,6 +241,118 @@ export const LOCAL_CITY_PAGES: Record<LocalCitySlug, LocalCityPage> = {
     related: [
       { label: "Conciergerie Gisors", href: "/conciergerie-automobile-gisors" },
       { label: "Agence de location Beauvais", href: "/agence-location-vehicule-beauvais" },
+      { label: "Catalogue véhicules", href: "/vehicules" },
+    ],
+  },
+  "location-vehicule-ile-de-france": {
+    slug: "location-vehicule-ile-de-france",
+    city: "Île-de-France",
+    kind: "location",
+    path: "/location-vehicule-ile-de-france",
+    metaTitle: "Location de véhicule en Île-de-France",
+    metaDescription:
+      "Location de véhicule haut de gamme en Île-de-France avec DreamEffect. Remise sur rendez-vous en IDF, flotte soignée, réservation WhatsApp.",
+    keywords: [
+      "location véhicule Île-de-France",
+      "location voiture IDF",
+      "location voiture Paris",
+      "location auto Île-de-France",
+      "DreamEffect IDF",
+      "DreamEffect",
+    ],
+    heroEyebrow: "Île-de-France · Location",
+    heroTitle: "Location de véhicule en Île-de-France",
+    heroDescription:
+      "Flotte premium, tarifs affichés, remise organisée sur rendez-vous en IDF — depuis notre base Beauvais / Gisors.",
+    blocks: [
+      {
+        title: "Louer une voiture haut de gamme en IDF",
+        paragraphs: [
+          "Vous cherchez une location de véhicule en Île-de-France ? DreamEffect met à disposition une flotte soignée (berlines, SUV, sportives) avec réservation simple et conditions claires.",
+          "Nous organisons la remise des clés sur rendez-vous selon votre lieu en IDF — idéal pour un week-end, un déplacement pro ou un essai plaisir.",
+        ],
+      },
+      {
+        title: "Une alternative locale aux grandes enseignes",
+        paragraphs: [
+          "Tarifs affichés sur chaque fiche, disponibilité mise à jour, interlocuteur unique par WhatsApp ou téléphone. Pas de call center anonyme : une maison de location et de conciergerie basée entre Oise et Vexin, active en Île-de-France.",
+        ],
+        bullets: [
+          "Location véhicule Île-de-France / Paris et périphérie",
+          "Remise sur rendez-vous selon vos contraintes",
+          "Flotte contrôlée et préparée avant chaque location",
+          "Devis et confirmation via WhatsApp",
+        ],
+      },
+      {
+        title: "Aussi pour les propriétaires en IDF",
+        paragraphs: [
+          "Vous habitez en Île-de-France et souhaitez confier votre véhicule ? Notre conciergerie automobile gère mise en location, entretien et suivi — contactez-nous pour étudier la faisabilité.",
+        ],
+      },
+    ],
+    ctaTitle: "Réserver en Île-de-France",
+    ctaBody:
+      "Parcourez la flotte ou contactez-nous pour un devis selon vos dates et votre lieu de remise.",
+    related: [
+      { label: "Agence Beauvais", href: "/agence-location-vehicule-beauvais" },
+      { label: "Aéroport Beauvais-Tillé", href: "/location-vehicule-aeroport-beauvais-tille" },
+      { label: "Espace propriétaires", href: "/proprietaires" },
+    ],
+  },
+  "location-vehicule-aeroport-beauvais-tille": {
+    slug: "location-vehicule-aeroport-beauvais-tille",
+    city: "Tillé",
+    kind: "location",
+    path: "/location-vehicule-aeroport-beauvais-tille",
+    metaTitle: "Location de véhicule aéroport Beauvais-Tillé",
+    metaDescription:
+      "Location voiture près de l’aéroport de Beauvais-Tillé (BVA). Remise organisée autour de Tillé / Beauvais, flotte DreamEffect, réservation WhatsApp.",
+    keywords: [
+      "location voiture aéroport Beauvais",
+      "location véhicule Beauvais-Tillé",
+      "location auto BVA",
+      "location voiture Tillé",
+      "aéroport Beauvais location",
+      "DreamEffect",
+    ],
+    heroEyebrow: "Aéroport Beauvais-Tillé · BVA",
+    heroTitle: "Location de véhicule à l’aéroport de Beauvais-Tillé",
+    heroDescription:
+      "Arrivée ou départ à BVA : organisez la remise près de Tillé / Beauvais avec une flotte soignée et un interlocuteur local.",
+    blocks: [
+      {
+        title: "Une location pratique près de BVA",
+        paragraphs: [
+          "Vous atterrissez à l’aéroport de Beauvais-Tillé ou vous partez en vol ? DreamEffect organise la remise d’un véhicule haut de gamme autour de Tillé et Beauvais, sur rendez-vous.",
+          "Alternative claire aux comptoirs aéroportuaires : tarifs affichés, véhicule préparé, suivi WhatsApp du début à la fin.",
+        ],
+      },
+      {
+        title: "Comment ça se passe",
+        paragraphs: [
+          "Choisissez le modèle, indiquez vos dates et votre créneau d’arrivée ou de départ. Nous confirmons la disponibilité et le lieu de remise (parking, rendez-vous local selon le cas).",
+        ],
+        bullets: [
+          "Location près de l’aéroport Beauvais-Tillé (BVA)",
+          "Remise / restitution organisées localement",
+          "Flotte premium contrôlée avant chaque départ",
+          "Réponse rapide en heures ouvrées",
+        ],
+      },
+      {
+        title: "Zone desservie",
+        paragraphs: [
+          "Tillé, Beauvais et communes voisines de l’Oise. Pour une remise plus loin (Gisors, Île-de-France), contactez-nous : nous étudions la faisabilité selon le véhicule et le planning.",
+        ],
+      },
+    ],
+    ctaTitle: "Réserver près de Beauvais-Tillé",
+    ctaBody:
+      "Indiquez vos dates et votre vol : nous revenons avec un créneau de remise adapté.",
+    related: [
+      { label: "Agence de location Beauvais", href: "/agence-location-vehicule-beauvais" },
+      { label: "Location Île-de-France", href: "/location-vehicule-ile-de-france" },
       { label: "Catalogue véhicules", href: "/vehicules" },
     ],
   },

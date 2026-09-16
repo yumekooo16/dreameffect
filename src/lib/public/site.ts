@@ -34,6 +34,7 @@ export const PUBLIC_ROUTES = {
 export const INFO_ROUTES = {
   insurance: "/assurance-location-vehicule-premium",
   ownerManagement: "/gestion-locative-proprietaires",
+  faq: "/faq",
 } as const;
 
 /** Landings SEO locales (intentions ville + service). */
@@ -42,6 +43,8 @@ export const LOCAL_ROUTES = {
   conciergerieGisors: "/conciergerie-automobile-gisors",
   locationBeauvais: "/agence-location-vehicule-beauvais",
   locationGisors: "/agence-location-vehicule-gisors",
+  locationIdf: "/location-vehicule-ile-de-france",
+  locationAirportTille: "/location-vehicule-aeroport-beauvais-tille",
 } as const;
 
 export const LEGAL_ROUTES = {

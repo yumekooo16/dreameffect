@@ -4,6 +4,7 @@ import { SITE_URL } from "@/src/lib/public/site";
 const DISALLOW = [
   "/admin/",
   "/espace-proprietaire/",
+  "/auth/",
   "/login",
   "/redirect",
   "/offline",
@@ -22,6 +23,25 @@ const AI_USER_AGENTS = [
   "Google-Extended",
 ] as const;
 
+const AI_ALLOW = [
+  "/",
+  "/vehicules",
+  "/vehicules/",
+  "/contact",
+  "/proprietaires",
+  "/calendrier",
+  "/faq",
+  "/assurance-location-vehicule-premium",
+  "/gestion-locative-proprietaires",
+  "/agence-location-vehicule-beauvais",
+  "/agence-location-vehicule-gisors",
+  "/conciergerie-automobile-beauvais",
+  "/conciergerie-automobile-gisors",
+  "/location-vehicule-ile-de-france",
+  "/location-vehicule-aeroport-beauvais-tille",
+  "/llms.txt",
+] as const;
+
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
@@ -32,19 +52,7 @@ export default function robots(): MetadataRoute.Robots {
       },
       ...AI_USER_AGENTS.map((userAgent) => ({
         userAgent,
-        allow: [
-          "/",
-          "/vehicules",
-          "/vehicules/",
-          "/contact",
-          "/proprietaires",
-          "/calendrier",
-          "/agence-location-vehicule-beauvais",
-          "/agence-location-vehicule-gisors",
-          "/conciergerie-automobile-beauvais",
-          "/conciergerie-automobile-gisors",
-          "/llms.txt",
-        ],
+        allow: [...AI_ALLOW],
         disallow: DISALLOW,
       })),
     ],

@@ -2,10 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { InfoArticle, InfoCta } from "@/src/components/public/info-article";
+import JsonLd from "@/src/components/public/json-ld";
 import PageHero from "@/src/components/public/page-hero";
 import { INSURANCE_INFO_BLOCKS } from "@/src/lib/public/info-content";
 import { CATALOG_KEYWORDS, formatServiceAreaLabel } from "@/src/lib/public/local-seo";
-import { buildPageMetadata } from "@/src/lib/public/seo";
+import { breadcrumbJsonLd, buildPageMetadata } from "@/src/lib/public/seo";
 import { INFO_ROUTES, PUBLIC_ROUTES } from "@/src/lib/public/site";
 
 export const metadata: Metadata = buildPageMetadata({
@@ -18,6 +19,12 @@ export const metadata: Metadata = buildPageMetadata({
 export default function InsuranceInfoPage() {
   return (
     <>
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: "Accueil", path: "/" },
+          { name: "Assurance location premium", path: INFO_ROUTES.insurance },
+        ])}
+      />
       <PageHero
         eyebrow="Informations"
         title="Assurance et location de véhicule premium"

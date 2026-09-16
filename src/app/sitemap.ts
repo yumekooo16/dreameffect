@@ -43,6 +43,12 @@ function staticSitemapEntries(lastModified: Date): MetadataRoute.Sitemap {
       priority: 0.85,
     },
     {
+      url: `${SITE_URL}${INFO_ROUTES.faq}`,
+      lastModified,
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    {
       url: `${SITE_URL}${INFO_ROUTES.insurance}`,
       lastModified,
       changeFrequency: "monthly",
@@ -77,6 +83,18 @@ function staticSitemapEntries(lastModified: Date): MetadataRoute.Sitemap {
       lastModified,
       changeFrequency: "monthly",
       priority: 0.8,
+    },
+    {
+      url: `${SITE_URL}${LOCAL_ROUTES.locationIdf}`,
+      lastModified,
+      changeFrequency: "monthly",
+      priority: 0.85,
+    },
+    {
+      url: `${SITE_URL}${LOCAL_ROUTES.locationAirportTille}`,
+      lastModified,
+      changeFrequency: "monthly",
+      priority: 0.85,
     },
     {
       url: `${SITE_URL}${LEGAL_ROUTES.legal}`,

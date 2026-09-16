@@ -18,6 +18,7 @@ type ServiceDepartment = {
 export const SERVICE_AREAS: readonly (ServiceCity | ServiceDepartment)[] = [
   { name: "Beauvais", schemaType: "City", region: "Oise", department: "60" },
   { name: "Gisors", schemaType: "City", region: "Eure", department: "27" },
+  { name: "Tillé", schemaType: "City", region: "Oise", department: "60" },
   { name: "Oise", schemaType: "AdministrativeArea", region: "Hauts-de-France" },
   { name: "Eure", schemaType: "AdministrativeArea", region: "Normandie" },
   {
@@ -34,6 +35,9 @@ export const LOCAL_KEYWORDS = [
   "location véhicule Eure",
   "location véhicule Île-de-France",
   "location voiture IDF",
+  "location voiture Paris",
+  "location véhicule aéroport Beauvais",
+  "location voiture Beauvais-Tillé",
   "agence de location Beauvais",
   "agence de location Gisors",
   "conciergerie Beauvais",

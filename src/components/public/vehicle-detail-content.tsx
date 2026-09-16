@@ -69,8 +69,12 @@ export default function VehicleDetailContent({
               <div>
                 <p className="de-public-vehicle-brand">{vehicle.brand}</p>
                 <h1 className="de-display de-vehicle-detail-title">
-                  {vehicle.model}
+                  Location {vehicle.model}
                   {vehicle.version ? ` ${vehicle.version}` : ""}
+                  <span className="sr-only">
+                    {" "}
+                    à {vehicle.location?.trim() || "Beauvais"}
+                  </span>
                 </h1>
                 {vehicle.year && (
                   <p className="mt-1 text-sm de-muted">{vehicle.year}</p>

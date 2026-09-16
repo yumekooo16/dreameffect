@@ -2,8 +2,11 @@ import type { Metadata } from "next";
 import { resolveVehicleImageUrl } from "@/src/lib/image-url";
 import {
   AREA_SERVED_LABELS,
+  BUSINESS_GEO,
   PWA_ICON_512,
+  businessGeoJsonLd,
   businessPostalAddressJsonLd,
+  buildGoogleMapsDirectionsUrl,
   openingHoursSpecificationJsonLd,
 } from "@/src/lib/public/business";
 import { CONTACT_EMAIL, CONTACT_PHONE_E164 } from "@/src/lib/public/contact";
@@ -12,10 +15,10 @@ import {
   formatServiceAreaLabel,
 } from "@/src/lib/public/local-seo";
 import { buildSameAsLinks } from "@/src/lib/public/llms";
+import { getCustomerReviews } from "@/src/lib/public/reviews";
 import { SITE_NAME, SITE_TAGLINE, SITE_URL } from "@/src/lib/public/site";
 
-export const DEFAULT_DESCRIPTION =
-  "DreamEffect — agence de location et conciergerie automobile à Beauvais et Gisors. Véhicules haut de gamme, gestion locative pour propriétaires, réservation par WhatsApp.";
+export const DEFAULT_DESCRIPTION = `DreamEffect — location et conciergerie automobile à Beauvais, Gisors et en Île-de-France (${formatServiceAreaLabel()}). Véhicules haut de gamme, gestion locative pour propriétaires, réservation WhatsApp.`;
 
 /** Image sociale 1200×630 — distincte de l'icône PWA 512. */
 export const DEFAULT_OG_IMAGE = "/og.png";
@@ -28,6 +31,7 @@ type PageSeo = {
   noIndex?: boolean;
   keywords?: string[];
   ogImage?: string | null;
+  ogImageAlt?: string;
   ogType?: "website" | "article";
   /** Titre document complet, sans suffixe « | DreamEffect ». */
   absoluteTitle?: boolean;
@@ -50,14 +54,15 @@ export function absoluteImageUrl(path?: string | null) {
 }
 
 function buildSocialImages(
-  imageUrl: string
+  imageUrl: string,
+  alt: string
 ): NonNullable<Metadata["openGraph"]>["images"] {
   return [
     {
       url: imageUrl,
       width: 1200,
       height: 630,
-      alt: SITE_NAME,
+      alt,
     },
   ];
 }
@@ -69,6 +74,7 @@ export function buildPageMetadata({
   noIndex = false,
   keywords = [],
   ogImage,
+  ogImageAlt,
   ogType = "website",
   absoluteTitle = false,
 }: PageSeo): Metadata {
@@ -76,18 +82,28 @@ export function buildPageMetadata({
   const socialTitle =
     absoluteTitle || title.includes(SITE_NAME) ? title : `${title} | ${SITE_NAME}`;
   const imageUrl = absoluteImageUrl(ogImage ?? DEFAULT_OG_IMAGE);
+  const imageAlt = ogImageAlt?.trim() || socialTitle;
 
   return {
     title: absoluteTitle ? { absolute: title } : title,
     description,
     metadataBase: new URL(SITE_URL),
     alternates: { canonical: url },
+    authors: [{ name: SITE_NAME, url: SITE_URL }],
+    creator: SITE_NAME,
+    publisher: SITE_NAME,
     robots: noIndex
       ? { index: false, follow: false }
       : {
           index: true,
           follow: true,
-          googleBot: { index: true, follow: true, "max-image-preview": "large" },
+          googleBot: {
+            index: true,
+            follow: true,
+            "max-image-preview": "large",
+            "max-snippet": -1,
+            "max-video-preview": -1,
+          },
         },
     openGraph: {
       type: ogType,
@@ -96,7 +112,7 @@ export function buildPageMetadata({
       siteName: SITE_NAME,
       title: socialTitle,
       description,
-      images: buildSocialImages(imageUrl),
+      images: buildSocialImages(imageUrl, imageAlt),
     },
     twitter: {
       card: "summary_large_image",
@@ -114,6 +130,7 @@ export function organizationJsonLd() {
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
+    "@id": `${SITE_URL}/#organization`,
     name: SITE_NAME,
     url: SITE_URL,
     logo: absoluteUrl(ORGANIZATION_LOGO),
@@ -143,8 +160,32 @@ export function faqPageJsonLd(
   };
 }
 
+function aggregateRatingJsonLd() {
+  const reviews = getCustomerReviews();
+  if (reviews.length === 0) return null;
+
+  const ratingValues = reviews.map((review) => review.rating).filter(Number.isFinite);
+  if (ratingValues.length === 0) return null;
+
+  const ratingValue =
+    Math.round(
+      (ratingValues.reduce((sum, value) => sum + value, 0) / ratingValues.length) * 10
+    ) / 10;
+
+  return {
+    "@type": "AggregateRating" as const,
+    ratingValue,
+    reviewCount: ratingValues.length,
+    bestRating: 5,
+    worstRating: 1,
+  };
+}
+
 export function localBusinessJsonLd() {
   const sameAs = buildSameAsLinks();
+  const geo = businessGeoJsonLd();
+  const aggregateRating = aggregateRatingJsonLd();
+  const hasMap = buildGoogleMapsDirectionsUrl();
 
   return {
     "@context": "https://schema.org",
@@ -159,8 +200,17 @@ export function localBusinessJsonLd() {
     email: CONTACT_EMAIL,
     priceRange: "€€€",
     address: businessPostalAddressJsonLd(),
+    ...(geo ? { geo } : {}),
+    ...(hasMap ? { hasMap } : {}),
+    ...(Number.isFinite(BUSINESS_GEO.latitude)
+      ? {
+          latitude: BUSINESS_GEO.latitude,
+          longitude: BUSINESS_GEO.longitude,
+        }
+      : {}),
     areaServed: areaServedJsonLd(),
     openingHoursSpecification: openingHoursSpecificationJsonLd(),
+    ...(aggregateRating ? { aggregateRating } : {}),
     serviceType: [
       "Location de véhicules haut de gamme",
       "Gestion locative automobile",
@@ -172,10 +222,12 @@ export function localBusinessJsonLd() {
 
 export function autoRentalJsonLd() {
   const sameAs = buildSameAsLinks();
+  const geo = businessGeoJsonLd();
 
   return {
     "@context": "https://schema.org",
     "@type": "AutoRental",
+    "@id": `${SITE_URL}/#autorental`,
     name: SITE_NAME,
     description: DEFAULT_DESCRIPTION,
     image: absoluteUrl(PWA_ICON_512),
@@ -183,6 +235,7 @@ export function autoRentalJsonLd() {
     telephone: CONTACT_PHONE_E164,
     priceRange: "€€€",
     address: businessPostalAddressJsonLd(),
+    ...(geo ? { geo } : {}),
     areaServed: [...AREA_SERVED_LABELS],
     openingHoursSpecification: openingHoursSpecificationJsonLd(),
     serviceType: ["Location de véhicules", "Gestion de flotte pour propriétaires"],
@@ -194,16 +247,14 @@ export function webSiteJsonLd() {
   return {
     "@context": "https://schema.org",
     "@type": "WebSite",
+    "@id": `${SITE_URL}/#website`,
     name: SITE_NAME,
     alternateName: ["Dream Effect", "Dreameffect"],
     description: SITE_TAGLINE,
     url: SITE_URL,
     inLanguage: "fr-FR",
     publisher: {
-      "@type": "Organization",
-      name: SITE_NAME,
-      url: SITE_URL,
-      logo: absoluteUrl(ORGANIZATION_LOGO),
+      "@id": `${SITE_URL}/#organization`,
     },
   };
 }
@@ -218,6 +269,31 @@ export function breadcrumbJsonLd(items: { name: string; path: string }[]) {
       name: item.name,
       item: absoluteUrl(item.path),
     })),
+  };
+}
+
+export function serviceJsonLd({
+  name,
+  description,
+  path,
+  serviceType,
+}: {
+  name: string;
+  description: string;
+  path: string;
+  serviceType: string;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    name,
+    description,
+    serviceType,
+    url: absoluteUrl(path),
+    provider: {
+      "@id": `${SITE_URL}/#organization`,
+    },
+    areaServed: areaServedJsonLd(),
   };
 }
 

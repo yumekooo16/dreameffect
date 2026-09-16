@@ -1,6 +1,11 @@
 import { requireAdmin } from "@/src/lib/admin/auth";
 import AdminHeader from "@/src/components/admin/header-shell";
 import AdminAppNav from "@/src/components/admin/app-nav";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
 
 export default async function AdminLayout({
   children,

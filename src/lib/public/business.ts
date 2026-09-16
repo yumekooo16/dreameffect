@@ -44,6 +44,7 @@ export const OPENING_HOURS = {
 export const AREA_SERVED_LABELS = [
   "Beauvais",
   "Gisors",
+  "Tillé",
   "Oise",
   "Eure",
   "Île-de-France",
@@ -56,6 +57,23 @@ export const SERVICE_POINTS = [
 ] as const;
 
 export const PWA_ICON_512 = "/icons/icon-512x512.png";
+
+/** Coordonnées siège / point principal (Beauvais) — surchargeables via env. */
+export const BUSINESS_GEO = {
+  latitude: Number(env("NEXT_PUBLIC_BUSINESS_LAT") ?? "49.4294"),
+  longitude: Number(env("NEXT_PUBLIC_BUSINESS_LNG") ?? "2.0808"),
+} as const;
+
+export function businessGeoJsonLd() {
+  const { latitude, longitude } = BUSINESS_GEO;
+  if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) return null;
+
+  return {
+    "@type": "GeoCoordinates" as const,
+    latitude,
+    longitude,
+  };
+}
 
 /** Adresse sur une ligne (footer, JSON-LD). */
 export function formatBusinessAddressLine(): string {

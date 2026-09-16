@@ -1,6 +1,11 @@
 import { requireOwner } from "@/src/lib/owner/auth";
 import OwnerHeader from "@/src/components/owner/header";
 import OwnerAppNav from "@/src/components/owner/app-nav";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
 
 export default async function OwnerLayout({
   children,

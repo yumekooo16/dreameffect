@@ -3,7 +3,10 @@ import { LOCAL_ROUTES } from "@/src/lib/public/site";
 
 export default function HomeCitiesSection() {
   return (
-    <div className="de-keys-territory">
+    <nav className="de-keys-territory" aria-labelledby="home-territory-title">
+      <h2 id="home-territory-title" className="sr-only">
+        Zones desservies
+      </h2>
       <strong>Beauvais · Gisors · Île-de-France</strong>
       <Link href={LOCAL_ROUTES.locationBeauvais} className="de-keys-chip">
         <span>60000</span> Beauvais — location
@@ -17,7 +20,12 @@ export default function HomeCitiesSection() {
       <Link href={LOCAL_ROUTES.conciergerieGisors} className="de-keys-chip">
         Conciergerie Gisors
       </Link>
-      <span className="de-keys-chip de-keys-chip--muted">Île-de-France</span>
-    </div>
+      <Link href={LOCAL_ROUTES.locationIdf} className="de-keys-chip">
+        Île-de-France
+      </Link>
+      <Link href={LOCAL_ROUTES.locationAirportTille} className="de-keys-chip">
+        Aéroport Beauvais-Tillé
+      </Link>
+    </nav>
   );
 }
