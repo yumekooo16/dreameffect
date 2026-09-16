@@ -41,7 +41,13 @@ export const OPENING_HOURS = {
   ] as const,
 };
 
-export const AREA_SERVED_LABELS = ["Beauvais", "Gisors", "Oise", "Eure"] as const;
+export const AREA_SERVED_LABELS = [
+  "Beauvais",
+  "Gisors",
+  "Oise",
+  "Eure",
+  "Île-de-France",
+] as const;
 
 /** Points d'accueil / remise des clés — Beauvais et Gisors. */
 export const SERVICE_POINTS = [

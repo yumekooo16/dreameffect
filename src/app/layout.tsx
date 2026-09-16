@@ -73,6 +73,12 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      {
+        url: pwaConfig.icons.sizes.favicon16,
+        sizes: "16x16",
+        type: "image/png",
+      },
       {
         url: pwaConfig.icons.sizes.favicon32,
         sizes: "32x32",
@@ -96,6 +102,7 @@ export const metadata: Metadata = {
         type: "image/png",
       },
     ],
+    shortcut: ["/favicon.ico"],
   },
 };
 

@@ -87,7 +87,7 @@ export function getLegalNoticeBlocks(): LegalBlock[] {
       title: "Activité",
       paragraphs: [
         `${SITE_NAME} propose la location de véhicules haut de gamme, la conciergerie automobile et la gestion locative pour propriétaires.`,
-        `Zones d'activité principales : ${formatServiceAreaLabel()}. Le siège social est à Paris ; les remises de clés et l'accueil clients se font à Beauvais, Gisors ou sur rendez-vous dans l'Oise et l'Eure.`,
+        `Zones d'activité principales : ${formatServiceAreaLabel()}. Le siège social est à Paris ; les remises de clés et l'accueil clients se font à Beauvais, Gisors, en Île-de-France ou sur rendez-vous dans l'Oise et l'Eure.`,
         "Les réservations se font par WhatsApp, téléphone ou formulaire. Aucun paiement n'est encaissé en ligne sur ce site.",
       ],
     },
@@ -251,7 +251,7 @@ export function getRentalTermsBlocks(): LegalBlock[] {
     {
       title: "Remise des clés, carburant et usage",
       paragraphs: [
-        "La remise et la restitution ont lieu à Beauvais, Gisors ou à un point convenu dans l'Oise et l'Eure (domicile, gare, aéroport de Beauvais-Tillé, etc.).",
+        "La remise et la restitution ont lieu à Beauvais, Gisors, en Île-de-France ou à un point convenu dans l'Oise et l'Eure (domicile, gare, aéroport de Beauvais-Tillé, etc.).",
         "Le véhicule est remis propre, avec le niveau de carburant indiqué au contrat. Il doit être restitué dans le même état de propreté et avec le même niveau de carburant, sauf accord contraire.",
         "Le locataire utilise le véhicule en bon père de famille : respect du code de la route, pas de fumeur si interdit au contrat, pas d'animaux sans accord, pas de modifications mécaniques.",
       ],

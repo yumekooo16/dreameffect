@@ -20,6 +20,11 @@ export const SERVICE_AREAS: readonly (ServiceCity | ServiceDepartment)[] = [
   { name: "Gisors", schemaType: "City", region: "Eure", department: "27" },
   { name: "Oise", schemaType: "AdministrativeArea", region: "Hauts-de-France" },
   { name: "Eure", schemaType: "AdministrativeArea", region: "Normandie" },
+  {
+    name: "Île-de-France",
+    schemaType: "AdministrativeArea",
+    region: "Île-de-France",
+  },
 ] as const;
 
 export const LOCAL_KEYWORDS = [
@@ -27,12 +32,15 @@ export const LOCAL_KEYWORDS = [
   "location voiture Oise",
   "location auto Gisors",
   "location véhicule Eure",
+  "location véhicule Île-de-France",
+  "location voiture IDF",
   "agence de location Beauvais",
   "agence de location Gisors",
   "conciergerie Beauvais",
   "conciergerie Gisors",
   "conciergerie automobile Beauvais",
   "conciergerie automobile Gisors",
+  "conciergerie automobile Île-de-France",
   "DreamEffect",
 ] as const;
 
@@ -66,7 +74,7 @@ export const CONTACT_KEYWORDS = [
 ] as const;
 
 export function formatServiceAreaLabel() {
-  return "Beauvais · Gisors · Oise · Eure";
+  return "Beauvais · Gisors · Île-de-France";
 }
 
 export function resolveVehicleSeoCity(location?: string | null) {

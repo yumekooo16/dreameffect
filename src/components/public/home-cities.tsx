@@ -4,7 +4,7 @@ import { LOCAL_ROUTES } from "@/src/lib/public/site";
 export default function HomeCitiesSection() {
   return (
     <div className="de-keys-territory">
-      <strong>Oise · Eure</strong>
+      <strong>Beauvais · Gisors · Île-de-France</strong>
       <Link href={LOCAL_ROUTES.locationBeauvais} className="de-keys-chip">
         <span>60000</span> Beauvais — location
       </Link>
@@ -17,6 +17,7 @@ export default function HomeCitiesSection() {
       <Link href={LOCAL_ROUTES.conciergerieGisors} className="de-keys-chip">
         Conciergerie Gisors
       </Link>
+      <span className="de-keys-chip de-keys-chip--muted">Île-de-France</span>
     </div>
   );
 }
