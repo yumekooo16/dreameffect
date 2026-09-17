@@ -28,14 +28,19 @@ export default function HeroSection({ imageUrl, imageFrame }: HeroSectionProps) 
       </div>
 
       <div className="de-keys-hero-copy">
-        <p id="home-hero-brand" className="de-keys-brand">
+        <h1 id="home-hero-brand" className="de-keys-brand">
           {SITE_NAME}
-        </p>
+          <span className="sr-only">
+            {" "}
+            — Location et conciergerie automobile à Beauvais, Gisors et en
+            Île-de-France
+          </span>
+        </h1>
         <p className="de-keys-kicker">{formatServiceAreaLabel()}</p>
-        <h1 id="home-hero-title" className="de-keys-title">
+        <p id="home-hero-title" className="de-keys-title">
           Confiez. Louez.
           <em> On s&apos;occupe du reste.</em>
-        </h1>
+        </p>
         <p className="de-keys-lead">
           Location et gestion de véhicules haut de gamme. Flotte préparée, tarifs
           affichés, remise des clés sur rendez-vous — Beauvais, Gisors et

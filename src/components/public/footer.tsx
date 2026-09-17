@@ -21,7 +21,8 @@ export default function PublicFooter() {
       <div className="de-public-container">
         <p className="de-footer-wordmark">{SITE_NAME}</p>
         <p className="de-footer-tagline">
-          Location et gestion de véhicules haut de gamme — Beauvais &amp; Gisors
+          Location et gestion de véhicules haut de gamme — Beauvais, Gisors
+          &amp; Île-de-France
         </p>
 
         <div className="de-footer-editorial">
@@ -62,6 +63,9 @@ export default function PublicFooter() {
                   Calendrier des réservations
                 </Link>
               </li>
+              <li>
+                <Link href={INFO_ROUTES.faq}>FAQ</Link>
+              </li>
             </ul>
           </nav>
 
@@ -81,6 +85,14 @@ export default function PublicFooter() {
               </li>
               <li>
                 <Link href={LOCAL_ROUTES.locationGisors}>Location Gisors</Link>
+              </li>
+              <li>
+                <Link href={LOCAL_ROUTES.locationIdf}>Location Île-de-France</Link>
+              </li>
+              <li>
+                <Link href={LOCAL_ROUTES.locationAirportTille}>
+                  Aéroport Beauvais-Tillé
+                </Link>
               </li>
               <li>
                 <Link href={LOCAL_ROUTES.conciergerieBeauvais}>

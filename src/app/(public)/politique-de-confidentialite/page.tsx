@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
+import JsonLd from "@/src/components/public/json-ld";
 import PageHero from "@/src/components/public/page-hero";
 import { LegalDocument } from "@/src/components/public/legal-content";
 import { getPrivacyBlocks } from "@/src/lib/public/legal";
-import { buildPageMetadata } from "@/src/lib/public/seo";
+import { breadcrumbJsonLd, buildPageMetadata } from "@/src/lib/public/seo";
 import { LEGAL_ROUTES } from "@/src/lib/public/site";
 
 export const metadata: Metadata = buildPageMetadata({
@@ -15,6 +16,15 @@ export const metadata: Metadata = buildPageMetadata({
 export default function PrivacyPolicyPage() {
   return (
     <>
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: "Accueil", path: "/" },
+          {
+            name: "Politique de confidentialité",
+            path: LEGAL_ROUTES.privacy,
+          },
+        ])}
+      />
       <PageHero
         eyebrow="Informations"
         title="Politique de confidentialité"

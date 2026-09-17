@@ -33,11 +33,14 @@ export function buildLlmsTxt(): string {
     `- Catalogue véhicules : ${SITE_URL}${PUBLIC_ROUTES.vehicles}`,
     `- Propriétaires : ${SITE_URL}${PUBLIC_ROUTES.owners}`,
     `- Contact : ${SITE_URL}${PUBLIC_ROUTES.contact}`,
+    `- FAQ : ${SITE_URL}${INFO_ROUTES.faq}`,
     `- Calendrier des réservations : ${SITE_URL}${PUBLIC_ROUTES.calendar}`,
     `- Assurance location premium : ${SITE_URL}${INFO_ROUTES.insurance}`,
     `- Gestion locative propriétaires : ${SITE_URL}${INFO_ROUTES.ownerManagement}`,
     `- Agence de location Beauvais : ${SITE_URL}${LOCAL_ROUTES.locationBeauvais}`,
     `- Agence de location Gisors : ${SITE_URL}${LOCAL_ROUTES.locationGisors}`,
+    `- Location Île-de-France : ${SITE_URL}${LOCAL_ROUTES.locationIdf}`,
+    `- Location aéroport Beauvais-Tillé : ${SITE_URL}${LOCAL_ROUTES.locationAirportTille}`,
     `- Conciergerie automobile Beauvais : ${SITE_URL}${LOCAL_ROUTES.conciergerieBeauvais}`,
     `- Conciergerie automobile Gisors : ${SITE_URL}${LOCAL_ROUTES.conciergerieGisors}`,
     `- Conditions de location : ${SITE_URL}${LEGAL_ROUTES.terms}`,
@@ -63,7 +66,7 @@ export function buildLlmsTxt(): string {
     `- Sitemap : ${SITE_URL}/sitemap.xml`,
     `- Robots : ${SITE_URL}/robots.txt`,
     "",
-    "Ce site est public. Les espaces /login, /admin et /espace-proprietaire sont réservés aux utilisateurs authentifiés."
+    "Ce site est public. Les espaces /login, /admin, /auth et /espace-proprietaire sont réservés aux utilisateurs authentifiés."
   );
 
   return `${lines.join("\n")}\n`;

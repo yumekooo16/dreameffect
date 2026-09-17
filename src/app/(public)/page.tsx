@@ -5,7 +5,7 @@ import HowItWorksSection from "@/src/components/public/how-it-works";
 import VehiclesPreview from "@/src/components/public/vehicles-preview";
 import HomeReviewsSection from "@/src/components/public/home-reviews";
 import HomeCtaSection from "@/src/components/public/home-cta";
-import HomeFaqSection, { HOME_FAQ_ITEMS } from "@/src/components/public/home-faq";
+import HomeFaqSection, { getVisibleHomeFaqItems } from "@/src/components/public/home-faq";
 import HomeFigures from "@/src/components/public/home-figures";
 import JsonLd from "@/src/components/public/json-ld";
 import { withDemoFleetFallback } from "@/src/lib/public/demo-vehicles";
@@ -25,16 +25,18 @@ export const metadata: Metadata = buildPageMetadata({
   path: "/",
   keywords: [...HOME_KEYWORDS],
   absoluteTitle: true,
+  ogImageAlt: `DreamEffect — location véhicules haut de gamme à ${formatServiceAreaLabel()}`,
 });
 
 export default async function HomePage() {
   const vehicles = withDemoFleetFallback(await fetchPublicVehicles());
   const heroVisual = resolveHeroVisual(vehicles);
   const visualPool = await collectNarrativeVisualPool(vehicles);
+  const visibleFaqs = getVisibleHomeFaqItems().all;
 
   return (
     <>
-      <JsonLd data={faqPageJsonLd([...HOME_FAQ_ITEMS])} />
+      <JsonLd data={faqPageJsonLd(visibleFaqs)} />
       <HeroSection imageUrl={heroVisual?.url} imageFrame={heroVisual?.frame} />
       <HomeCitiesSection />
       <HomeFigures />

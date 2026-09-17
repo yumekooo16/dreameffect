@@ -4,7 +4,11 @@ import { InfoArticle, InfoCta } from "@/src/components/public/info-article";
 import JsonLd from "@/src/components/public/json-ld";
 import PageHero from "@/src/components/public/page-hero";
 import type { LocalCityPage } from "@/src/lib/public/local-city-pages";
-import { breadcrumbJsonLd, buildPageMetadata } from "@/src/lib/public/seo";
+import {
+  breadcrumbJsonLd,
+  buildPageMetadata,
+  serviceJsonLd,
+} from "@/src/lib/public/seo";
 import { PUBLIC_ROUTES } from "@/src/lib/public/site";
 
 export function buildLocalCityMetadata(page: LocalCityPage) {
@@ -13,6 +17,7 @@ export function buildLocalCityMetadata(page: LocalCityPage) {
     description: page.metaDescription,
     path: page.path,
     keywords: page.keywords,
+    ogImageAlt: page.metaTitle,
   });
 }
 
@@ -21,14 +26,26 @@ export default function LocalCityPageView({ page }: { page: LocalCityPage }) {
     page.kind === "location" ? PUBLIC_ROUTES.vehicles : PUBLIC_ROUTES.owners;
   const primaryLabel =
     page.kind === "location" ? "Voir les véhicules" : "Espace propriétaires";
+  const serviceType =
+    page.kind === "location"
+      ? "Location de véhicules"
+      : "Conciergerie automobile";
 
   return (
     <>
       <JsonLd
-        data={breadcrumbJsonLd([
-          { name: "Accueil", path: "/" },
-          { name: page.metaTitle, path: page.path },
-        ])}
+        data={[
+          breadcrumbJsonLd([
+            { name: "Accueil", path: "/" },
+            { name: page.metaTitle, path: page.path },
+          ]),
+          serviceJsonLd({
+            name: page.metaTitle,
+            description: page.metaDescription,
+            path: page.path,
+            serviceType,
+          }),
+        ]}
       />
       <PageHero
         eyebrow={page.heroEyebrow}
