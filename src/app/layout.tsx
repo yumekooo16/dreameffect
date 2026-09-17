@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Newsreader, Source_Sans_3 } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import { ServiceWorkerRegister } from "@/src/components/pwa/service-worker-register";
 import { StandaloneRedirect } from "@/src/components/pwa/standalone-redirect";
 import { pwaConfig } from "@/src/lib/pwa/config";
@@ -117,6 +118,7 @@ export default function RootLayout({
         {children}
         <StandaloneRedirect />
         <ServiceWorkerRegister />
+        <Analytics />
       </body>
     </html>
   );

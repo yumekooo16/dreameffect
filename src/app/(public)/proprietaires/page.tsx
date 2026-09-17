@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { connection } from "next/server";
 import OwnersHero from "@/src/components/public/owners-hero";
 import OwnersContent from "@/src/components/public/owners-content";
 import JsonLd from "@/src/components/public/json-ld";
@@ -20,7 +19,7 @@ import {
 } from "@/src/lib/public/local-seo";
 import { PUBLIC_ROUTES, SITE_URL } from "@/src/lib/public/site";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Confier votre véhicule",
@@ -48,8 +47,6 @@ function ownersServiceJsonLd() {
 }
 
 export default async function OwnersPage() {
-  await connection();
-
   const vehicles = withDemoFleetFallback(await fetchPublicVehicles());
   const heroVisual = resolveHeroVisual(vehicles);
 

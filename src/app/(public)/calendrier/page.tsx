@@ -25,7 +25,7 @@ export const metadata: Metadata = buildPageMetadata({
   ],
 });
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 type PageProps = {
   searchParams: Promise<{ vehicule?: string }>;

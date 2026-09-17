@@ -22,6 +22,7 @@ const nextConfig: NextConfig = {
     "/*": ["./contracts/templates/contrat-location-dreameffect-v2.pdf"],
   },
   images: {
+    formats: ["image/avif", "image/webp"],
     remotePatterns: [
       ...(supabaseHostname
         ? [{ protocol: "https" as const, hostname: supabaseHostname }]
@@ -94,6 +95,10 @@ const nextConfig: NextConfig = {
           {
             key: "Referrer-Policy",
             value: "strict-origin-when-cross-origin",
+          },
+          {
+            key: "Strict-Transport-Security",
+            value: "max-age=63072000; includeSubDomains; preload",
           },
         ],
       },

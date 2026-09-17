@@ -156,7 +156,15 @@ export function getPrivacyBlocks(): LegalBlock[] {
       paragraphs: [
         "Les données sont destinées à l'équipe DreamEffect. Elles peuvent être traitées par nos sous-traitants techniques (hébergement Vercel, base de données Supabase, messagerie) dans le cadre de leur mission, uniquement.",
         "WhatsApp (Meta) est utilisé si vous choisissez ce canal : son traitement est alors régi par les conditions de ce service.",
-        "Aucune donnée n'est vendue. Aucune mesure d'audience publicitaire n'est déposée.",
+        "Aucune donnée n'est vendue.",
+      ],
+    },
+    {
+      title: "Cookies",
+      paragraphs: [
+        "Le site utilise uniquement des cookies et stockages techniques nécessaires au fonctionnement : session de connexion des espaces admin / propriétaire, option « Rester connecté », et mémorisation du bandeau d'information cookies (localStorage).",
+        "Une mesure d'audience anonymisée peut être activée via Vercel Analytics : elle ne dépose pas de cookie publicitaire et ne sert pas à du profilage commercial.",
+        "Vous pouvez supprimer les cookies et données locales depuis les paramètres de votre navigateur.",
       ],
     },
     {

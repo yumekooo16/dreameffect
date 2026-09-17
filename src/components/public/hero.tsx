@@ -1,7 +1,6 @@
 import Link from "next/link";
-import { ArrowRight, MessageCircle } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import HeroBackground from "@/src/components/public/hero-background";
-import { CONTACT_WHATSAPP_URL } from "@/src/lib/public/contact";
 import { formatServiceAreaLabel } from "@/src/lib/public/local-seo";
 import { PUBLIC_ROUTES, SITE_NAME } from "@/src/lib/public/site";
 import type { VehicleImageFrame } from "@/src/lib/vehicles/image-frame";
@@ -50,23 +49,12 @@ export default function HeroSection({ imageUrl, imageFrame }: HeroSectionProps) 
             Voir la flotte
             <ArrowRight size={18} strokeWidth={1.75} aria-hidden />
           </Link>
-          <Link href={PUBLIC_ROUTES.owners} className="de-btn de-btn-outline">
-            Confier mon véhicule
-          </Link>
-          <Link
-            href={CONTACT_WHATSAPP_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="de-keys-link"
-            aria-label="Ouvrir WhatsApp"
-            style={{ marginTop: 0 }}
-          >
-            <MessageCircle size={16} strokeWidth={1.75} aria-hidden />
-            WhatsApp
-          </Link>
         </div>
         <p className="de-keys-media-cap de-keys-media-cap--stage">
-          Flotte entretenue · Remise sous 24 h
+          Flotte entretenue · Remise sous 24 h ·{" "}
+          <Link href={PUBLIC_ROUTES.owners} className="de-keys-link-inline">
+            Confier mon véhicule
+          </Link>
         </p>
       </div>
     </section>

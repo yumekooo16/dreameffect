@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { connection } from "next/server";
 import HeroSection from "@/src/components/public/hero";
 import HomeCitiesSection from "@/src/components/public/home-cities";
 import HowItWorksSection from "@/src/components/public/how-it-works";
@@ -18,7 +17,7 @@ import {
   resolveHeroVisual,
 } from "@/src/lib/public/hero-image";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export const metadata: Metadata = buildPageMetadata({
   title: "DreamEffect — Location & conciergerie Beauvais · Gisors · IDF",
@@ -29,8 +28,6 @@ export const metadata: Metadata = buildPageMetadata({
 });
 
 export default async function HomePage() {
-  await connection();
-
   const vehicles = withDemoFleetFallback(await fetchPublicVehicles());
   const heroVisual = resolveHeroVisual(vehicles);
   const visualPool = await collectNarrativeVisualPool(vehicles);
