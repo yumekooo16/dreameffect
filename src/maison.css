@@ -298,12 +298,7 @@
   animation: de-keys-hero-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both;
 }
 
-.de-keys-media-cap--stage {
-  position: static;
-  margin-top: 2.75rem;
-  font-size: 0.625rem;
-  letter-spacing: 0.1em;
-  color: color-mix(in srgb, var(--text) 58%, transparent);
+.de-keys-hero--stage .de-keys-media-cap--stage {
   animation: de-keys-hero-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.28s both;
 }
 
@@ -426,6 +421,18 @@
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--text);
+}
+
+.de-keys-media-cap.de-keys-media-cap--stage {
+  position: static;
+  left: auto;
+  bottom: auto;
+  z-index: auto;
+  display: block;
+  margin-top: 2.75rem;
+  font-size: 0.625rem;
+  letter-spacing: 0.1em;
+  color: color-mix(in srgb, var(--text) 55%, transparent);
 }
 
 /* --- Territory soft ----------------------------------------- */
