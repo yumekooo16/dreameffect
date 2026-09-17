@@ -37,7 +37,7 @@ export default function PublicHeader() {
               height={44}
               className="de-maison-header-logo"
               priority
-              unoptimized
+              sizes="44px"
             />
           </Link>
         </div>

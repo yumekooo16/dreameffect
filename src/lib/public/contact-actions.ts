@@ -1,6 +1,11 @@
 "use server";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
+import {
+  assertContactRateLimit,
+  assertHumanTiming,
+  isHoneypotFilled,
+} from "@/src/lib/public/form-spam-guard";
 import { createAdminClient } from "@/src/lib/supabase/admin";
 
 export type ContactLeadInput = {
@@ -12,6 +17,10 @@ export type ContactLeadInput = {
   topicLabel: string;
   message: string;
   gdprConsent: boolean;
+  /** Champ honeypot — doit rester vide. */
+  website?: string;
+  /** Timestamp ms au montage du formulaire. */
+  formStartedAt?: number;
 };
 
 export type ContactLeadResult =
@@ -66,6 +75,18 @@ async function notifyAdminsAboutContactLead(
 export async function submitContactLead(
   input: ContactLeadInput
 ): Promise<ContactLeadResult> {
+  if (isHoneypotFilled(input.website)) {
+    // Succès silencieux pour les bots
+    return { ok: true };
+  }
+
+  if (!assertHumanTiming(input.formStartedAt)) {
+    return { ok: false, error: "Envoi trop rapide. Réessayez." };
+  }
+
+  const rate = await assertContactRateLimit();
+  if (!rate.ok) return rate;
+
   const firstName = input.firstName.trim();
   const lastName = input.lastName.trim();
   const email = input.email.trim();

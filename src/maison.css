@@ -553,6 +553,18 @@
   border-color: var(--brass);
 }
 
+.de-keys-link-inline {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+  text-decoration-color: color-mix(in srgb, currentColor 45%, transparent);
+}
+
+.de-keys-link-inline:hover {
+  color: var(--brass-soft);
+  text-decoration-color: var(--brass);
+}
+
 /* --- Narrative steps ---------------------------------------- */
 .de-keys-narrative {
   display: grid;

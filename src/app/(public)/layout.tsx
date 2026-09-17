@@ -1,6 +1,7 @@
 import JsonLd from "@/src/components/public/json-ld";
 import PublicHeader from "@/src/components/public/header";
 import PublicFooter from "@/src/components/public/footer";
+import CookieBanner from "@/src/components/gdpr/cookie-banner";
 import { globalPublicJsonLd } from "@/src/lib/public/seo";
 
 export default function PublicLayout({
@@ -19,6 +20,8 @@ export default function PublicLayout({
         <main id="main-content">{children}</main>
         <PublicFooter />
       </div>
+      <CookieBanner />
     </div>
   );
 }
+

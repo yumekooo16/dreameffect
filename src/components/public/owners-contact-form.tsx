@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Send, CheckCircle2 } from "lucide-react";
 import GdprConsentField from "@/src/components/gdpr/gdpr-consent-field";
+import HoneypotField from "@/src/components/gdpr/honeypot-field";
 import { buildWhatsAppUrl, WHATSAPP_NUMBER } from "@/src/lib/constants";
 import { submitContactLead } from "@/src/lib/public/contact-actions";
 import {
@@ -18,6 +19,7 @@ type FormState = {
   vehicle: string;
   message: string;
   gdprConsent: boolean;
+  website: string;
 };
 
 const INITIAL: FormState = {
@@ -28,6 +30,7 @@ const INITIAL: FormState = {
   vehicle: "",
   message: "",
   gdprConsent: false,
+  website: "",
 };
 
 type FormErrors = Partial<Record<keyof FormState, string>>;
@@ -69,6 +72,7 @@ export default function OwnersContactForm() {
   const [sent, setSent] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [formStartedAt] = useState(() => Date.now());
 
   function updateField<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -114,6 +118,8 @@ export default function OwnersContactForm() {
       topicLabel: "Gestion locative — propriétaire",
       message: adminMessage,
       gdprConsent: form.gdprConsent,
+      website: form.website,
+      formStartedAt,
     });
 
     setSubmitting(false);
@@ -163,6 +169,12 @@ export default function OwnersContactForm() {
 
   return (
     <form className="de-contact-form" onSubmit={handleSubmit} noValidate>
+      <HoneypotField
+        id="owner-website"
+        value={form.website}
+        onChange={(value) => updateField("website", value)}
+      />
+
       <div className="de-form-row">
         <div className="de-form-field">
           <label htmlFor="owner-firstName" className="de-label">
