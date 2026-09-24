@@ -21,7 +21,8 @@ export default function PublicFooter() {
       <div className="de-public-container">
         <p className="de-footer-wordmark">{SITE_NAME}</p>
         <p className="de-footer-tagline">
-          Location et gestion de véhicules haut de gamme — Beauvais &amp; Gisors
+          Location et gestion de véhicules haut de gamme — Beauvais · Gisors ·
+          IDF
         </p>
 
         <div className="de-footer-editorial">
@@ -33,6 +34,7 @@ export default function PublicFooter() {
                   {point.postalCode} {point.city}
                 </span>
               ))}
+              <span className="block">Île-de-France (IDF)</span>
             </address>
             <a href={telHref()} className="de-footer-phone">
               {CONTACT_PHONE}
