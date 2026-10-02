@@ -1,20 +1,17 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { DayPicker } from "react-day-picker";
-import { fr } from "react-day-picker/locale";
-import "react-day-picker/style.css";
 import { CalendarDays, ChevronRight } from "lucide-react";
-import {
-  expandBlockedDateKeys,
-  startOfDay,
-} from "@/src/lib/dates/calendar-utils";
+import VehicleBookingPanel from "@/src/components/public/vehicle-booking-panel";
 import type { VehicleAvailability } from "@/src/lib/public/availability-data";
 import { getVehicleDisplayName } from "@/src/lib/public/vehicles-data";
-import type { PublicVehicle } from "@/src/lib/public/vehicles-types";
+import type {
+  PublicVehicle,
+  PublicVehicleDetail,
+} from "@/src/lib/public/vehicles-types";
 import { resolveVehicleImageUrl } from "@/src/lib/image-url";
 import { PUBLIC_ROUTES } from "@/src/lib/public/site";
 import { getLowestRentalPrice, formatPriceFrom } from "@/src/lib/vehicles/pricing";
@@ -22,39 +19,22 @@ import { getLowestRentalPrice, formatPriceFrom } from "@/src/lib/vehicles/pricin
 type Props = {
   vehicles: PublicVehicle[];
   selectedSlug: string | null;
+  selectedVehicle: PublicVehicleDetail | null;
   availability: VehicleAvailability | null;
 };
 
 export default function ReservationCalendar({
   vehicles,
   selectedSlug,
+  selectedVehicle,
   availability,
 }: Props) {
   const router = useRouter();
-  const [month, setMonth] = useState<Date>(() => startOfDay(new Date()));
 
   const selected = useMemo(
     () => vehicles.find((vehicle) => vehicle.slug === selectedSlug) ?? null,
     [vehicles, selectedSlug]
   );
-
-  const blockedKeys = useMemo(
-    () =>
-      availability
-        ? expandBlockedDateKeys(
-            availability.blockedPeriods,
-            availability.maintenanceDays
-          )
-        : new Set<string>(),
-    [availability]
-  );
-
-  const reservedDays = useMemo(
-    () => Array.from(blockedKeys).map((key) => new Date(`${key}T12:00:00`)),
-    [blockedKeys]
-  );
-
-  const today = useMemo(() => startOfDay(new Date()), []);
 
   function selectVehicle(slug: string) {
     router.push(`${PUBLIC_ROUTES.calendar}?vehicule=${encodeURIComponent(slug)}`);
@@ -68,8 +48,8 @@ export default function ReservationCalendar({
           Choisissez un véhicule
         </h2>
         <p className="de-calendar-page__lead">
-          Consultez les dates déjà réservées ou en maintenance. Les jours
-          marqués restent indisponibles.
+          Consultez les disponibilités, estimez votre location, puis envoyez
+          votre demande — directement depuis cette page.
         </p>
       </div>
 
@@ -146,46 +126,29 @@ export default function ReservationCalendar({
           <p className="de-label">Étape 2</p>
           <h2 className="de-display de-calendar-page__title">
             {selected
-              ? `Calendrier — ${getVehicleDisplayName(selected)}`
-              : "Calendrier des réservations"}
+              ? `Réserver — ${getVehicleDisplayName(selected)}`
+              : "Demande de réservation"}
           </h2>
           <p className="de-calendar-page__lead">
             {selected
-              ? "Les jours grisés sont déjà réservés ou indisponibles."
-              : "Sélectionnez un véhicule ci-dessus pour afficher ses dates réservées."}
+              ? "Choisissez vos dates, consultez l'estimation et la caution, puis envoyez votre demande."
+              : "Sélectionnez un véhicule ci-dessus pour afficher le calendrier et formuler une demande."}
           </p>
         </div>
 
-        {selected && availability ? (
-          <div className="de-booking-calendar-wrap de-calendar-page__picker">
-            <div className="de-calendar de-calendar-public">
-              <DayPicker
-                mode="single"
-                locale={fr}
-                month={month}
-                onMonthChange={setMonth}
-                numberOfMonths={1}
-                disabled={[{ before: today }, ...reservedDays]}
-                modifiers={{ unavailable: reservedDays }}
-                modifiersClassNames={{ unavailable: "cal-unavailable" }}
-                showOutsideDays
-                fixedWeeks
-              />
-              <div className="de-calendar-legend">
-                <span className="legend-cal-available">Disponible</span>
-                <span className="legend-cal-unavailable">Réservé / indisponible</span>
-              </div>
-            </div>
-
+        {selectedVehicle && availability ? (
+          <div className="de-calendar-page__booking">
+            <VehicleBookingPanel
+              vehicle={selectedVehicle}
+              availability={availability}
+              compact
+            />
             <div className="de-calendar-page__actions">
               <Link
-                href={`${PUBLIC_ROUTES.vehicles}/${selected.slug}`}
-                className="de-btn de-btn-primary"
+                href={`${PUBLIC_ROUTES.vehicles}/${selectedVehicle.slug}`}
+                className="de-btn de-btn-ghost"
               >
-                Voir la fiche &amp; réserver
-              </Link>
-              <Link href={PUBLIC_ROUTES.contact} className="de-btn de-btn-ghost">
-                Nous contacter
+                Voir photos &amp; détails
               </Link>
             </div>
           </div>
