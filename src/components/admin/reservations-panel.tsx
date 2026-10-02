@@ -78,13 +78,13 @@ export default function ReservationsPanel({
               <p className="mt-1 text-lg font-medium">{stats.finished}</p>
             </div>
             <div className="de-card-inner">
-              <p className="de-label">Part propriétaires</p>
+              <p className="de-label">Parts propriétaires</p>
               <p className="mt-1 text-lg font-medium">
                 {formatEuro(stats.ownerShare)}
               </p>
             </div>
             <div className="de-card-inner">
-              <p className="de-label">Commission DreamEffect</p>
+              <p className="de-label">Marge DreamEffect</p>
               <p className="mt-1 text-lg font-medium text-[var(--blue-soft)]">
                 {formatEuro(stats.companyShare)}
               </p>

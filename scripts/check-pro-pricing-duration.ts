@@ -10,6 +10,7 @@ import {
 } from "../src/lib/revenue/pro-pricing";
 import { countBillableRentalDays } from "../src/lib/dates/calendar-utils";
 import { splitRevenueForContext } from "../src/lib/revenue/split";
+import { computeLiveReservationSplit } from "../src/lib/revenue/live-split";
 
 const pricing = normalizeVehicleProPricing({
   pro_price_24h_weekday: 70,
@@ -78,6 +79,26 @@ assert(
   weekendPayout?.baseAmount === 200,
   `48 h week-end = 200 (reçu ${weekendPayout?.baseAmount})`
 );
+
+// Montants stockés en % (70/30 → 154/66) doivent être recalculés en prix pro
+const healed = computeLiveReservationSplit(
+  {
+    vehicle_id: "v1",
+    total_price: 220,
+    owner_amount: 154,
+    company_amount: 66,
+    start_date: wed,
+    end_date: fri,
+  },
+  {
+    mode: "pro_price",
+    ownerSharePercent: 70,
+    proPricing: pricing,
+  }
+);
+assert(healed.needsSync, "anciens montants % → needsSync");
+assert(healed.ownerAmount === 140, `heal owner=140 (reçu ${healed.ownerAmount})`);
+assert(healed.companyAmount === 80, `heal marge=80 (reçu ${healed.companyAmount})`);
 
 if (process.exitCode) {
   console.error("\nÉchecs détectés.");

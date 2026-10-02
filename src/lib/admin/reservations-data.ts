@@ -5,6 +5,8 @@ import {
   type ReservationListItem,
   type ReservationRecord,
 } from "@/src/lib/admin/reservations-types";
+import { computeLiveReservationSplit } from "@/src/lib/revenue/live-split";
+import { fetchVehiclesRevenueFormConfigs } from "@/src/lib/revenue/owner-settings";
 
 function ownerDisplayName(
   owner?: { first_name: string | null; last_name: string | null } | null
@@ -50,23 +52,43 @@ function enrichReservations(
 export async function fetchReservationsList() {
   const supabase = await createClient();
 
-  const [reservationsRes, vehiclesRes, ownersRes] = await Promise.all([
-    supabase
-      .from("reservations")
-      .select(
-        "id, vehicle_id, start_date, end_date, customer_name, customer_email, pickup_location, return_location, status, owner_amount, company_amount, total_price, distance_km, created_at, updated_at"
-      )
-      .order("start_date", { ascending: false }),
-    supabase
-      .from("owner_vehicle_dashboard")
-      .select("vehicle_id, owner_id, brand, model, image_url"),
-    supabase
-      .from("profiles")
-      .select("id, first_name, last_name")
-      .eq("role", "owner"),
-  ]);
+  const [reservationsRes, vehiclesRes, ownersRes, revenueConfigs] =
+    await Promise.all([
+      supabase
+        .from("reservations")
+        .select(
+          "id, vehicle_id, start_date, end_date, customer_name, customer_email, pickup_location, return_location, status, owner_amount, company_amount, total_price, distance_km, created_at, updated_at"
+        )
+        .order("start_date", { ascending: false }),
+      supabase
+        .from("owner_vehicle_dashboard")
+        .select("vehicle_id, owner_id, brand, model, image_url"),
+      supabase
+        .from("profiles")
+        .select("id, first_name, last_name")
+        .eq("role", "owner"),
+      fetchVehiclesRevenueFormConfigs(supabase),
+    ]);
 
-  const reservations = (reservationsRes.data ?? []) as ReservationRecord[];
+  const configByVehicle = new Map(
+    revenueConfigs.map((config) => [config.vehicleId, config])
+  );
+
+  // Recalcule les parts prix pro pour les stats (évite les anciens montants % stockés).
+  const reservations = ((reservationsRes.data ?? []) as ReservationRecord[]).map(
+    (reservation) => {
+      const live = computeLiveReservationSplit(
+        reservation,
+        configByVehicle.get(reservation.vehicle_id)
+      );
+      if (!live.needsSync) return reservation;
+      return {
+        ...reservation,
+        owner_amount: live.ownerAmount,
+        company_amount: live.companyAmount,
+      };
+    }
+  );
 
   const vehicles = new Map(
     (vehiclesRes.data ?? []).map((vehicle) => [
@@ -225,8 +247,30 @@ async function buildReservationDetail(
     };
   }
 
+  const revenueConfigs = await fetchVehiclesRevenueFormConfigs(supabase);
+  const vehicleConfig = revenueConfigs.find(
+    (config) => config.vehicleId === record.vehicle_id
+  );
+  const live = computeLiveReservationSplit(record, vehicleConfig);
+
+  if (live.needsSync) {
+    const { error: syncError } = await supabase
+      .from("reservations")
+      .update({
+        owner_amount: live.ownerAmount,
+        company_amount: live.companyAmount,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", record.id);
+    if (syncError) {
+      console.error("[buildReservationDetail:syncSplit]", syncError.message);
+    }
+  }
+
   const base: ReservationListItem = {
     ...record,
+    owner_amount: live.ownerAmount,
+    company_amount: live.companyAmount,
     vehicle_label: `${vehicle.brand} ${vehicle.model}`,
     vehicle_image_url: vehicle.image_url,
     owner_id: vehicle.owner_id,
@@ -243,6 +287,12 @@ async function buildReservationDetail(
       phone: null,
     },
     client_history: clientHistory,
+    finance: {
+      mode: live.mode,
+      ownerAmount: live.ownerAmount,
+      companyAmount: live.companyAmount,
+      tierLabel: live.tierLabel ?? null,
+    },
   };
 }
 
@@ -263,9 +313,6 @@ export async function fetchVehiclesForReservationForm() {
     (ownersRes.data ?? []).map((owner) => [owner.id, ownerDisplayName(owner)])
   );
 
-  const { fetchVehiclesRevenueFormConfigs } = await import(
-    "@/src/lib/revenue/owner-settings"
-  );
   const revenueConfigs = await fetchVehiclesRevenueFormConfigs(supabase);
 
   return {
