@@ -10,6 +10,10 @@ import {
   buildOwnerAdminMessage,
   buildOwnerWhatsAppMessage,
 } from "@/src/lib/public/owner-whatsapp-message";
+import {
+  SuccessActionButton,
+  useRedirectSuccessFeedback,
+} from "@/src/components/ui/success-feedback";
 
 type FormState = {
   firstName: string;
@@ -73,6 +77,7 @@ export default function OwnersContactForm() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [formStartedAt] = useState(() => Date.now());
+  const { succeeded, flashSuccess, clearSuccess } = useRedirectSuccessFeedback();
 
   function updateField<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -89,6 +94,7 @@ export default function OwnersContactForm() {
     e.preventDefault();
     setSent(false);
     setSubmitError(null);
+    clearSuccess();
 
     const nextErrors = validate(form);
     if (Object.keys(nextErrors).length > 0) {
@@ -139,15 +145,17 @@ export default function OwnersContactForm() {
       })
     );
     window.open(url, "_blank", "noopener,noreferrer");
-    setSent(true);
-    setForm(INITIAL);
-    setErrors({});
+    flashSuccess(() => {
+      setSent(true);
+      setForm(INITIAL);
+      setErrors({});
+    });
   }
 
   if (sent) {
     return (
       <div className="de-contact-form-success">
-        <CheckCircle2 size={28} strokeWidth={1.75} className="text-[var(--blue-soft)]" />
+        <CheckCircle2 size={28} strokeWidth={1.75} className="text-[#22c55e]" />
         <h3 className="de-display mt-4 text-xl">
           Demande enregistrée
         </h3>
@@ -294,14 +302,20 @@ export default function OwnersContactForm() {
       ) : null}
 
       <div className="de-form-actions">
-        <button
+        <SuccessActionButton
           type="submit"
           className="de-btn de-btn-primary de-btn-lg"
-          disabled={submitting}
-        >
-          <Send size={18} strokeWidth={2} />
-          {submitting ? "Envoi…" : "Envoyer ma demande"}
-        </button>
+          pending={submitting}
+          succeeded={succeeded}
+          idleLabel={
+            <>
+              <Send size={18} strokeWidth={2} />
+              Envoyer ma demande
+            </>
+          }
+          pendingLabel="Envoi…"
+          successLabel="Demande enregistrée"
+        />
         <p className="de-form-note">
           La demande est enregistrée côté DreamEffect, puis WhatsApp s&apos;ouvre
           pour finaliser l&apos;échange.

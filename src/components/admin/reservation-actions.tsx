@@ -11,6 +11,11 @@ import ReservationForm, {
   type ReservationVehicleRevenueConfig,
 } from "./reservation-form";
 import type { ReservationFormData } from "@/src/lib/admin/reservations-types";
+import {
+  ActionSuccessMessage,
+  SuccessActionButton,
+  useSuccessFeedback,
+} from "@/src/components/ui/success-feedback";
 
 type VehicleOption = { id: string; label: string };
 
@@ -39,20 +44,40 @@ export default function ReservationActionsPanel({
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const { succeeded, flashSuccess, clearSuccess } = useSuccessFeedback();
+  const [successKind, setSuccessKind] = useState<
+    "confirm" | "finish" | "cancel" | null
+  >(null);
 
-  function runAction(action: () => Promise<{ success: boolean; error?: string }>) {
+  function runAction(
+    kind: "confirm" | "finish" | "cancel",
+    action: () => Promise<{ success: boolean; error?: string }>,
+    successMessage: string
+  ) {
     setMessage(null);
     setError(null);
+    clearSuccess();
+    setSuccessKind(null);
 
     startTransition(async () => {
       const result = await action();
 
       if (result.success) {
-        setMessage("Action effectuée.");
+        setSuccessKind(kind);
+        setMessage(successMessage);
         setEditing(false);
-        setConfirmCancel(false);
-        setShowFinishForm(false);
-        setFinishKm("");
+        if (kind !== "finish") {
+          setShowFinishForm(false);
+          setFinishKm("");
+        }
+        if (kind !== "cancel") {
+          setConfirmCancel(false);
+        }
+        flashSuccess(() => {
+          setShowFinishForm(false);
+          setFinishKm("");
+          setConfirmCancel(false);
+        });
         router.refresh();
       } else {
         setError(result.error ?? "Action impossible");
@@ -98,20 +123,27 @@ export default function ReservationActionsPanel({
         </button>
 
         {canConfirm && (
-          <button
-            type="button"
-            disabled={pending}
-            onClick={() => runAction(() => confirmReservation(reservationId))}
+          <SuccessActionButton
+            pending={pending}
+            succeeded={succeeded && successKind === "confirm"}
+            onClick={() =>
+              runAction(
+                "confirm",
+                () => confirmReservation(reservationId),
+                "Réservation confirmée."
+              )
+            }
+            idleLabel="Confirmer"
+            pendingLabel="Traitement…"
+            successLabel="Confirmée"
             className="de-btn de-btn-primary"
-          >
-            Confirmer
-          </button>
+          />
         )}
 
         {canFinish && !showFinishForm && (
           <button
             type="button"
-            disabled={pending}
+            disabled={pending || succeeded}
             onClick={() => setShowFinishForm(true)}
             className="de-btn de-btn-ghost"
           >
@@ -122,7 +154,7 @@ export default function ReservationActionsPanel({
         {canCancel && !confirmCancel && (
           <button
             type="button"
-            disabled={pending}
+            disabled={pending || succeeded}
             onClick={() => setConfirmCancel(true)}
             className="de-btn de-btn-ghost text-destructive"
           >
@@ -132,17 +164,24 @@ export default function ReservationActionsPanel({
 
         {canCancel && confirmCancel && (
           <>
-            <button
-              type="button"
-              disabled={pending}
-              onClick={() => runAction(() => cancelReservation(reservationId))}
+            <SuccessActionButton
+              pending={pending}
+              succeeded={succeeded && successKind === "cancel"}
+              onClick={() =>
+                runAction(
+                  "cancel",
+                  () => cancelReservation(reservationId),
+                  "Réservation annulée."
+                )
+              }
+              idleLabel="Confirmer l'annulation"
+              pendingLabel="Traitement…"
+              successLabel="Annulée"
               className="de-btn de-btn-ghost text-destructive"
-            >
-              {pending ? "Traitement…" : "Confirmer l'annulation"}
-            </button>
+            />
             <button
               type="button"
-              disabled={pending}
+              disabled={pending || succeeded}
               onClick={() => setConfirmCancel(false)}
               className="de-btn de-btn-ghost"
             >
@@ -171,24 +210,29 @@ export default function ReservationActionsPanel({
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
-            <button
-              type="button"
-              disabled={pending}
+            <SuccessActionButton
+              pending={pending}
+              succeeded={succeeded && successKind === "finish"}
               onClick={() => {
                 const km = Number(finishKm.replace(/\s/g, ""));
                 if (!finishKm.trim() || Number.isNaN(km) || km < 0) {
                   setError("Indiquez le kilométrage parcouru par le client");
                   return;
                 }
-                runAction(() => finishReservation(reservationId, km));
+                runAction(
+                  "finish",
+                  () => finishReservation(reservationId, km),
+                  "Location terminée."
+                );
               }}
+              idleLabel="Confirmer la fin de location"
+              pendingLabel="Traitement…"
+              successLabel="Terminée"
               className="de-btn de-btn-primary"
-            >
-              {pending ? "Traitement…" : "Confirmer la fin de location"}
-            </button>
+            />
             <button
               type="button"
-              disabled={pending}
+              disabled={pending || succeeded}
               onClick={() => {
                 setShowFinishForm(false);
                 setFinishKm("");
@@ -202,13 +246,13 @@ export default function ReservationActionsPanel({
         </div>
       )}
 
-      {confirmCancel && (
+      {confirmCancel && !succeeded && (
         <p className="text-sm de-muted">
           Annuler cette réservation ? Aucune suppression définitive.
         </p>
       )}
 
-      {message && <p className="text-sm text-[var(--blue-soft)]">{message}</p>}
+      {message && <ActionSuccessMessage>{message}</ActionSuccessMessage>}
       {error && <p className="text-sm text-destructive">{error}</p>}
     </div>
   );

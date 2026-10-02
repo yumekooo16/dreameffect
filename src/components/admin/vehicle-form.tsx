@@ -7,6 +7,11 @@ import {
   updateVehicle,
   type VehicleFormData,
 } from "@/src/lib/admin/vehicles-actions";
+import {
+  ActionSuccessMessage,
+  SuccessActionButton,
+  useRedirectSuccessFeedback,
+} from "@/src/components/ui/success-feedback";
 import { VEHICLE_STATUSES, type VehicleStatus } from "@/src/lib/vehicles/status";
 import {
   FUEL_OPTIONS,
@@ -76,6 +81,7 @@ export default function VehicleForm({
   });
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const { succeeded, flashSuccess } = useRedirectSuccessFeedback();
 
   function updateField<K extends keyof VehicleFormData>(
     key: K,
@@ -121,12 +127,14 @@ export default function VehicleForm({
         return;
       }
 
-      router.push(
-        mode === "create"
-          ? `/admin/vehicules/${result.id}`
-          : `/admin/vehicules/${vehicleId}`
-      );
-      router.refresh();
+      flashSuccess(() => {
+        router.push(
+          mode === "create"
+            ? `/admin/vehicules/${result.id}`
+            : `/admin/vehicules/${vehicleId}`
+        );
+        router.refresh();
+      });
     });
   }
 
@@ -424,19 +432,21 @@ export default function VehicleForm({
       </div>
 
       {error && <p className="text-sm text-destructive">{error}</p>}
+      {succeeded && (
+        <ActionSuccessMessage>
+          {mode === "create" ? "Véhicule créé." : "Véhicule enregistré."}
+        </ActionSuccessMessage>
+      )}
 
       <div className="flex flex-wrap gap-2">
-        <button
+        <SuccessActionButton
           type="submit"
-          disabled={pending}
-          className="de-btn de-btn-primary"
-        >
-          {pending
-            ? "Enregistrement…"
-            : mode === "create"
-              ? "Créer le véhicule"
-              : "Enregistrer"}
-        </button>
+          pending={pending}
+          succeeded={succeeded}
+          idleLabel={mode === "create" ? "Créer le véhicule" : "Enregistrer"}
+          pendingLabel="Enregistrement…"
+          successLabel={mode === "create" ? "Créé" : "Enregistré"}
+        />
         <a href={cancelHref} className="de-btn de-btn-ghost">
           Annuler
         </a>

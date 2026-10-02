@@ -3,7 +3,6 @@
 import { useMemo, useState, useTransition } from "react";
 import {
   AlertTriangle,
-  CheckCircle2,
   Download,
   FileSearch,
   ShieldCheck,
@@ -22,6 +21,11 @@ import {
 } from "@/src/lib/contracts/fields";
 import { getContractPipelineStatusLabel } from "@/src/lib/reservations/client-docs";
 import type { ReservationContractRow } from "@/src/lib/admin/contract-types";
+import {
+  ActionSuccessMessage,
+  SuccessActionButton,
+  useSuccessFeedback,
+} from "@/src/components/ui/success-feedback";
 
 type Props = {
   reservationId: string;
@@ -39,6 +43,10 @@ export default function ReservationContractPanel({
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const [activeAction, setActiveAction] = useState<
+    "analyze" | "save" | "validate" | "generate" | null
+  >(null);
+  const { succeeded, flashSuccess, clearSuccess } = useSuccessFeedback();
   const [downloadUrl, setDownloadUrl] = useState<string | null>(
     contract?.signed_url ?? null
   );
@@ -59,6 +67,7 @@ export default function ReservationContractPanel({
   );
 
   function run(
+    kind: "analyze" | "save" | "validate" | "generate",
     action: () => Promise<{
       success: boolean;
       error?: string;
@@ -68,14 +77,18 @@ export default function ReservationContractPanel({
   ) {
     setError(null);
     setMessage(null);
+    clearSuccess();
+    setActiveAction(kind);
     startTransition(async () => {
       const result = await action();
       if (!result.success) {
         setError(result.error ?? "Action impossible");
+        setActiveAction(null);
         return;
       }
-      setMessage(result.message ?? "OK");
+      setMessage(result.message ?? "Action réalisée avec succès.");
       if (result.downloadUrl) setDownloadUrl(result.downloadUrl);
+      flashSuccess();
     });
   }
 
@@ -102,45 +115,71 @@ export default function ReservationContractPanel({
       </div>
 
       <div className="flex flex-wrap gap-2">
-        <button
-          type="button"
+        <SuccessActionButton
           className="de-btn de-btn-secondary"
-          disabled={pending}
-          onClick={() => run(() => analyzeReservationDocuments(reservationId))}
-        >
-          <FileSearch className="size-4" />
-          Analyser les documents
-        </button>
-        <button
-          type="button"
-          className="de-btn de-btn-secondary"
-          disabled={pending}
-          onClick={() => run(() => saveExtractedFields(reservationId, values))}
-        >
-          Enregistrer les champs
-        </button>
-        <button
-          type="button"
-          className="de-btn de-btn-secondary"
+          pending={pending && activeAction === "analyze"}
+          succeeded={succeeded && activeAction === "analyze"}
           disabled={pending}
           onClick={() =>
-            run(() => validateExtractedFields(reservationId, values))
+            run("analyze", () => analyzeReservationDocuments(reservationId))
           }
-        >
-          <ShieldCheck className="size-4" />
-          Valider les informations
-        </button>
-        <button
-          type="button"
+          idleLabel={
+            <>
+              <FileSearch className="size-4" />
+              Analyser les documents
+            </>
+          }
+          pendingLabel="Analyse…"
+          successLabel="Analysé"
+        />
+        <SuccessActionButton
+          className="de-btn de-btn-secondary"
+          pending={pending && activeAction === "save"}
+          succeeded={succeeded && activeAction === "save"}
+          disabled={pending}
+          onClick={() =>
+            run("save", () => saveExtractedFields(reservationId, values))
+          }
+          idleLabel="Enregistrer les champs"
+          pendingLabel="Enregistrement…"
+          successLabel="Enregistré"
+        />
+        <SuccessActionButton
+          className="de-btn de-btn-secondary"
+          pending={pending && activeAction === "validate"}
+          succeeded={succeeded && activeAction === "validate"}
+          disabled={pending}
+          onClick={() =>
+            run("validate", () => validateExtractedFields(reservationId, values))
+          }
+          idleLabel={
+            <>
+              <ShieldCheck className="size-4" />
+              Valider les informations
+            </>
+          }
+          pendingLabel="Validation…"
+          successLabel="Validé"
+        />
+        <SuccessActionButton
           className="de-btn de-btn-primary"
+          pending={pending && activeAction === "generate"}
+          succeeded={succeeded && activeAction === "generate"}
           disabled={pending}
           onClick={() =>
-            run(() => generateReservationContract(reservationId, values))
+            run("generate", () =>
+              generateReservationContract(reservationId, values)
+            )
           }
-        >
-          <Sparkles className="size-4" />
-          Remplir le contrat
-        </button>
+          idleLabel={
+            <>
+              <Sparkles className="size-4" />
+              Remplir le contrat
+            </>
+          }
+          pendingLabel="Génération…"
+          successLabel="Contrat prêt"
+        />
         {downloadUrl && (
           <a
             href={downloadUrl}
@@ -154,12 +193,7 @@ export default function ReservationContractPanel({
         )}
       </div>
 
-      {message && (
-        <p className="text-sm text-emerald-700 inline-flex items-center gap-1">
-          <CheckCircle2 className="size-4" />
-          {message}
-        </p>
-      )}
+      {message && <ActionSuccessMessage>{message}</ActionSuccessMessage>}
       {error && <p className="text-sm text-red-600">{error}</p>}
 
       <div className="grid gap-3 sm:grid-cols-2">

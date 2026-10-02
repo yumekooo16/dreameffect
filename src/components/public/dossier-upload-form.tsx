@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
-import { CheckCircle2, Upload } from "lucide-react";
+import { Upload } from "lucide-react";
 import { submitReservationDossier } from "@/src/lib/public/dossier-actions";
 import {
   prepareImageForUpload,
@@ -12,6 +12,11 @@ import {
   getReservationDocTypeLabel,
   type ReservationDocType,
 } from "@/src/lib/reservations/client-docs";
+import {
+  ActionSuccessMessage,
+  SuccessActionButton,
+  useSuccessFeedback,
+} from "@/src/components/ui/success-feedback";
 
 type Props = {
   token: string;
@@ -29,11 +34,13 @@ export default function DossierUploadForm({ token, uploadedTypes }: Props) {
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const { succeeded, flashSuccess, clearSuccess } = useSuccessFeedback();
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError(null);
     setSuccess(null);
+    clearSuccess();
 
     const form = formRef.current;
     if (!form) return;
@@ -81,6 +88,7 @@ export default function DossierUploadForm({ token, uploadedTypes }: Props) {
             ? "Dossier complet reçu. DreamEffect vous recontacte rapidement."
             : "Documents bien reçus. Vous pouvez encore compléter les pièces manquantes."
         );
+        flashSuccess();
         form.reset();
       } catch (err) {
         setError(
@@ -120,20 +128,25 @@ export default function DossierUploadForm({ token, uploadedTypes }: Props) {
         );
       })}
 
-      <button
+      <SuccessActionButton
         type="submit"
         className="de-btn de-btn-primary de-dossier-submit"
-        disabled={pending}
-      >
-        <Upload className="size-4" aria-hidden />
-        {pending ? "Compression & envoi…" : "Envoyer mes documents"}
-      </button>
+        pending={pending}
+        succeeded={succeeded}
+        idleLabel={
+          <>
+            <Upload className="size-4" aria-hidden />
+            Envoyer mes documents
+          </>
+        }
+        pendingLabel="Compression & envoi…"
+        successLabel="Documents envoyés"
+      />
 
       {success && (
-        <p className="de-dossier-success" role="status">
-          <CheckCircle2 className="size-4 shrink-0" aria-hidden />
+        <ActionSuccessMessage className="de-dossier-success">
           {success}
-        </p>
+        </ActionSuccessMessage>
       )}
       {error && (
         <p className="de-dossier-error" role="alert">

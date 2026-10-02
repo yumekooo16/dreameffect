@@ -3,6 +3,11 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import {
+  ActionSuccessMessage,
+  SuccessActionButton,
+  useRedirectSuccessFeedback,
+} from "@/src/components/ui/success-feedback";
+import {
   createMaintenance,
   updateMaintenance,
 } from "@/src/lib/admin/maintenance-actions";
@@ -59,6 +64,7 @@ export default function MaintenanceForm({
   });
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const { succeeded, flashSuccess } = useRedirectSuccessFeedback();
 
   function updateField<K extends keyof MaintenanceFormData>(
     key: K,
@@ -99,12 +105,14 @@ export default function MaintenanceForm({
         return;
       }
 
-      router.push(
-        mode === "create"
-          ? `/admin/maintenance/${result.id}`
-          : `/admin/maintenance/${maintenanceId}`
-      );
-      router.refresh();
+      flashSuccess(() => {
+        router.push(
+          mode === "create"
+            ? `/admin/maintenance/${result.id}`
+            : `/admin/maintenance/${maintenanceId}`
+        );
+        router.refresh();
+      });
     });
   }
 
@@ -226,19 +234,25 @@ export default function MaintenanceForm({
       </div>
 
       {error && <p className="text-sm text-destructive">{error}</p>}
+      {succeeded && (
+        <ActionSuccessMessage>
+          {mode === "create"
+            ? "Intervention créée."
+            : "Intervention enregistrée."}
+        </ActionSuccessMessage>
+      )}
 
       <div className="flex flex-wrap gap-2">
-        <button
+        <SuccessActionButton
           type="submit"
-          disabled={pending}
-          className="de-btn de-btn-primary"
-        >
-          {pending
-            ? "Enregistrement…"
-            : mode === "create"
-              ? "Créer l'intervention"
-              : "Enregistrer"}
-        </button>
+          pending={pending}
+          succeeded={succeeded}
+          idleLabel={
+            mode === "create" ? "Créer l'intervention" : "Enregistrer"
+          }
+          pendingLabel="Enregistrement…"
+          successLabel={mode === "create" ? "Créée" : "Enregistré"}
+        />
         <a href={cancelHref} className="de-btn de-btn-ghost">
           Annuler
         </a>

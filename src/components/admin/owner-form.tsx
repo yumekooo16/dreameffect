@@ -5,6 +5,11 @@ import { useRouter } from "next/navigation";
 import { createOwnerAccount } from "@/src/lib/admin/owners-actions";
 import type { OwnerFormData } from "@/src/lib/admin/owners-types";
 import type { RevenueMode } from "@/src/lib/revenue/split";
+import {
+  ActionSuccessMessage,
+  SuccessActionButton,
+  useSuccessFeedback,
+} from "@/src/components/ui/success-feedback";
 
 const defaultForm: OwnerFormData = {
   email: "",
@@ -22,6 +27,7 @@ export default function OwnerForm({ cancelHref }: { cancelHref: string }) {
   const [success, setSuccess] = useState<string | null>(null);
   const [inviteLink, setInviteLink] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const { succeeded, flashSuccess, clearSuccess } = useSuccessFeedback();
 
   function updateField<K extends keyof OwnerFormData>(
     key: K,
@@ -35,6 +41,7 @@ export default function OwnerForm({ cancelHref }: { cancelHref: string }) {
     setError(null);
     setSuccess(null);
     setInviteLink(null);
+    clearSuccess();
 
     startTransition(async () => {
       const result = await createOwnerAccount(form);
@@ -51,6 +58,7 @@ export default function OwnerForm({ cancelHref }: { cancelHref: string }) {
           result.warning ??
             "Compte créé. Copiez le lien ci-dessous et envoyez-le au propriétaire (WhatsApp recommandé sur iPhone)."
         );
+        flashSuccess();
         // Laisse le temps de copier le lien (Safari/iPhone)
         window.setTimeout(() => {
           router.push(`/admin/proprietaires/${result.id}`);
@@ -62,8 +70,10 @@ export default function OwnerForm({ cancelHref }: { cancelHref: string }) {
       setSuccess(
         "Invitation envoyée sur l'email du propriétaire. Il devra cliquer le lien pour vérifier son adresse et choisir son mot de passe."
       );
-      router.push(`/admin/proprietaires/${result.id}?invited=1`);
-      router.refresh();
+      flashSuccess(() => {
+        router.push(`/admin/proprietaires/${result.id}?invited=1`);
+        router.refresh();
+      });
     });
   }
 
@@ -229,7 +239,7 @@ export default function OwnerForm({ cancelHref }: { cancelHref: string }) {
       </div>
 
       {error && <p className="text-sm text-destructive">{error}</p>}
-      {success && <p className="text-sm text-[var(--blue-soft)]">{success}</p>}
+      {success && <ActionSuccessMessage>{success}</ActionSuccessMessage>}
       {inviteLink && (
         <div className="space-y-2 rounded-lg border border-[var(--blue-border)] p-3">
           <p className="de-label">Lien d&apos;invitation à transmettre</p>
@@ -247,13 +257,14 @@ export default function OwnerForm({ cancelHref }: { cancelHref: string }) {
       )}
 
       <div className="flex flex-wrap gap-2">
-        <button
+        <SuccessActionButton
           type="submit"
-          disabled={pending}
-          className="de-btn de-btn-primary"
-        >
-          {pending ? "Envoi de l'invitation…" : "Inviter le propriétaire"}
-        </button>
+          pending={pending}
+          succeeded={succeeded}
+          idleLabel="Inviter le propriétaire"
+          pendingLabel="Envoi de l'invitation…"
+          successLabel="Invitation envoyée"
+        />
         <a href={cancelHref} className="de-btn de-btn-ghost">
           Annuler
         </a>

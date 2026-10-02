@@ -1227,6 +1227,88 @@ body {
   background: var(--surface-raised);
 }
 
+.de-btn--success,
+.de-btn.de-btn--success:hover {
+  background: #16a34a;
+  border-color: #16a34a;
+  color: #fff;
+  pointer-events: none;
+  animation: de-btn-success-pop 0.45s ease;
+}
+
+.de-btn-success-icon {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+  animation: de-btn-success-check 0.4s ease 0.05s both;
+}
+
+.de-action-success {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 0.45rem;
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  font-weight: 500;
+  color: #4ade80;
+  animation: de-action-success-in 0.35s ease;
+}
+
+.de-action-success-icon {
+  width: 1rem;
+  height: 1rem;
+  margin-top: 0.1rem;
+  flex-shrink: 0;
+  color: #22c55e;
+}
+
+@keyframes de-btn-success-pop {
+  0% {
+    transform: scale(0.96);
+    box-shadow: 0 0 0 0 color-mix(in srgb, #22c55e 0%, transparent);
+  }
+  55% {
+    transform: scale(1.03);
+    box-shadow: 0 0 0 8px color-mix(in srgb, #22c55e 18%, transparent);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 color-mix(in srgb, #22c55e 0%, transparent);
+  }
+}
+
+@keyframes de-btn-success-check {
+  0% {
+    opacity: 0;
+    transform: scale(0.4) rotate(-20deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+@keyframes de-action-success-in {
+  0% {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .de-btn--success,
+  .de-btn.de-btn--success:hover,
+  .de-btn-success-icon,
+  .de-action-success {
+    animation: none;
+  }
+}
+
 .de-btn-tab {
   border-radius: calc(var(--radius) - 2px);
   padding: 0.4375rem 1rem;
@@ -2622,10 +2704,11 @@ button.de-list-item {
 
 .de-contact-form-success {
   border-radius: calc(var(--radius) - 2px);
-  border: 1px solid var(--blue-border);
-  background: color-mix(in srgb, var(--blue) 4%, var(--bg));
+  border: 1px solid color-mix(in srgb, #22c55e 28%, transparent);
+  background: color-mix(in srgb, #22c55e 8%, var(--bg));
   padding: 2rem;
   text-align: center;
+  animation: de-action-success-in 0.35s ease;
 }
 
 /* --- CTA accueil -------------------------------------------- */
@@ -5121,7 +5204,8 @@ button.de-list-item {
 }
 
 .de-dossier-success {
-  color: var(--blue-soft);
+  color: #4ade80;
+  animation: de-action-success-in 0.35s ease;
 }
 
 .de-dossier-error {

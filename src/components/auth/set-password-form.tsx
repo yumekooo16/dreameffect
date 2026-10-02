@@ -4,6 +4,10 @@ import { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/src/lib/supabase/client";
+import {
+  SuccessActionButton,
+  useRedirectSuccessFeedback,
+} from "@/src/components/ui/success-feedback";
 
 export default function SetPasswordForm({ email }: { email?: string | null }) {
   const supabase = createClient();
@@ -12,10 +16,12 @@ export default function SetPasswordForm({ email }: { email?: string | null }) {
   const [confirm, setConfirm] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const { succeeded, flashSuccess, clearSuccess } = useRedirectSuccessFeedback();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
+    clearSuccess();
 
     if (password.length < 8) {
       setError("Le mot de passe doit contenir au moins 8 caractères.");
@@ -39,8 +45,11 @@ export default function SetPasswordForm({ email }: { email?: string | null }) {
       return;
     }
 
-    router.replace("/espace-proprietaire");
-    router.refresh();
+    setLoading(false);
+    flashSuccess(() => {
+      router.replace("/espace-proprietaire");
+      router.refresh();
+    });
   }
 
   return (
@@ -96,13 +105,15 @@ export default function SetPasswordForm({ email }: { email?: string | null }) {
 
       {error && <p className="de-login-error">{error}</p>}
 
-      <button
+      <SuccessActionButton
         type="submit"
-        disabled={loading}
+        pending={loading}
+        succeeded={succeeded}
         className="de-btn de-btn-primary de-btn-lg de-login-submit"
-      >
-        {loading ? "Enregistrement…" : "Enregistrer et accéder"}
-      </button>
+        idleLabel="Enregistrer et accéder"
+        pendingLabel="Enregistrement…"
+        successLabel="Enregistré"
+      />
     </form>
   );
 }
