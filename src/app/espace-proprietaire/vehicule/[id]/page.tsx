@@ -15,6 +15,7 @@ import {
 import {
   resolveReservationSplit,
 } from "@/src/lib/revenue/split";
+import { fetchOwnerRevenueSettings } from "@/src/lib/revenue/owner-settings";
 import { getVehicleStatusLabel } from "@/src/lib/vehicles/status";
 
 export default async function VehiclePage({
@@ -37,28 +38,30 @@ export default async function VehiclePage({
 
   const supabase = await createClient();
 
-  const [reservationsRes, documentsRes, maintenanceRes] = await Promise.all([
-    supabase
-      .from("reservations")
-      .select(
-        "id, start_date, end_date, customer_name, status, owner_amount, company_amount, total_price, distance_km"
-      )
-      .eq("vehicle_id", id)
-      .order("start_date", { ascending: false })
-      .limit(50),
-    supabase
-      .from("documents")
-      .select("id, type, name, file_url, expiration_date, is_valid")
-      .eq("vehicle_id", id),
-    supabase
-      .from("maintenance")
-      .select(
-        "id, title, type, description, mileage, maintenance_date, next_due_date"
-      )
-      .eq("vehicle_id", id)
-      .order("maintenance_date", { ascending: false })
-      .limit(20),
-  ]);
+  const [reservationsRes, documentsRes, maintenanceRes, revenueSettings] =
+    await Promise.all([
+      supabase
+        .from("reservations")
+        .select(
+          "id, start_date, end_date, customer_name, status, owner_amount, company_amount, total_price, distance_km"
+        )
+        .eq("vehicle_id", id)
+        .order("start_date", { ascending: false })
+        .limit(50),
+      supabase
+        .from("documents")
+        .select("id, type, name, file_url, expiration_date, is_valid")
+        .eq("vehicle_id", id),
+      supabase
+        .from("maintenance")
+        .select(
+          "id, title, type, description, mileage, maintenance_date, next_due_date"
+        )
+        .eq("vehicle_id", id)
+        .order("maintenance_date", { ascending: false })
+        .limit(20),
+      fetchOwnerRevenueSettings(supabase, user.id),
+    ]);
 
   const allReservations = reservationsRes.data ?? [];
   const maintenance = maintenanceRes.data ?? [];
@@ -182,6 +185,7 @@ export default async function VehiclePage({
           monthlyRevenue,
           totalRentals: finishedReservations.length,
           reservations: allReservations,
+          revenueMode: revenueSettings.mode,
         }}
       />
     </div>

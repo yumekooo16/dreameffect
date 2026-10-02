@@ -61,6 +61,20 @@ export function rentalDurationDays(start: Date, end: Date) {
   return Math.max(1, diff);
 }
 
+/**
+ * Nombre de périodes de 24 h facturables (durée réelle, arrondie au supérieur).
+ * Ex. mercredi 10:00 → vendredi 10:00 = 48 h = 2 périodes (pas 3 jours calendaires).
+ */
+export function countBillableRentalDays(
+  startDate: string | Date,
+  endDate: string | Date
+) {
+  const start = new Date(startDate).getTime();
+  const end = new Date(endDate).getTime();
+  if (Number.isNaN(start) || Number.isNaN(end) || end <= start) return 1;
+  return Math.max(1, Math.ceil((end - start) / 86_400_000));
+}
+
 export function expandBlockedDateKeys(
   periods: { start: string; end: string }[],
   extraDays: string[] = []
