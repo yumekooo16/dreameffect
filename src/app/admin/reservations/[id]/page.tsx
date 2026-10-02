@@ -216,15 +216,25 @@ export default async function ReservationDetailPage({
             </p>
           </div>
           <div className="de-card-inner">
-            <p className="de-label">Part propriétaire</p>
+            <p className="de-label">
+              {reservation.finance.mode === "pro_price"
+                ? reservation.finance.tierLabel
+                  ? `Prix pro — ${reservation.finance.tierLabel}`
+                  : "Prix pro"
+                : "Part propriétaire"}
+            </p>
             <p className="de-stat-value mt-1 text-xl">
-              {formatEuro(reservation.owner_amount)}
+              {formatEuro(reservation.finance.ownerAmount)}
             </p>
           </div>
           <div className="de-card-inner">
-            <p className="de-label">Commission DreamEffect</p>
+            <p className="de-label">
+              {reservation.finance.mode === "pro_price"
+                ? "Marge DreamEffect"
+                : "Commission DreamEffect"}
+            </p>
             <p className="de-stat-value mt-1 text-xl text-[var(--blue-soft)]">
-              {formatEuro(reservation.company_amount)}
+              {formatEuro(reservation.finance.companyAmount)}
             </p>
           </div>
         </div>
@@ -267,8 +277,8 @@ export default async function ReservationDetailPage({
               pickup_location: reservation.pickup_location ?? "",
               return_location: reservation.return_location ?? "",
               total_price: Number(reservation.total_price ?? 0),
-              owner_amount: Number(reservation.owner_amount ?? 0),
-              company_amount: Number(reservation.company_amount ?? 0),
+              owner_amount: reservation.finance.ownerAmount,
+              company_amount: reservation.finance.companyAmount,
               distance_km: reservation.distance_km ?? null,
               status: reservation.status as "pending" | "confirmed" | "finished" | "cancelled",
             }}

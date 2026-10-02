@@ -11,7 +11,10 @@ import {
   splitRevenueForContext,
   type RevenueMode,
 } from "@/src/lib/revenue/split";
-import type { VehicleProPricing } from "@/src/lib/revenue/pro-pricing";
+import {
+  hasAnyProPrice,
+  type VehicleProPricing,
+} from "@/src/lib/revenue/pro-pricing";
 import type { ReservationFormData } from "@/src/lib/admin/reservations-types";
 
 type VehicleOption = { id: string; label: string };
@@ -189,21 +192,32 @@ export default function ReservationForm({
     });
   }
 
-  const ownerHint =
-    previewSplit.mode === "pro_price"
-      ? previewSplit.tierLabel
-        ? `Prix pro — ${previewSplit.tierLabel}`
-        : "Prix pro"
-      : `Part propriétaire (${
-          activeConfig?.ownerSharePercent ?? 60
-        } %)`;
+  const isProPriceMode = activeConfig?.mode === "pro_price";
+  const hasProGrid =
+    !!activeConfig?.proPricing && hasAnyProPrice(activeConfig.proPricing);
+  const hasDates = Boolean(form.start_date && form.end_date);
 
-  const companyHint =
-    previewSplit.mode === "pro_price"
-      ? "Marge DreamEffect (CA − prix pro)"
-      : `Commission DreamEffect (${
-          100 - (activeConfig?.ownerSharePercent ?? 60)
-        } %)`;
+  const ownerHint = isProPriceMode
+    ? previewSplit.tierLabel
+      ? `Prix pro — ${previewSplit.tierLabel}`
+      : "Prix pro"
+    : `Part propriétaire (${activeConfig?.ownerSharePercent ?? 60} %)`;
+
+  const companyHint = isProPriceMode
+    ? "Marge DreamEffect (CA − prix pro)"
+    : `Commission DreamEffect (${
+        100 - (activeConfig?.ownerSharePercent ?? 60)
+      } %)`;
+
+  const proPriceWarning = !isProPriceMode
+    ? null
+    : !hasProGrid
+      ? "Aucune grille prix pro sur ce véhicule — renseignez-la dans la fiche véhicule."
+      : !hasDates
+        ? "Indiquez le début et la fin pour calculer le reversement prix pro."
+        : previewSplit.tierLabel
+          ? null
+          : "Impossible de calculer le prix pro pour ces dates.";
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
@@ -319,15 +333,15 @@ export default function ReservationForm({
               </p>
             </div>
           </div>
-          {previewSplit.mode === "pro_price" &&
-            activeConfig &&
-            form.start_date &&
-            form.end_date && (
-              <p className="mt-2 text-xs de-muted">
-                Km inclus : {activeConfig.proPricing.pro_included_km ?? 200} ·{" "}
-                {activeConfig.proPricing.pro_extra_km_rate ?? 1} € / km supp.
-              </p>
-            )}
+          {proPriceWarning && (
+            <p className="mt-2 text-xs text-destructive">{proPriceWarning}</p>
+          )}
+          {isProPriceMode && hasProGrid && hasDates && previewSplit.tierLabel && (
+            <p className="mt-2 text-xs de-muted">
+              Km inclus : {activeConfig?.proPricing.pro_included_km ?? 200} ·{" "}
+              {activeConfig?.proPricing.pro_extra_km_rate ?? 1} € / km supp.
+            </p>
+          )}
         </div>
 
         {mode === "edit" && (

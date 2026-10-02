@@ -59,6 +59,9 @@ export function splitRevenue(
  * Calcule la répartition selon le mode propriétaire.
  * - percentage : % du prix client
  * - pro_price : grille prix pro véhicule (+ km supp.) ; DreamEffect = reste du CA
+ *
+ * En mode prix pro, on ne retombe jamais silencieusement en pourcentage
+ * (évite d'afficher 60 % alors que le propriétaire est en grille pro).
  */
 export function splitRevenueForContext(
   total: number,
@@ -67,33 +70,43 @@ export function splitRevenueForContext(
   const mode = context?.mode ?? "percentage";
   const safeTotal = Number.isFinite(total) && total > 0 ? total : 0;
 
-  if (
-    mode === "pro_price" &&
-    context?.proPricing &&
-    hasAnyProPrice(context.proPricing) &&
-    context.startDate &&
-    context.endDate
-  ) {
-    const payout = computeProOwnerPayout(
-      context.proPricing,
-      context.startDate,
-      context.endDate,
-      context.distanceKm
-    );
+  if (mode === "pro_price") {
+    if (
+      context?.proPricing &&
+      hasAnyProPrice(context.proPricing) &&
+      context.startDate &&
+      context.endDate
+    ) {
+      const payout = computeProOwnerPayout(
+        context.proPricing,
+        context.startDate,
+        context.endDate,
+        context.distanceKm
+      );
 
-    if (payout) {
-      const ownerAmount = payout.ownerAmount;
-      const companyAmount =
-        Math.round((safeTotal - ownerAmount) * 100) / 100;
+      if (payout) {
+        const ownerAmount = payout.ownerAmount;
+        const companyAmount =
+          Math.round((safeTotal - ownerAmount) * 100) / 100;
 
-      return {
-        total: safeTotal,
-        ownerAmount,
-        companyAmount,
-        mode: "pro_price",
-        tierLabel: payout.tierLabel,
-      };
+        return {
+          total: safeTotal,
+          ownerAmount,
+          companyAmount,
+          mode: "pro_price",
+          tierLabel: payout.tierLabel,
+        };
+      }
     }
+
+    // Dates ou grille manquantes : rester en prix pro sans inventer un %.
+    return {
+      total: safeTotal,
+      ownerAmount: 0,
+      companyAmount: safeTotal,
+      mode: "pro_price",
+      tierLabel: null,
+    };
   }
 
   const percentageSplit = splitRevenue(

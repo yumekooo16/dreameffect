@@ -40,6 +40,12 @@ export type ReservationDetail = ReservationListItem & {
     finished_reservations: number;
     total_spent: number;
   };
+  finance: {
+    mode: "percentage" | "pro_price";
+    ownerAmount: number;
+    companyAmount: number;
+    tierLabel: string | null;
+  };
 };
 
 export type ReservationStats = {
