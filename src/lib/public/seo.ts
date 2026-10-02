@@ -15,7 +15,7 @@ import { buildSameAsLinks } from "@/src/lib/public/llms";
 import { SITE_NAME, SITE_TAGLINE, SITE_URL } from "@/src/lib/public/site";
 
 export const DEFAULT_DESCRIPTION =
-  "DreamEffect — agence de location et conciergerie automobile à Beauvais et Gisors. Véhicules haut de gamme, gestion locative pour propriétaires, réservation par WhatsApp.";
+  "DreamEffect — agence de location et conciergerie automobile à Beauvais, Gisors et en IDF (Île-de-France). Véhicules haut de gamme, gestion locative pour propriétaires, réservation par WhatsApp.";
 
 /** Image sociale 1200×630 — distincte de l'icône PWA 512. */
 export const DEFAULT_OG_IMAGE = "/og.png";

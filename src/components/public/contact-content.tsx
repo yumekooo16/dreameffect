@@ -34,6 +34,13 @@ export default function ContactContent() {
               </p>
             </address>
           ))}
+          <address className="de-keys-locale not-italic">
+            <p className="de-keys-locale-city">IDF</p>
+            <p className="de-keys-locale-code">Île-de-France</p>
+            <p className="de-keys-eyebrow" style={{ marginTop: "0.4rem" }}>
+              Remise sur rendez-vous
+            </p>
+          </address>
         </div>
 
         <div className="de-keys-contact-grid">
@@ -50,8 +57,8 @@ export default function ContactContent() {
             <p className="de-keys-eyebrow">Direct</p>
             <p className="de-keys-lede">{hoursLabel}</p>
             <p className="de-keys-lede">
-              Remise des clés à Beauvais, Gisors, ou sur rendez-vous dans
-              l&apos;Oise et l&apos;Eure.
+              Remise des clés à Beauvais, Gisors, en IDF (Île-de-France), ou sur
+              rendez-vous dans l&apos;Oise et l&apos;Eure.
             </p>
 
             <a href={telHref()} className="de-keys-direct">

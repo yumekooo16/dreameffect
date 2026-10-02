@@ -31,24 +31,25 @@ export const LOCAL_CITY_PAGES: Record<LocalCitySlug, LocalCityPage> = {
     path: "/conciergerie-automobile-beauvais",
     metaTitle: "Conciergerie automobile à Beauvais",
     metaDescription:
-      "Conciergerie automobile à Beauvais (Oise) : DreamEffect gère location, entretien et suivi de votre véhicule. Mandat clair, équipe locale.",
+      "Conciergerie automobile à Beauvais (Oise) et en IDF : DreamEffect gère location, entretien et suivi de votre véhicule. Mandat clair, équipe locale.",
     keywords: [
       "conciergerie automobile Beauvais",
       "conciergerie Beauvais",
       "gestion locative voiture Beauvais",
       "conciergerie auto Oise",
+      "conciergerie automobile IDF",
       "DreamEffect",
     ],
-    heroEyebrow: "Beauvais · Oise",
+    heroEyebrow: "Beauvais · Oise · IDF",
     heroTitle: "Conciergerie automobile à Beauvais",
     heroDescription:
-      "Confiez votre véhicule : mise en location, entretien et suivi — sans charge mentale au quotidien.",
+      "Confiez votre véhicule : mise en location, entretien et suivi — à Beauvais et en IDF, sans charge mentale au quotidien.",
     blocks: [
       {
         title: "Une conciergerie auto près de Beauvais",
         paragraphs: [
-          "Vous cherchez une conciergerie automobile à Beauvais ? DreamEffect prend en charge la mise en location, l’entretien et le suivi de votre véhicule, avec une équipe locale basée en Oise.",
-          "Nous intervenons à Beauvais et alentours (Tillé, Allonne, communes voisines) pour les propriétaires qui veulent monétiser un véhicule sans gérer annonces, clés ni entretien au quotidien.",
+          "Vous cherchez une conciergerie automobile à Beauvais ? DreamEffect prend en charge la mise en location, l’entretien et le suivi de votre véhicule, avec une équipe locale basée en Oise et une couverture en IDF.",
+          "Nous intervenons à Beauvais et alentours (Tillé, Allonne, communes voisines) ainsi qu’en Île-de-France pour les propriétaires qui veulent monétiser un véhicule sans gérer annonces, clés ni entretien au quotidien.",
         ],
       },
       {
@@ -66,13 +67,13 @@ export const LOCAL_CITY_PAGES: Record<LocalCitySlug, LocalCityPage> = {
       {
         title: "Pourquoi un interlocuteur local ?",
         paragraphs: [
-          "Une conciergerie automobile à Beauvais, c’est la réactivité d’une équipe joignable (WhatsApp / téléphone) et une connaissance du terrain Oise — pas un call center distant.",
+          "Une conciergerie automobile à Beauvais et en IDF, c’est la réactivité d’une équipe joignable (WhatsApp / téléphone) et une connaissance du terrain Oise / Île-de-France — pas un call center distant.",
         ],
       },
     ],
     ctaTitle: "Parler de votre véhicule",
     ctaBody:
-      "Décrivez votre modèle : nous revenons vers vous avec les prochaines étapes de mise en gestion.",
+      "Décrivez votre modèle : nous revenons vers vous avec les prochaines étapes de mise en gestion (Beauvais, Gisors, IDF).",
     related: [
       { label: "Agence de location Beauvais", href: "/agence-location-vehicule-beauvais" },
       { label: "Conciergerie Gisors", href: "/conciergerie-automobile-gisors" },
@@ -86,23 +87,24 @@ export const LOCAL_CITY_PAGES: Record<LocalCitySlug, LocalCityPage> = {
     path: "/conciergerie-automobile-gisors",
     metaTitle: "Conciergerie automobile à Gisors",
     metaDescription:
-      "Conciergerie automobile à Gisors (Eure / Vexin) : DreamEffect gère location, entretien et suivi. Interlocuteur local, mandat clair.",
+      "Conciergerie automobile à Gisors (Eure / Vexin) et en IDF : DreamEffect gère location, entretien et suivi. Interlocuteur local, mandat clair.",
     keywords: [
       "conciergerie automobile Gisors",
       "conciergerie Gisors",
       "gestion locative voiture Gisors",
       "conciergerie auto Vexin",
+      "conciergerie automobile IDF",
       "DreamEffect",
     ],
-    heroEyebrow: "Gisors · Vexin",
+    heroEyebrow: "Gisors · Vexin · IDF",
     heroTitle: "Conciergerie automobile à Gisors",
     heroDescription:
-      "Gestion locative et entretien de votre véhicule, avec une présence locale entre l’Eure et l’Oise.",
+      "Gestion locative et entretien de votre véhicule, entre l’Eure, l’Oise et l’IDF.",
     blocks: [
       {
         title: "Une conciergerie auto à Gisors",
         paragraphs: [
-          "Vous cherchez une conciergerie automobile à Gisors ? DreamEffect accompagne les propriétaires du Vexin : mise en location, organisation des remises, entretien et suivi.",
+          "Vous cherchez une conciergerie automobile à Gisors ? DreamEffect accompagne les propriétaires du Vexin et d’Île-de-France : mise en location, organisation des remises, entretien et suivi.",
           "Un seul interlocuteur pour faire tourner votre véhicule sans charge mentale au quotidien.",
         ],
       },
@@ -112,7 +114,7 @@ export const LOCAL_CITY_PAGES: Record<LocalCitySlug, LocalCityPage> = {
           "Annonces, réservations, état des lieux et entretien courant — selon le mandat défini ensemble.",
         ],
         bullets: [
-          "Conciergerie automobile Gisors & Vexin",
+          "Conciergerie automobile Gisors, Vexin & IDF",
           "Calendrier et qualification des locataires",
           "Remises / reprises organisées localement",
           "Reporting propriétaire transparent",
@@ -121,13 +123,13 @@ export const LOCAL_CITY_PAGES: Record<LocalCitySlug, LocalCityPage> = {
       {
         title: "Zone d’intervention",
         paragraphs: [
-          "Gisors, Epte, communes du Vexin et axes vers Beauvais / Rouen. Contactez-nous pour confirmer la faisabilité selon votre véhicule et votre localisation.",
+          "Gisors, Epte, communes du Vexin, axes vers Beauvais / Rouen, et remise sur rendez-vous en IDF. Contactez-nous pour confirmer la faisabilité selon votre véhicule et votre localisation.",
         ],
       },
     ],
     ctaTitle: "Confier votre véhicule à Gisors",
     ctaBody:
-      "Échange rapide sur votre modèle, puis proposition de mise en gestion.",
+      "Échange rapide sur votre modèle, puis proposition de mise en gestion (Gisors, Beauvais, IDF).",
     related: [
       { label: "Agence de location Gisors", href: "/agence-location-vehicule-gisors" },
       { label: "Conciergerie Beauvais", href: "/conciergerie-automobile-beauvais" },
@@ -141,23 +143,24 @@ export const LOCAL_CITY_PAGES: Record<LocalCitySlug, LocalCityPage> = {
     path: "/agence-location-vehicule-beauvais",
     metaTitle: "Agence de location de véhicules à Beauvais",
     metaDescription:
-      "Agence de location à Beauvais : citadines, SUV et sportives chez DreamEffect. Réservation en ligne, remise locale dans l’Oise.",
+      "Agence de location à Beauvais et en IDF : citadines, SUV et sportives chez DreamEffect. Réservation en ligne, remise locale dans l’Oise et l’Île-de-France.",
     keywords: [
       "agence de location Beauvais",
       "agence location véhicule Beauvais",
       "location voiture Beauvais",
       "location auto Oise",
+      "location voiture IDF",
       "DreamEffect",
     ],
-    heroEyebrow: "Beauvais · Location",
+    heroEyebrow: "Beauvais · Location · IDF",
     heroTitle: "Agence de location de véhicules à Beauvais",
     heroDescription:
-      "Flotte soignée, tarifs affichés, réservation simple — prise en charge locale dans l’Oise.",
+      "Flotte soignée, tarifs affichés, réservation simple — prise en charge locale dans l’Oise et en IDF.",
     blocks: [
       {
         title: "Location de voiture à Beauvais",
         paragraphs: [
-          "Vous cherchez une agence de location à Beauvais ? DreamEffect propose une flotte entretenue (citadine, SUV, sportive) avec réservation en ligne et organisation de la remise près de Beauvais.",
+          "Vous cherchez une agence de location à Beauvais ? DreamEffect propose une flotte entretenue (citadine, SUV, sportive) avec réservation en ligne et organisation de la remise près de Beauvais ou en IDF.",
           "Idéal pour un week-end, un déplacement pro ou un essai plaisir — kilometrage et options clarifiés dès le devis.",
         ],
       },
@@ -167,7 +170,7 @@ export const LOCAL_CITY_PAGES: Record<LocalCitySlug, LocalCityPage> = {
           "Chaque fiche véhicule détaille prix, dépôts et conditions. Pas de surprise à la remise des clés.",
         ],
         bullets: [
-          "Agence de location Beauvais / Oise",
+          "Agence de location Beauvais / Oise / IDF",
           "Réservation en ligne 24/7",
           "Remise et restitution locales",
           "Assistance WhatsApp & téléphone",
@@ -176,12 +179,13 @@ export const LOCAL_CITY_PAGES: Record<LocalCitySlug, LocalCityPage> = {
       {
         title: "Simple et local",
         paragraphs: [
-          "Processus digital (demande → devis → confirmation) et équipe joignable. Une alternative flexible aux grandes enseignes, avec le sérieux d’une maison locale.",
+          "Processus digital (demande → devis → confirmation) et équipe joignable à Beauvais comme en IDF. Une alternative flexible aux grandes enseignes, avec le sérieux d’une maison locale.",
         ],
       },
     ],
     ctaTitle: "Voir la flotte disponible",
-    ctaBody: "Parcourez les véhicules ou contactez-nous pour un devis selon vos dates.",
+    ctaBody:
+      "Parcourez les véhicules ou contactez-nous pour un devis selon vos dates (Beauvais, Gisors, IDF).",
     related: [
       { label: "Conciergerie Beauvais", href: "/conciergerie-automobile-beauvais" },
       { label: "Agence de location Gisors", href: "/agence-location-vehicule-gisors" },
@@ -195,23 +199,24 @@ export const LOCAL_CITY_PAGES: Record<LocalCitySlug, LocalCityPage> = {
     path: "/agence-location-vehicule-gisors",
     metaTitle: "Agence de location de véhicules à Gisors",
     metaDescription:
-      "Agence de location à Gisors : flotte soignée DreamEffect, réservation en ligne, remise dans le Vexin. Conditions claires.",
+      "Agence de location à Gisors et en IDF : flotte soignée DreamEffect, réservation en ligne, remise dans le Vexin et l’Île-de-France. Conditions claires.",
     keywords: [
       "agence de location Gisors",
       "agence location véhicule Gisors",
       "location voiture Gisors",
       "location auto Vexin",
+      "location voiture IDF",
       "DreamEffect",
     ],
-    heroEyebrow: "Gisors · Location",
+    heroEyebrow: "Gisors · Location · IDF",
     heroTitle: "Agence de location de véhicules à Gisors",
     heroDescription:
-      "Véhicules entretenus, réservation simple, organisation locale autour de Gisors et du Vexin.",
+      "Véhicules entretenus, réservation simple, organisation locale autour de Gisors, du Vexin et de l’IDF.",
     blocks: [
       {
         title: "Location de voiture à Gisors",
         paragraphs: [
-          "Vous cherchez une agence de location à Gisors ? DreamEffect met à disposition des véhicules contrôlés, avec réservation en ligne et remise organisée près de Gisors.",
+          "Vous cherchez une agence de location à Gisors ? DreamEffect met à disposition des véhicules contrôlés, avec réservation en ligne et remise organisée près de Gisors ou en IDF.",
           "Week-end, remplacement ponctuel ou déplacement : conditions et kilometrage clairs dès le devis.",
         ],
       },
@@ -221,21 +226,22 @@ export const LOCAL_CITY_PAGES: Record<LocalCitySlug, LocalCityPage> = {
           "Choisissez parmi la flotte disponible — citadine, SUV ou sportive — selon vos besoins. Chaque véhicule est préparé avant la remise des clés.",
         ],
         bullets: [
-          "Agence de location Gisors / Vexin",
+          "Agence de location Gisors / Vexin / IDF",
           "Flotte contrôlée et assurée",
           "Devis et confirmation en ligne",
           "Équipe locale joignable",
         ],
       },
       {
-        title: "Proximité Vexin",
+        title: "Proximité Vexin & IDF",
         paragraphs: [
-          "Service local pour Gisors et environs, avec la même exigence de suivi qu’à Beauvais. Contactez-nous pour les créneaux de remise.",
+          "Service local pour Gisors et environs, avec la même exigence de suivi qu’à Beauvais et en Île-de-France. Contactez-nous pour les créneaux de remise.",
         ],
       },
     ],
     ctaTitle: "Réserver près de Gisors",
-    ctaBody: "Consultez la flotte ou écrivez-nous pour un devis sur vos dates.",
+    ctaBody:
+      "Consultez la flotte ou écrivez-nous pour un devis sur vos dates (Gisors, Beauvais, IDF).",
     related: [
       { label: "Conciergerie Gisors", href: "/conciergerie-automobile-gisors" },
       { label: "Agence de location Beauvais", href: "/agence-location-vehicule-beauvais" },
