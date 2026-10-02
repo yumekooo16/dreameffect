@@ -2,7 +2,11 @@
 
 import RevenueChart from "@/src/components/revenue-chart";
 import RevenueSplitCard from "@/src/components/owner/revenue-split-card";
-import { computeRevenueSummary, resolveReservationSplit } from "@/src/lib/revenue/split";
+import {
+  computeRevenueSummary,
+  resolveReservationSplit,
+  type RevenueMode,
+} from "@/src/lib/revenue/split";
 
 type Reservation = {
   id: string;
@@ -19,12 +23,14 @@ type Props = {
   monthlyRevenue: number;
   totalRentals: number;
   reservations: Reservation[];
+  revenueMode?: RevenueMode | null;
 };
 
 export default function VehicleRevenue({
   monthlyRevenue,
   totalRentals,
   reservations,
+  revenueMode = "percentage",
 }: Props) {
   const history = reservations.filter((r) => r.status === "finished");
   const summary = computeRevenueSummary(history, { finishedOnly: false });
@@ -49,6 +55,7 @@ export default function VehicleRevenue({
         companyShare={summary.companyShare}
         title="Répartition des revenus"
         compact
+        revenueMode={revenueMode}
       />
 
       <div className="grid gap-3 sm:grid-cols-3">

@@ -49,16 +49,18 @@ export default function RevenueSplitCard({
         </p>
       </div>
 
-      <div className="de-revenue-split__bar" aria-hidden>
-        <span
-          className="de-revenue-split__bar-owner"
-          style={{ width: `${ownerPercent}%` }}
-        />
-        <span
-          className="de-revenue-split__bar-company"
-          style={{ width: `${companyPercent}%` }}
-        />
-      </div>
+      {mode === "percentage" && (
+        <div className="de-revenue-split__bar" aria-hidden>
+          <span
+            className="de-revenue-split__bar-owner"
+            style={{ width: `${ownerPercent}%` }}
+          />
+          <span
+            className="de-revenue-split__bar-company"
+            style={{ width: `${companyPercent}%` }}
+          />
+        </div>
+      )}
 
       <div className="de-revenue-split__grid">
         <div className="de-revenue-split__item de-revenue-split__item--owner">

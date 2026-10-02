@@ -3,6 +3,7 @@
 import { useState } from "react";
 import dynamic from "next/dynamic";
 import ChartSkeleton from "@/src/components/owner/chart-skeleton";
+import type { RevenueMode } from "@/src/lib/revenue/split";
 
 const Calendar = dynamic(() => import("@/src/components/calendar"), {
   loading: () => <ChartSkeleton />,
@@ -45,6 +46,7 @@ type Props = {
     monthlyRevenue: number;
     totalRentals: number;
     reservations: Reservation[];
+    revenueMode?: RevenueMode | null;
   };
 };
 
