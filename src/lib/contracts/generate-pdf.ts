@@ -5,6 +5,7 @@ import {
   CONTRACT_FIELD_DEFS,
   type ContractFieldName,
 } from "@/src/lib/contracts/fields";
+import { countBillableRentalDays } from "@/src/lib/dates/calendar-utils";
 import { formatLegalAddress, LEGAL_ENTITY } from "@/src/lib/public/legal";
 
 export type ContractFillPayload = {
@@ -279,9 +280,7 @@ function rentalDurationDays(startIso: string, endIso: string) {
   const start = new Date(startIso).getTime();
   const end = new Date(endIso).getTime();
   if (Number.isNaN(start) || Number.isNaN(end) || end <= start) return null;
-  const ms = end - start;
-  const days = Math.max(1, Math.ceil(ms / (1000 * 60 * 60 * 24)));
-  return days;
+  return countBillableRentalDays(startIso, endIso);
 }
 
 export function mapFieldsToPayload(

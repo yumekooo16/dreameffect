@@ -20,6 +20,7 @@
     "remove-preview-vehicles": "tsx scripts/remove-preview-vehicles.ts",
     "setup-ammotioncars": "tsx scripts/setup-ammotioncars.ts",
     "check-catalog": "tsx scripts/check-catalog.ts",
+    "check-pro-pricing-duration": "tsx scripts/check-pro-pricing-duration.ts",
     "generate-pwa-icons": "tsx scripts/generate-pwa-icons.ts",
     "generate-og-image": "tsx scripts/generate-og-image.ts"
   },

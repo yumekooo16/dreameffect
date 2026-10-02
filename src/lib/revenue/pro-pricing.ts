@@ -1,5 +1,9 @@
 /** Grille « prix pro » — reversement propriétaire (hors catalogue public). */
 
+import { countBillableRentalDays } from "@/src/lib/dates/calendar-utils";
+
+export { countBillableRentalDays };
+
 export type VehicleProPricing = {
   pro_price_24h_weekday: number | null;
   pro_price_24h_weekend: number | null;
@@ -109,36 +113,20 @@ export function hasAnyProPrice(pricing: VehicleProPricing): boolean {
   );
 }
 
-function startOfLocalDay(date: Date) {
-  const value = new Date(date);
-  value.setHours(0, 0, 0, 0);
-  return value;
-}
-
-/** Jours calendaires inclusifs (aligné sur le ledger). */
-export function countInclusiveDays(startDate: string, endDate: string) {
-  const start = startOfLocalDay(new Date(startDate));
-  const end = startOfLocalDay(new Date(endDate));
-  const days =
-    Math.floor((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
-  return Math.max(days, 1);
-}
-
 /** true si le jour (local) est ven / sam / dim. */
 export function isWeekendDay(date: Date) {
   const day = date.getDay();
   return day === 0 || day === 5 || day === 6;
 }
 
-/** Location « week-end » si ≥ 50 % des jours tombent ven–dim. */
+/** Location « week-end » si ≥ 50 % des périodes de 24 h tombent ven–dim. */
 export function isWeekendDominantRental(startDate: string, endDate: string) {
-  const start = startOfLocalDay(new Date(startDate));
-  const days = countInclusiveDays(startDate, endDate);
+  const start = new Date(startDate);
+  const days = countBillableRentalDays(startDate, endDate);
   let weekendDays = 0;
 
   for (let i = 0; i < days; i += 1) {
-    const cursor = new Date(start);
-    cursor.setDate(start.getDate() + i);
+    const cursor = new Date(start.getTime() + i * 86_400_000);
     if (isWeekendDay(cursor)) weekendDays += 1;
   }
 
@@ -274,7 +262,7 @@ export function computeProOwnerPayout(
   endDate: string,
   distanceKm?: number | null
 ): ProOwnerPayout | null {
-  const rentalDays = countInclusiveDays(startDate, endDate);
+  const rentalDays = countBillableRentalDays(startDate, endDate);
   const weekendDominant = isWeekendDominantRental(startDate, endDate);
   const tier = pickTier(pricing, rentalDays, weekendDominant);
 
