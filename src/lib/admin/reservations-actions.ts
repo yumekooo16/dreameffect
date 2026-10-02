@@ -6,6 +6,7 @@ import {
   type ReservationForDailyLedger,
 } from "@/src/lib/revenue/daily-ledger";
 import { buildRevenueSplitContextForVehicle } from "@/src/lib/revenue/owner-settings";
+import { hasAnyProPrice } from "@/src/lib/revenue/pro-pricing";
 import { createClient } from "@/src/lib/supabase/server";
 import { requireAdmin } from "@/src/lib/admin/auth";
 import type { ReservationFormData } from "@/src/lib/admin/reservations-types";
@@ -98,10 +99,22 @@ async function buildPayload(data: ReservationFormData) {
       distanceKm: data.distance_km,
     }
   );
-  const { ownerAmount, companyAmount } = splitRevenueForContext(
-    data.total_price,
-    context
-  );
+
+  if (
+    context.mode === "pro_price" &&
+    (!context.proPricing || !hasAnyProPrice(context.proPricing))
+  ) {
+    throw new Error(
+      "Ce propriétaire est en mode prix pro — renseignez la grille prix pro sur le véhicule avant d'enregistrer la réservation."
+    );
+  }
+
+  const split = splitRevenueForContext(data.total_price, context);
+  if (context.mode === "pro_price" && !split.tierLabel) {
+    throw new Error(
+      "Impossible de calculer le prix pro pour ces dates — vérifiez le début, la fin et la grille du véhicule."
+    );
+  }
 
   return {
     vehicle_id: data.vehicle_id,
@@ -112,8 +125,8 @@ async function buildPayload(data: ReservationFormData) {
     pickup_location: data.pickup_location.trim() || null,
     return_location: data.return_location.trim() || null,
     total_price: data.total_price,
-    owner_amount: ownerAmount,
-    company_amount: companyAmount,
+    owner_amount: split.ownerAmount,
+    company_amount: split.companyAmount,
     distance_km: data.distance_km,
     status: data.status,
     updated_at: new Date().toISOString(),
@@ -240,7 +253,18 @@ export async function createReservation(
   }
 
   const supabase = await createClient();
-  const payload = await buildPayload({ ...data, status });
+  let payload: Awaited<ReturnType<typeof buildPayload>>;
+  try {
+    payload = await buildPayload({ ...data, status });
+  } catch (err) {
+    return {
+      success: false,
+      error:
+        err instanceof Error
+          ? err.message
+          : "Impossible de calculer la répartition des revenus",
+    };
+  }
 
   const { data: reservation, error } = await supabase
     .from("reservations")
@@ -320,7 +344,18 @@ export async function updateReservation(
     .eq("id", reservationId)
     .single();
 
-  const payload = await buildPayload(data);
+  let payload: Awaited<ReturnType<typeof buildPayload>>;
+  try {
+    payload = await buildPayload(data);
+  } catch (err) {
+    return {
+      success: false,
+      error:
+        err instanceof Error
+          ? err.message
+          : "Impossible de calculer la répartition des revenus",
+    };
+  }
 
   const { data: reservation, error } = await supabase
     .from("reservations")

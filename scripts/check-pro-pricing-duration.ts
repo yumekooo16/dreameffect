@@ -52,6 +52,21 @@ const split = splitRevenueForContext(220, {
 });
 assert(split.ownerAmount === 140, `ownerAmount=140 (reçu ${split.ownerAmount})`);
 assert(split.companyAmount === 80, `marge=80 (reçu ${split.companyAmount})`);
+assert(split.mode === "pro_price", `mode reste prix pro (reçu ${split.mode})`);
+
+// Sans dates : ne doit PAS retomber en pourcentage
+const incomplete = splitRevenueForContext(220, {
+  mode: "pro_price",
+  proPricing: pricing,
+});
+assert(
+  incomplete.mode === "pro_price",
+  `sans dates → mode prix pro (reçu ${incomplete.mode})`
+);
+assert(
+  incomplete.ownerAmount === 0,
+  `sans dates → owner 0 (reçu ${incomplete.ownerAmount})`
+);
 
 // Vendredi 10:00 → dimanche 10:00 = 48 h week-end
 const friStart = "2026-10-09T10:00:00";
