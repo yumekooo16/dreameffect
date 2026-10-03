@@ -12,6 +12,7 @@ import {
   deleteVehicleHeroImage,
   uploadVehicleHeroImage,
 } from "@/src/lib/admin/vehicles-actions";
+import { ActionSuccessMessage } from "@/src/components/ui/success-feedback";
 
 const MAX_FILE_SIZE_MB = 10;
 
@@ -172,7 +173,7 @@ export default function VehicleHeroImageManager({
           ))}
       </div>
 
-      {message && <p className="text-sm text-[var(--blue-soft)]">{message}</p>}
+      {message && <ActionSuccessMessage>{message}</ActionSuccessMessage>}
       {error && <p className="text-sm text-destructive">{error}</p>}
     </div>
   );

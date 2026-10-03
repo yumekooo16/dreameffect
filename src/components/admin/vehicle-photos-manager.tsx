@@ -26,6 +26,7 @@ import {
   uploadVehiclePhoto,
 } from "@/src/lib/admin/vehicles-actions";
 import type { VehicleImageRow } from "@/src/lib/admin/vehicles-types";
+import { ActionSuccessMessage } from "@/src/components/ui/success-feedback";
 import {
   DEFAULT_VEHICLE_IMAGE_FRAME,
   MAX_VEHICLE_PHOTOS,
@@ -524,7 +525,7 @@ export default function VehiclePhotosManager({
         </div>
       )}
 
-      {message && <p className="text-sm text-[var(--blue-soft)]">{message}</p>}
+      {message && <ActionSuccessMessage>{message}</ActionSuccessMessage>}
       {error && <p className="text-sm text-destructive">{error}</p>}
     </div>
   );

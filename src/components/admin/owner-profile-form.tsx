@@ -4,6 +4,11 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { updateOwnerProfile } from "@/src/lib/admin/owners-actions";
 import type { RevenueMode } from "@/src/lib/revenue/split";
+import {
+  ActionSuccessMessage,
+  SuccessActionButton,
+  useSuccessFeedback,
+} from "@/src/components/ui/success-feedback";
 
 type Props = {
   ownerId: string;
@@ -48,17 +53,20 @@ export default function OwnerProfileForm({
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const { succeeded, flashSuccess, clearSuccess } = useSuccessFeedback();
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setMessage(null);
     setError(null);
+    clearSuccess();
 
     startTransition(async () => {
       const result = await updateOwnerProfile(ownerId, form);
 
       if (result.success) {
         setMessage("Informations enregistrées.");
+        flashSuccess();
         router.refresh();
       } else {
         setError(result.error ?? "Erreur lors de l'enregistrement.");
@@ -206,16 +214,17 @@ export default function OwnerProfileForm({
         </div>
       </div>
 
-      {message && <p className="text-sm text-[var(--blue-soft)]">{message}</p>}
+      {message && <ActionSuccessMessage>{message}</ActionSuccessMessage>}
       {error && <p className="text-sm text-destructive">{error}</p>}
 
-      <button
+      <SuccessActionButton
         type="submit"
-        disabled={pending}
-        className="de-btn de-btn-primary"
-      >
-        {pending ? "Enregistrement…" : "Enregistrer les informations"}
-      </button>
+        pending={pending}
+        succeeded={succeeded}
+        idleLabel="Enregistrer les informations"
+        pendingLabel="Enregistrement…"
+        successLabel="Enregistré"
+      />
     </form>
   );
 }

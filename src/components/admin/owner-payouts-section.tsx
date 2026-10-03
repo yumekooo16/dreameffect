@@ -7,6 +7,11 @@ import {
   deleteOwnerPayout,
 } from "@/src/lib/admin/finance-actions";
 import type { OwnerPayoutRecord } from "@/src/lib/admin/finance-types";
+import {
+  ActionSuccessMessage,
+  SuccessActionButton,
+  useSuccessFeedback,
+} from "@/src/components/ui/success-feedback";
 
 function formatEuro(amount?: number | null) {
   return `${Number(amount ?? 0).toLocaleString("fr-FR")} €`;
@@ -41,6 +46,8 @@ export default function OwnerPayoutsSection({
   const [showForm, setShowForm] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [savedMessage, setSavedMessage] = useState<string | null>(null);
+  const { succeeded, flashSuccess, clearSuccess } = useSuccessFeedback();
 
   const [form, setForm] = useState({
     owner_id: "",
@@ -55,6 +62,8 @@ export default function OwnerPayoutsSection({
   function handleCreate(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    setSavedMessage(null);
+    clearSuccess();
 
     startTransition(async () => {
       const result = await createOwnerPayout(form);
@@ -62,15 +71,19 @@ export default function OwnerPayoutsSection({
         setError(result.error ?? "Erreur inconnue");
         return;
       }
-      setShowForm(false);
-      setForm({
-        owner_id: "",
-        amount_due: 0,
-        amount_paid: 0,
-        period_start: "",
-        period_end: "",
-        status: "pending",
-        notes: "",
+      setSavedMessage("Reversement enregistré.");
+      flashSuccess(() => {
+        setShowForm(false);
+        setSavedMessage(null);
+        setForm({
+          owner_id: "",
+          amount_due: 0,
+          amount_paid: 0,
+          period_start: "",
+          period_end: "",
+          status: "pending",
+          notes: "",
+        });
       });
     });
   }
@@ -241,14 +254,19 @@ export default function OwnerPayoutsSection({
           {error && (
             <p className="text-sm text-[var(--destructive)]">{error}</p>
           )}
+          {savedMessage && (
+            <ActionSuccessMessage>{savedMessage}</ActionSuccessMessage>
+          )}
 
-          <button
+          <SuccessActionButton
             type="submit"
-            disabled={isPending}
+            pending={isPending}
+            succeeded={succeeded}
+            idleLabel="Enregistrer"
+            pendingLabel="Enregistrement…"
+            successLabel="Enregistré"
             className="de-btn de-btn-primary text-sm"
-          >
-            {isPending ? "Enregistrement..." : "Enregistrer"}
-          </button>
+          />
         </form>
       )}
 

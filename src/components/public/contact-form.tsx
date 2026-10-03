@@ -6,6 +6,10 @@ import GdprConsentField from "@/src/components/gdpr/gdpr-consent-field";
 import HoneypotField from "@/src/components/gdpr/honeypot-field";
 import { buildWhatsAppUrl, WHATSAPP_NUMBER } from "@/src/lib/constants";
 import { submitContactLead } from "@/src/lib/public/contact-actions";
+import {
+  SuccessActionButton,
+  useRedirectSuccessFeedback,
+} from "@/src/components/ui/success-feedback";
 
 const TOPICS = [
   { value: "location", label: "Louer un véhicule" },
@@ -89,6 +93,7 @@ export default function ContactForm() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [formStartedAt] = useState(() => Date.now());
+  const { succeeded, flashSuccess, clearSuccess } = useRedirectSuccessFeedback();
 
   function updateField<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -105,6 +110,7 @@ export default function ContactForm() {
     e.preventDefault();
     setSent(false);
     setSubmitError(null);
+    clearSuccess();
 
     const nextErrors = validate(form);
     if (Object.keys(nextErrors).length > 0) {
@@ -136,15 +142,17 @@ export default function ContactForm() {
 
     const url = buildWhatsAppUrl(WHATSAPP_NUMBER, buildWhatsAppMessage(form));
     window.open(url, "_blank", "noopener,noreferrer");
-    setSent(true);
-    setForm(INITIAL);
-    setErrors({});
+    flashSuccess(() => {
+      setSent(true);
+      setForm(INITIAL);
+      setErrors({});
+    });
   }
 
   if (sent) {
     return (
       <div className="de-contact-form-success">
-        <CheckCircle2 size={28} strokeWidth={1.75} className="text-[var(--blue-soft)]" />
+        <CheckCircle2 size={28} strokeWidth={1.75} className="text-[#22c55e]" />
         <h2 className="de-display mt-4 text-xl">
           Message prêt à envoyer
         </h2>
@@ -291,18 +299,25 @@ export default function ContactForm() {
             {submitError}
           </p>
         )}
-        <button
+        <SuccessActionButton
           type="submit"
           className="de-btn de-btn-primary de-btn-lg"
-          disabled={submitting}
-        >
-          {submitting ? (
-            <Loader2 size={18} strokeWidth={2} className="animate-spin" />
-          ) : (
-            <Send size={18} strokeWidth={2} />
-          )}
-          {submitting ? "Enregistrement…" : "Envoyer ma demande"}
-        </button>
+          pending={submitting}
+          succeeded={succeeded}
+          idleLabel={
+            <>
+              <Send size={18} strokeWidth={2} />
+              Envoyer ma demande
+            </>
+          }
+          pendingLabel={
+            <>
+              <Loader2 size={18} strokeWidth={2} className="animate-spin" />
+              Enregistrement…
+            </>
+          }
+          successLabel="Demande enregistrée"
+        />
         <p className="de-form-note">
           Vos coordonnées sont enregistrées côté DreamEffect. WhatsApp
           s&apos;ouvrira avec uniquement votre demande et votre message.

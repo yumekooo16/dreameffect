@@ -16,6 +16,11 @@ import {
   type VehicleProPricing,
 } from "@/src/lib/revenue/pro-pricing";
 import type { ReservationFormData } from "@/src/lib/admin/reservations-types";
+import {
+  ActionSuccessMessage,
+  SuccessActionButton,
+  useRedirectSuccessFeedback,
+} from "@/src/components/ui/success-feedback";
 
 type VehicleOption = { id: string; label: string };
 
@@ -78,6 +83,7 @@ export default function ReservationForm({
   );
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const { succeeded, flashSuccess } = useRedirectSuccessFeedback();
 
   const configByVehicle = useMemo(() => {
     const map = new Map<string, ReservationVehicleRevenueConfig>();
@@ -175,12 +181,14 @@ export default function ReservationForm({
           return;
         }
 
-        router.push(
-          mode === "create"
-            ? `/admin/reservations/${result.id}`
-            : `/admin/reservations/${reservationId}`
-        );
-        router.refresh();
+        flashSuccess(() => {
+          router.push(
+            mode === "create"
+              ? `/admin/reservations/${result.id}`
+              : `/admin/reservations/${reservationId}`
+          );
+          router.refresh();
+        });
       } catch (err) {
         console.error("[ReservationForm]", err);
         setError(
@@ -387,19 +395,25 @@ export default function ReservationForm({
       </div>
 
       {error && <p className="text-sm text-destructive">{error}</p>}
+      {succeeded && (
+        <ActionSuccessMessage>
+          {mode === "create"
+            ? "Réservation créée."
+            : "Réservation enregistrée."}
+        </ActionSuccessMessage>
+      )}
 
       <div className="flex flex-wrap gap-2">
-        <button
+        <SuccessActionButton
           type="submit"
-          disabled={pending}
-          className="de-btn de-btn-primary"
-        >
-          {pending
-            ? "Enregistrement…"
-            : mode === "create"
-              ? "Créer la réservation"
-              : "Enregistrer"}
-        </button>
+          pending={pending}
+          succeeded={succeeded}
+          idleLabel={
+            mode === "create" ? "Créer la réservation" : "Enregistrer"
+          }
+          pendingLabel="Enregistrement…"
+          successLabel={mode === "create" ? "Créée" : "Enregistré"}
+        />
         <a href={cancelHref} className="de-btn de-btn-ghost">
           Annuler
         </a>

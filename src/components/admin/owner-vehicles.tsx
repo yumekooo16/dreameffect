@@ -8,6 +8,11 @@ import { updateOwnerVehicleDetails } from "@/src/lib/admin/vehicles-actions";
 import { resolveVehicleImageUrl } from "@/src/lib/image-url";
 import VehicleStatusBadge from "@/src/components/vehicle-status-badge";
 import type { OwnerVehicle } from "@/src/lib/admin/owners-types";
+import {
+  ActionSuccessMessage,
+  SuccessActionButton,
+  useSuccessFeedback,
+} from "@/src/components/ui/success-feedback";
 
 function contractMileage(vehicle: OwnerVehicle) {
   return vehicle.initial_mileage ?? vehicle.mileage ?? null;
@@ -32,11 +37,13 @@ function VehicleEditForm({ vehicle }: { vehicle: OwnerVehicle }) {
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const { succeeded, flashSuccess, clearSuccess } = useSuccessFeedback();
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setMessage(null);
     setError(null);
+    clearSuccess();
 
     const parsedMileage = form.initial_mileage.trim()
       ? Number(form.initial_mileage.replace(/\s/g, ""))
@@ -65,8 +72,10 @@ function VehicleEditForm({ vehicle }: { vehicle: OwnerVehicle }) {
 
       if (result.success) {
         setMessage("Véhicule enregistré.");
-        setOpen(false);
-        router.refresh();
+        flashSuccess(() => {
+          setOpen(false);
+          router.refresh();
+        });
       } else {
         setError(result.error ?? "Erreur lors de l'enregistrement.");
       }
@@ -146,25 +155,26 @@ function VehicleEditForm({ vehicle }: { vehicle: OwnerVehicle }) {
             </div>
           </div>
 
-          {message && (
-            <p className="text-sm text-[var(--blue-soft)]">{message}</p>
-          )}
+          {message && <ActionSuccessMessage>{message}</ActionSuccessMessage>}
           {error && <p className="text-sm text-destructive">{error}</p>}
 
           <div className="flex flex-wrap gap-2">
-            <button
+            <SuccessActionButton
               type="submit"
-              disabled={pending}
+              pending={pending}
+              succeeded={succeeded}
+              idleLabel="Enregistrer"
+              pendingLabel="Enregistrement…"
+              successLabel="Enregistré"
               className="de-btn de-btn-primary text-sm"
-            >
-              {pending ? "Enregistrement…" : "Enregistrer"}
-            </button>
+            />
             <button
               type="button"
               onClick={() => {
                 setOpen(false);
                 setError(null);
                 setMessage(null);
+                clearSuccess();
               }}
               className="de-btn de-btn-ghost text-sm"
             >
