@@ -25,8 +25,16 @@ vérification admin → génération PDF officiel rempli → téléchargement.
 ## Variables d’environnement
 
 - `OPENAI_API_KEY` (optionnel) : extraction automatique
-- Sans clé : saisie manuelle des champs dans l’admin
+- `OPENAI_OCR_MODEL` (optionnel, défaut `gpt-4o-mini`) : modèle vision OCR
+- Sans clé / en cas de 429 (quota) : saisie manuelle des champs dans l’admin — le contrat reste générable
 - Mentions légales en-tête : `NEXT_PUBLIC_LEGAL_*` (voir `src/lib/public/legal.ts`)
+
+### Erreur 429 OpenAI
+
+Le 429 signifie quota ou rate-limit OpenAI (pas un bug app). Solutions :
+1. Ajouter des crédits sur https://platform.openai.com/settings/organization/billing
+2. Attendre 1–2 min puis réessayer l’analyse
+3. Ou remplir les champs manuellement puis générer le contrat
 
 ## Migration SQL
 

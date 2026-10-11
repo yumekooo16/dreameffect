@@ -45,9 +45,64 @@ function asConfidence(value: unknown): FieldConfidence {
   return "unknown";
 }
 
+const MAX_OCR_ATTEMPTS = 3;
+/** Au-delà, detail=low pour limiter tokens / 429. */
+const LARGE_IMAGE_BYTES = 1_200_000;
+
+function ocrModel() {
+  // gpt-4o-mini : bien plus tolérant aux rate-limits / quotas que gpt-4o.
+  // Surcharge : OPENAI_OCR_MODEL=gpt-4o
+  return process.env.OPENAI_OCR_MODEL?.trim() || "gpt-4o-mini";
+}
+
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function parseRetryAfterMs(header: string | null, attempt: number) {
+  if (header) {
+    const asSeconds = Number(header);
+    if (Number.isFinite(asSeconds) && asSeconds >= 0) {
+      return Math.min(asSeconds * 1000, 20_000);
+    }
+    const asDate = Date.parse(header);
+    if (Number.isFinite(asDate)) {
+      return Math.min(Math.max(asDate - Date.now(), 0), 20_000);
+    }
+  }
+  return Math.min(1500 * 2 ** (attempt - 1), 12_000);
+}
+
+function explainOpenAiFailure(status: number, body: string) {
+  const lower = body.toLowerCase();
+  if (status === 401) {
+    return "Clé OPENAI_API_KEY invalide ou révoquée. Mettez-la à jour sur Vercel, ou saisissez les champs manuellement.";
+  }
+  if (status === 429) {
+    if (lower.includes("insufficient_quota") || lower.includes("billing")) {
+      return (
+        "Quota OpenAI épuisé (facturation). Ajoutez des crédits sur platform.openai.com/settings/organization/billing, " +
+        "ou saisissez les champs manuellement — le contrat reste générable sans OCR."
+      );
+    }
+    return (
+      "Limite de débit OpenAI (429). Réessayez dans 1–2 minutes, " +
+      "ou saisissez les champs manuellement."
+    );
+  }
+  if (status === 400) {
+    return "Requête OCR refusée (documents trop lourds ou format invalide). Réessayez avec des photos plus légères, ou saisie manuelle.";
+  }
+  return `Extraction OCR impossible (${status}). Vérifiez OPENAI_API_KEY / quotas, ou saisissez manuellement.`;
+}
+
+
 /**
  * Extrait UNIQUEMENT les infos visibles sur les documents.
  * Absente / illisible → null (jamais inventée).
+ *
+ * En cas d'échec API (429 inclus) : soft-fail → provider "none" + message clair.
+ * L'admin peut toujours saisir / générer le contrat.
  */
 export async function extractContractFieldsFromDocuments(
   documents: OcrDocumentInput[]
@@ -115,7 +170,8 @@ export async function extractContractFieldsFromDocuments(
         type: "image_url",
         image_url: {
           url: bytesToDataUrl(doc.bytes, doc.mimeType),
-          detail: "high",
+          // "auto"/"low" consomme bien moins de tokens que "high" → moins de 429.
+          detail: doc.bytes.byteLength > LARGE_IMAGE_BYTES ? "low" : "auto",
         },
       });
     } else {
@@ -128,64 +184,92 @@ export async function extractContractFieldsFromDocuments(
     }
   }
 
-  const response = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${process.env.OPENAI_API_KEY!.trim()}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      model: process.env.OPENAI_OCR_MODEL?.trim() || "gpt-4o",
-      temperature: 0,
-      response_format: { type: "json_object" },
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content },
-      ],
-    }),
-  });
-
-  if (!response.ok) {
-    const body = await response.text();
-    console.error("[extractContractFieldsFromDocuments]", response.status, body);
-    throw new Error(
-      `Extraction OCR impossible (${response.status}). Vérifiez OPENAI_API_KEY / quotas.`
-    );
-  }
-
-  const json = (await response.json()) as {
-    choices?: Array<{ message?: { content?: string } }>;
+  const requestBody = {
+    model: ocrModel(),
+    temperature: 0,
+    response_format: { type: "json_object" as const },
+    messages: [
+      { role: "system", content: systemPrompt },
+      { role: "user", content },
+    ],
   };
-  const raw = json.choices?.[0]?.message?.content ?? "{}";
 
-  let parsed: {
-    fields?: Array<Record<string, unknown>>;
-    notes?: string | null;
-  };
-  try {
-    parsed = JSON.parse(raw);
-  } catch {
-    throw new Error("Réponse OCR illisible (JSON invalide).");
-  }
+  let lastError =
+    "Extraction OCR impossible. Saisissez les champs manuellement.";
 
-  const allowed = new Set<string>(fieldNames);
-  const fields: OcrExtractionResult["fields"] = [];
-
-  for (const row of parsed.fields ?? []) {
-    const name = String(row.field_name ?? "");
-    if (!allowed.has(name)) continue;
-    fields.push({
-      field_name: name as ContractFieldName,
-      value: asNullableString(row.value),
-      confidence: asConfidence(row.confidence),
-      source_document: String(row.source_document ?? "unknown"),
+  for (let attempt = 1; attempt <= MAX_OCR_ATTEMPTS; attempt++) {
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.OPENAI_API_KEY!.trim()}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(requestBody),
     });
+
+    if (response.ok) {
+      const json = (await response.json()) as {
+        choices?: Array<{ message?: { content?: string } }>;
+      };
+      const raw = json.choices?.[0]?.message?.content ?? "{}";
+
+      let parsed: {
+        fields?: Array<Record<string, unknown>>;
+        notes?: string | null;
+      };
+      try {
+        parsed = JSON.parse(raw);
+      } catch {
+        return {
+          fields: [],
+          rawNotes:
+            "Réponse OCR illisible (JSON invalide). Saisissez les champs manuellement.",
+          provider: "none",
+        };
+      }
+
+      const allowed = new Set<string>(fieldNames);
+      const fields: OcrExtractionResult["fields"] = [];
+
+      for (const row of parsed.fields ?? []) {
+        const name = String(row.field_name ?? "");
+        if (!allowed.has(name)) continue;
+        fields.push({
+          field_name: name as ContractFieldName,
+          value: asNullableString(row.value),
+          confidence: asConfidence(row.confidence),
+          source_document: String(row.source_document ?? "unknown"),
+        });
+      }
+
+      return {
+        fields,
+        rawNotes: asNullableString(parsed.notes),
+        provider: "openai",
+      };
+    }
+
+    const body = await response.text();
+    lastError = explainOpenAiFailure(response.status, body);
+    console.error(
+      "[extractContractFieldsFromDocuments]",
+      response.status,
+      `attempt=${attempt}/${MAX_OCR_ATTEMPTS}`,
+      body.slice(0, 500)
+    );
+
+    if (response.status === 429 && attempt < MAX_OCR_ATTEMPTS) {
+      await sleep(parseRetryAfterMs(response.headers.get("retry-after"), attempt));
+      continue;
+    }
+
+    break;
   }
 
   return {
-    fields,
-    rawNotes: asNullableString(parsed.notes),
-    provider: "openai",
+    fields: [],
+    rawNotes: lastError,
+    provider: "none",
   };
 }
 
