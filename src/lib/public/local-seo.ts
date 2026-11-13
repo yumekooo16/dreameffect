@@ -74,7 +74,7 @@ export const CONTACT_KEYWORDS = [
 ] as const;
 
 export function formatServiceAreaLabel() {
-  return "Beauvais · Gisors · Île-de-France";
+  return "Beauvais · Gisors · IDF";
 }
 
 export function resolveVehicleSeoCity(location?: string | null) {
@@ -130,6 +130,7 @@ export function buildVehicleSeoKeywords(
     `location voiture ${city}`,
     "DreamEffect",
     "location véhicule Oise",
+    "location voiture IDF",
   ];
 }
 

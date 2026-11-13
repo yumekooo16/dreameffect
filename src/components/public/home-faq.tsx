@@ -8,10 +8,10 @@ export default function HomeFaqSection() {
     HOME_FAQ_ITEMS[0],
     HOME_FAQ_ITEMS[2],
     HOME_FAQ_ITEMS[3],
-    HOME_FAQ_ITEMS[4], // agence Beauvais / Gisors
+    HOME_FAQ_ITEMS[4], // agence Beauvais / Gisors / IDF
   ];
   const ownerFaqs = [
-    HOME_FAQ_ITEMS[5], // conciergerie Beauvais / Gisors
+    HOME_FAQ_ITEMS[5], // conciergerie Beauvais / Gisors / IDF
     ...OWNERS_FAQ.slice(0, 3),
   ];
 

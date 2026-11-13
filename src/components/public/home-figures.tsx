@@ -8,7 +8,7 @@ const FIGURES = [
   },
   {
     value: "60000 · 27140",
-    label: "Beauvais et Gisors — remise des clés sur rendez-vous.",
+    label: "Beauvais, Gisors et IDF — remise des clés sur rendez-vous.",
   },
   {
     value: "Clé en main",

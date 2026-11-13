@@ -49,7 +49,7 @@ export const AREA_SERVED_LABELS = [
   "Île-de-France",
 ] as const;
 
-/** Points d'accueil / remise des clés — Beauvais et Gisors. */
+/** Points d'accueil / remise des clés — Beauvais, Gisors et zone IDF. */
 export const SERVICE_POINTS = [
   { postalCode: "60000", city: "Beauvais", region: "Oise" },
   { postalCode: "27140", city: "Gisors", region: "Eure" },

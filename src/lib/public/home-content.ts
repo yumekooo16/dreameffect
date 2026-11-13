@@ -10,7 +10,7 @@ export const HOME_PROCESS_STEPS = [
   {
     step: "02",
     title: "On s'occupe de tout",
-    text: "Remise des clés à Beauvais, Gisors, en Île-de-France ou sur votre lieu de rendez-vous dans l'Oise et l'Eure. Véhicule préparé, nettoyé et contrôlé avant chaque location. Un interlocuteur unique du début à la fin.",
+    text: "Remise des clés à Beauvais, Gisors, en IDF (Île-de-France) ou sur votre lieu de rendez-vous dans l'Oise et l'Eure. Véhicule préparé, nettoyé et contrôlé avant chaque location. Un interlocuteur unique du début à la fin.",
     visualAlt: "Remise de clés et préparation véhicule DreamEffect",
   },
   {
@@ -40,17 +40,17 @@ export const HOME_FAQ_ITEMS = [
   {
     question: "Où se fait la remise des clés ?",
     answer:
-      "À Beauvais, Gisors et dans l'ensemble de l'Oise et de l'Eure. Le lieu se convient lors de la réservation — domicile, gare, aéroport de Beauvais-Tillé ou autre rendez-vous.",
+      "À Beauvais, Gisors, en IDF (Île-de-France) et dans l'ensemble de l'Oise et de l'Eure. Le lieu se convient lors de la réservation — domicile, gare, aéroport de Beauvais-Tillé ou autre rendez-vous.",
   },
   {
-    question: "Proposez-vous une agence de location à Beauvais et Gisors ?",
+    question: "Proposez-vous une agence de location à Beauvais, Gisors et en IDF ?",
     answer:
-      "Oui. DreamEffect est une agence de location de véhicules à Beauvais et Gisors : flotte en ligne, devis selon vos dates, remise des clés organisée localement dans l'Oise et le Vexin.",
+      "Oui. DreamEffect est une agence de location de véhicules à Beauvais, Gisors et en IDF (Île-de-France) : flotte en ligne, devis selon vos dates, remise des clés organisée localement dans l'Oise, le Vexin et l'Île-de-France.",
   },
   {
-    question: "Faites-vous de la conciergerie automobile à Beauvais et Gisors ?",
+    question: "Faites-vous de la conciergerie automobile à Beauvais, Gisors et en IDF ?",
     answer:
-      "Oui. Notre conciergerie automobile à Beauvais et Gisors gère mise en location, entretien et suivi pour les propriétaires qui souhaitent rentabiliser leur véhicule sans s'en occuper au quotidien.",
+      "Oui. Notre conciergerie automobile à Beauvais, Gisors et en IDF gère mise en location, entretien et suivi pour les propriétaires qui souhaitent rentabiliser leur véhicule sans s'en occuper au quotidien.",
   },
   {
     question: "Comment confier mon véhicule en gestion locative ?",

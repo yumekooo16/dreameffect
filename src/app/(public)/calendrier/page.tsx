@@ -21,7 +21,8 @@ export const metadata: Metadata = buildPageMetadata({
     "calendrier réservation voiture",
     "disponibilités location véhicule",
     "DreamEffect calendrier",
-    "location Beauvais Gisors",
+    "location Beauvais Gisors IDF",
+    "location voiture Île-de-France",
   ],
 });
 

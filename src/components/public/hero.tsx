@@ -38,8 +38,7 @@ export default function HeroSection({ imageUrl, imageFrame }: HeroSectionProps) 
         </h1>
         <p className="de-keys-lead">
           Location et gestion de véhicules haut de gamme. Flotte préparée, tarifs
-          affichés, remise des clés sur rendez-vous — Beauvais, Gisors et
-          Île-de-France.
+          affichés, remise des clés sur rendez-vous — Beauvais, Gisors et IDF.
         </p>
         <div className="de-keys-actions">
           <Link
