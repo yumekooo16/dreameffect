@@ -212,6 +212,7 @@ export default async function AdminVehicleDetailPage({
       <Section title="Actions administrateur">
         <VehicleActionsPanel
           vehicleId={vehicle.id}
+          vehicleLabel={`${vehicle.brand} ${vehicle.model}`}
           owners={owners}
           isUnavailable={vehicle.status === "unavailable"}
           initial={{

@@ -17,6 +17,7 @@ import {
   type VehicleProPricing,
 } from "@/src/lib/revenue/pro-pricing";
 import { isMissingColumnError } from "@/src/lib/vehicles/db-columns";
+import { syncVehicleStatusFromReservations } from "@/src/lib/vehicles/sync-status";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 import {
   MAX_VEHICLE_PHOTOS,
@@ -387,20 +388,224 @@ export async function deactivateVehicle(vehicleId: string): Promise<ActionResult
   await requireAdmin();
   const supabase = await createClient();
 
-  const { error } = await supabase
+  const { data: existing } = await supabase
+    .from("vehicles")
+    .select("id, slug")
+    .eq("id", vehicleId)
+    .maybeSingle();
+
+  if (!existing) {
+    return { success: false, error: "Véhicule introuvable" };
+  }
+
+  const { data: updated, error } = await supabase
     .from("vehicles")
     .update({
       status: "unavailable",
+      is_published: false,
       updated_at: new Date().toISOString(),
     })
-    .eq("id", vehicleId);
+    .eq("id", vehicleId)
+    .select("id, status, is_published")
+    .maybeSingle();
 
   if (error) {
-    return { success: false, error: error.message };
+    if (isMissingColumnError(error.message)) {
+      const { data: legacyUpdated, error: legacyError } = await supabase
+        .from("vehicles")
+        .update({
+          status: "unavailable",
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", vehicleId)
+        .select("id, status")
+        .maybeSingle();
+
+      if (legacyError) {
+        return { success: false, error: legacyError.message };
+      }
+      if (!legacyUpdated) {
+        return {
+          success: false,
+          error: "Désactivation refusée (aucune ligne mise à jour)",
+        };
+      }
+    } else {
+      return { success: false, error: error.message };
+    }
+  } else if (!updated) {
+    return {
+      success: false,
+      error: "Désactivation refusée (aucune ligne mise à jour)",
+    };
   }
 
-  revalidateVehiclePaths(vehicleId);
+  revalidateVehiclePaths(vehicleId, existing.slug);
   return { success: true };
+}
+
+export async function reactivateVehicle(vehicleId: string): Promise<ActionResult> {
+  await requireAdmin();
+  const supabase = await createClient();
+
+  const { data: existing } = await supabase
+    .from("vehicles")
+    .select("id, slug")
+    .eq("id", vehicleId)
+    .maybeSingle();
+
+  if (!existing) {
+    return { success: false, error: "Véhicule introuvable" };
+  }
+
+  const { data: updated, error } = await supabase
+    .from("vehicles")
+    .update({
+      status: "available",
+      is_published: true,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", vehicleId)
+    .select("id, status")
+    .maybeSingle();
+
+  if (error) {
+    if (isMissingColumnError(error.message)) {
+      const { data: legacyUpdated, error: legacyError } = await supabase
+        .from("vehicles")
+        .update({
+          status: "available",
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", vehicleId)
+        .select("id, status")
+        .maybeSingle();
+
+      if (legacyError) {
+        return { success: false, error: legacyError.message };
+      }
+      if (!legacyUpdated) {
+        return {
+          success: false,
+          error: "Réactivation refusée (aucune ligne mise à jour)",
+        };
+      }
+    } else {
+      return { success: false, error: error.message };
+    }
+  } else if (!updated) {
+    return {
+      success: false,
+      error: "Réactivation refusée (aucune ligne mise à jour)",
+    };
+  }
+
+  await syncVehicleStatusFromReservations(vehicleId);
+  revalidateVehiclePaths(vehicleId, existing.slug);
+  return { success: true };
+}
+
+export async function deleteVehicle(vehicleId: string): Promise<ActionResult> {
+  try {
+    await requireAdmin();
+    const admin = createAdminClient();
+
+    const fullSelect = await admin
+      .from("vehicles")
+      .select("id, slug, image_url, hero_image_url, public_image_url")
+      .eq("id", vehicleId)
+      .maybeSingle();
+
+    const vehicleResult =
+      fullSelect.error && isMissingColumnError(fullSelect.error.message)
+        ? await admin
+            .from("vehicles")
+            .select("id, slug, image_url")
+            .eq("id", vehicleId)
+            .maybeSingle()
+        : fullSelect;
+
+    if (vehicleResult.error) {
+      return { success: false, error: vehicleResult.error.message };
+    }
+    if (!vehicleResult.data) {
+      return { success: false, error: "Véhicule introuvable" };
+    }
+
+    const vehicle = vehicleResult.data as {
+      id: string;
+      slug?: string | null;
+      image_url?: string | null;
+      hero_image_url?: string | null;
+      public_image_url?: string | null;
+    };
+
+    const storagePaths = new Set<string>();
+    for (const path of [
+      vehicle.image_url,
+      vehicle.hero_image_url,
+      vehicle.public_image_url,
+    ]) {
+      if (path?.trim()) storagePaths.add(path.trim());
+    }
+
+    const { data: images } = await admin
+      .from("vehicle_images")
+      .select("image_url")
+      .eq("vehicle_id", vehicleId);
+
+    for (const image of images ?? []) {
+      if (image.image_url?.trim()) {
+        storagePaths.add(image.image_url.trim());
+      }
+    }
+
+    const relatedTables = [
+      "reservations",
+      "maintenance",
+      "documents",
+      "vehicle_images",
+    ] as const;
+
+    for (const table of relatedTables) {
+      const { error } = await admin.from(table).delete().eq("vehicle_id", vehicleId);
+      if (error && !error.message.includes("Could not find the table")) {
+        return { success: false, error: `${table} : ${error.message}` };
+      }
+    }
+
+    const { error: deleteError } = await admin
+      .from("vehicles")
+      .delete()
+      .eq("id", vehicleId);
+
+    if (deleteError) {
+      return { success: false, error: deleteError.message };
+    }
+
+    if (storagePaths.size > 0) {
+      const { error: storageError } = await admin.storage
+        .from(BUCKET)
+        .remove([...storagePaths]);
+
+      if (storageError && !/not found/i.test(storageError.message)) {
+        console.warn("[deleteVehicle] Storage:", storageError.message);
+      }
+    }
+
+    revalidateVehiclePaths(vehicleId, vehicle.slug);
+    return { success: true };
+  } catch (error) {
+    if (isRedirectError(error)) throw error;
+    console.error("[deleteVehicle]", error);
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : "Impossible de supprimer le véhicule",
+    };
+  }
 }
 
 export async function uploadVehiclePhoto(
