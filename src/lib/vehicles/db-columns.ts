@@ -23,7 +23,7 @@ export const PUBLIC_VEHICLE_CATALOG_BASE =
 export const PUBLIC_VEHICLE_CATALOG_SELECT = PUBLIC_VEHICLE_CATALOG_BASE;
 
 export const ADMIN_VEHICLE_BASE_SELECT =
-  `id, owner_id, brand, model, version, year, plate, vin, color, mileage, status, image_url, daily_rate, ${VEHICLE_PRICING_COLUMNS}, ${VEHICLE_PRO_PRICING_COLUMNS}, fuel, transmission, power, location, description, slug, is_published, created_at, updated_at`;
+  `id, owner_id, brand, model, version, year, plate, vin, color, mileage, status, image_url, daily_rate, ${VEHICLE_PRICING_COLUMNS}, ${VEHICLE_PRO_PRICING_COLUMNS}, fuel, transmission, power, location, description, slug, is_published, monthly_rent, created_at, updated_at`;
 
 export const ADMIN_VEHICLE_BASE_SELECT_LEGACY =
   `id, owner_id, brand, model, version, year, plate, vin, color, mileage, status, image_url, daily_rate, ${VEHICLE_PRICING_COLUMNS}, fuel, transmission, power, location, description, slug, is_published, created_at, updated_at`;

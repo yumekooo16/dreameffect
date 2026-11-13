@@ -40,6 +40,7 @@ export type VehicleRow = {
   description?: string | null;
   slug?: string | null;
   is_published?: boolean;
+  monthly_rent?: number | null;
   created_at: string;
   updated_at?: string | null;
 };

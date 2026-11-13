@@ -12,6 +12,7 @@ export type OwnerPortalVehicle = {
   image_url?: string | null;
   hero_image_url?: string | null;
   total_revenue?: number | null;
+  monthly_rent?: number | null;
 };
 
 type DashboardVehicleRow = {
@@ -86,32 +87,84 @@ async function enrichVehicleExtras(
   const supabase = await createClient();
   const vehicleIds = vehicles.map((vehicle) => vehicle.vehicle_id);
 
-  const withHero = await supabase
+  const withRent = await supabase
     .from("vehicles")
-    .select("id, plate, initial_mileage, hero_image_url")
+    .select("id, plate, initial_mileage, hero_image_url, monthly_rent")
     .in("id", vehicleIds);
 
-  let extras = withHero.data;
+  let extras = withRent.data as
+    | Array<{
+        id: string;
+        plate?: string | null;
+        initial_mileage?: number | null;
+        hero_image_url?: string | null;
+        monthly_rent?: number | null;
+      }>
+    | null
+    | undefined;
 
-  if (withHero.error?.message.includes("hero_image_url")) {
+  if (withRent.error?.message.includes("monthly_rent")) {
+    const withHero = await supabase
+      .from("vehicles")
+      .select("id, plate, initial_mileage, hero_image_url")
+      .in("id", vehicleIds);
+
+    if (withHero.error?.message.includes("hero_image_url")) {
+      const withInitial = await supabase
+        .from("vehicles")
+        .select("id, plate, initial_mileage")
+        .in("id", vehicleIds);
+      extras = (withInitial.data ?? []).map((row) => ({
+        ...row,
+        hero_image_url: null,
+        monthly_rent: null,
+      }));
+    } else if (withHero.error?.message.includes("initial_mileage")) {
+      const fallback = await supabase
+        .from("vehicles")
+        .select("id, plate, hero_image_url")
+        .in("id", vehicleIds);
+      extras = (fallback.data ?? []).map((row) => ({
+        ...row,
+        initial_mileage: null,
+        monthly_rent: null,
+      }));
+    } else if (withHero.error) {
+      const fallback = await supabase
+        .from("vehicles")
+        .select("id, plate")
+        .in("id", vehicleIds);
+      extras = (fallback.data ?? []).map((row) => ({
+        ...row,
+        initial_mileage: null,
+        hero_image_url: null,
+        monthly_rent: null,
+      }));
+    } else {
+      extras = (withHero.data ?? []).map((row) => ({
+        ...row,
+        monthly_rent: null,
+      }));
+    }
+  } else if (withRent.error?.message.includes("hero_image_url")) {
     const withInitial = await supabase
       .from("vehicles")
-      .select("id, plate, initial_mileage")
+      .select("id, plate, initial_mileage, monthly_rent")
       .in("id", vehicleIds);
     extras = (withInitial.data ?? []).map((row) => ({
       ...row,
       hero_image_url: null,
     }));
-  } else if (withHero.error?.message.includes("initial_mileage")) {
+  } else if (withRent.error?.message.includes("initial_mileage")) {
     const fallback = await supabase
       .from("vehicles")
-      .select("id, plate, hero_image_url")
+      .select("id, plate, hero_image_url, monthly_rent")
       .in("id", vehicleIds);
     extras = (fallback.data ?? []).map((row) => ({
       ...row,
       initial_mileage: null,
     }));
-  } else if (withHero.error) {
+  } else if (withRent.error) {
     const fallback = await supabase
       .from("vehicles")
       .select("id, plate")
@@ -120,6 +173,7 @@ async function enrichVehicleExtras(
       ...row,
       initial_mileage: null,
       hero_image_url: null,
+      monthly_rent: null,
     }));
   }
 
@@ -134,6 +188,10 @@ async function enrichVehicleExtras(
         plate: row.plate,
         initial_mileage: row.initial_mileage,
         hero_image_url: row.hero_image_url ?? null,
+        monthly_rent:
+          row.monthly_rent != null && Number.isFinite(Number(row.monthly_rent))
+            ? Number(row.monthly_rent)
+            : null,
       },
     ])
   );
@@ -148,6 +206,7 @@ async function enrichVehicleExtras(
       initial_mileage:
         vehicle.initial_mileage ?? extra.initial_mileage ?? null,
       hero_image_url: vehicle.hero_image_url ?? extra.hero_image_url ?? null,
+      monthly_rent: vehicle.monthly_rent ?? extra.monthly_rent ?? null,
     };
   });
 }

@@ -173,6 +173,24 @@ export default function OwnerProfileForm({
               </span>
             </span>
           </label>
+          <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-[var(--blue-border)] p-3">
+            <input
+              type="radio"
+              name="revenue_mode_edit"
+              className="mt-1"
+              checked={form.revenue_mode === "monthly_rent"}
+              onChange={() =>
+                setForm((prev) => ({ ...prev, revenue_mode: "monthly_rent" }))
+              }
+            />
+            <span>
+              <span className="block text-sm font-medium">Loyer mensuel</span>
+              <span className="text-xs de-muted">
+                Loyer fixe par véhicule chaque mois. Le CA des locations reste
+                chez DreamEffect.
+              </span>
+            </span>
+          </label>
         </fieldset>
 
         {form.revenue_mode === "percentage" && (
@@ -200,6 +218,13 @@ export default function OwnerProfileForm({
               className="de-input w-full max-w-xs"
             />
           </div>
+        )}
+
+        {form.revenue_mode === "monthly_rent" && (
+          <p className="text-sm de-muted">
+            Indiquez le montant du loyer sur chaque fiche véhicule de ce
+            propriétaire.
+          </p>
         )}
       </div>
 

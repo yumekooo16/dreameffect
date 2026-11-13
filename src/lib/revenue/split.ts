@@ -14,7 +14,21 @@ export const COMPANY_REVENUE_SHARE_PERCENT = Math.round(
   COMPANY_REVENUE_SHARE * 100
 );
 
-export type RevenueMode = "percentage" | "pro_price";
+export type RevenueMode = "percentage" | "pro_price" | "monthly_rent";
+
+export const REVENUE_MODES: RevenueMode[] = [
+  "percentage",
+  "pro_price",
+  "monthly_rent",
+];
+
+export function isRevenueMode(value: unknown): value is RevenueMode {
+  return (
+    value === "percentage" ||
+    value === "pro_price" ||
+    value === "monthly_rent"
+  );
+}
 
 export type RevenueSplit = {
   total: number;
@@ -30,6 +44,8 @@ export type RevenueSplitContext = {
   endDate?: string | null;
   distanceKm?: number | null;
   proPricing?: VehicleProPricing | null;
+  /** Loyer mensuel fixe du véhicule (mode monthly_rent). */
+  monthlyRent?: number | null;
 };
 
 export function normalizeOwnerShare(share?: number | null) {
@@ -59,9 +75,9 @@ export function splitRevenue(
  * Calcule la répartition selon le mode propriétaire.
  * - percentage : % du prix client
  * - pro_price : grille prix pro véhicule (+ km supp.) ; DreamEffect = reste du CA
+ * - monthly_rent : loyer mensuel fixe (hors CA location) ; CA location → DreamEffect
  *
- * En mode prix pro, on ne retombe jamais silencieusement en pourcentage
- * (évite d'afficher 60 % alors que le propriétaire est en grille pro).
+ * En mode prix pro / loyer, on ne retombe jamais silencieusement en pourcentage.
  */
 export function splitRevenueForContext(
   total: number,
@@ -69,6 +85,17 @@ export function splitRevenueForContext(
 ): RevenueSplit & { mode: RevenueMode; tierLabel?: string | null } {
   const mode = context?.mode ?? "percentage";
   const safeTotal = Number.isFinite(total) && total > 0 ? total : 0;
+
+  if (mode === "monthly_rent") {
+    // Le loyer est payé hors réservation : le CA client reste à DreamEffect.
+    return {
+      total: safeTotal,
+      ownerAmount: 0,
+      companyAmount: safeTotal,
+      mode: "monthly_rent",
+      tierLabel: null,
+    };
+  }
 
   if (mode === "pro_price") {
     if (
@@ -188,5 +215,12 @@ export function formatEuro(amount: number) {
 }
 
 export function revenueModeLabel(mode: RevenueMode) {
-  return mode === "pro_price" ? "Prix pro" : "Pourcentage";
+  if (mode === "pro_price") return "Prix pro";
+  if (mode === "monthly_rent") return "Loyer mensuel";
+  return "Pourcentage";
+}
+
+export function normalizeMonthlyRent(value?: number | null) {
+  if (value == null || !Number.isFinite(value) || value < 0) return null;
+  return Math.round(value * 100) / 100;
 }

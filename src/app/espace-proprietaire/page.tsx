@@ -327,6 +327,7 @@ export default async function OwnerDashboard() {
           )}
           fleetCount={vehicles.length}
           revenueMode={revenueSettings.mode}
+          monthlyRent={primaryVehicle.monthly_rent ?? null}
         />
       )}
 
@@ -336,8 +337,20 @@ export default async function OwnerDashboard() {
             totalRevenue={fleetRevenue.totalRevenue}
             ownerShare={fleetRevenue.ownerShare}
             companyShare={fleetRevenue.companyShare}
-            title="Gains totaux de votre flotte"
+            title={
+              revenueSettings.mode === "monthly_rent"
+                ? "Loyer mensuel de votre flotte"
+                : "Gains totaux de votre flotte"
+            }
             revenueMode={revenueSettings.mode}
+            monthlyRent={
+              revenueSettings.mode === "monthly_rent"
+                ? vehicles.reduce(
+                    (sum, vehicle) => sum + Number(vehicle.monthly_rent ?? 0),
+                    0
+                  )
+                : null
+            }
           />
           <div>
             <p className="de-label mb-3">Journal des revenus (locations confirmées)</p>

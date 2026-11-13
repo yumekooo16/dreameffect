@@ -11,6 +11,7 @@ export type LiveRevenueConfig = {
   mode: RevenueMode;
   ownerSharePercent: number;
   proPricing: VehicleProPricing;
+  monthlyRent?: number | null;
 };
 
 export type ReservationRevenueInput = {
@@ -56,6 +57,7 @@ export function computeLiveReservationSplit(
     endDate: reservation.end_date,
     distanceKm: reservation.distance_km,
     proPricing: config.proPricing,
+    monthlyRent: config.monthlyRent,
   });
 
   // En prix pro, n'écraser que si le calcul grille est abouti (tierLabel présent).
@@ -67,6 +69,17 @@ export function computeLiveReservationSplit(
       mode: "pro_price",
       tierLabel: null,
       needsSync: false,
+    };
+  }
+
+  if (config.mode === "monthly_rent") {
+    const needsSync =
+      Math.round(storedOwner * 100) !== 0 ||
+      Math.round(storedCompany * 100) !== Math.round(split.companyAmount * 100);
+
+    return {
+      ...split,
+      needsSync,
     };
   }
 

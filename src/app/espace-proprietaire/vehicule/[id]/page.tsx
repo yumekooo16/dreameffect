@@ -141,12 +141,23 @@ export default async function VehiclePage({
                   : "—"}
               </p>
             </div>
-            <div className="de-card-inner">
-              <p className="de-label">Revenus générés</p>
-              <p className="mt-1 font-medium text-[var(--blue-soft)]">
-                {Number(vehicle.total_revenue ?? 0).toLocaleString("fr-FR")} €
-              </p>
-            </div>
+            {revenueSettings.mode === "monthly_rent" ? (
+              <div className="de-card-inner">
+                <p className="de-label">Loyer mensuel</p>
+                <p className="mt-1 font-medium text-[var(--blue-soft)]">
+                  {vehicle.monthly_rent != null && vehicle.monthly_rent > 0
+                    ? `${Number(vehicle.monthly_rent).toLocaleString("fr-FR")} € / mois`
+                    : "Non renseigné"}
+                </p>
+              </div>
+            ) : (
+              <div className="de-card-inner">
+                <p className="de-label">Revenus générés</p>
+                <p className="mt-1 font-medium text-[var(--blue-soft)]">
+                  {Number(vehicle.total_revenue ?? 0).toLocaleString("fr-FR")} €
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -186,6 +197,7 @@ export default async function VehiclePage({
           totalRentals: finishedReservations.length,
           reservations: allReservations,
           revenueMode: revenueSettings.mode,
+          monthlyRent: vehicle.monthly_rent ?? null,
         }}
       />
     </div>

@@ -41,7 +41,7 @@ export type ReservationDetail = ReservationListItem & {
     total_spent: number;
   };
   finance: {
-    mode: "percentage" | "pro_price";
+    mode: "percentage" | "pro_price" | "monthly_rent";
     ownerAmount: number;
     companyAmount: number;
     tierLabel: string | null;

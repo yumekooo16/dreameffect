@@ -202,7 +202,11 @@ function validateOwnerForm(data: OwnerFormData): string | null {
   const emailError = validateRealOwnerEmail(data.email);
   if (emailError) return emailError;
 
-  if (data.revenue_mode !== "percentage" && data.revenue_mode !== "pro_price") {
+  if (
+    data.revenue_mode !== "percentage" &&
+    data.revenue_mode !== "pro_price" &&
+    data.revenue_mode !== "monthly_rent"
+  ) {
     return "Mode de rémunération invalide";
   }
   if (data.revenue_mode === "percentage") {
@@ -221,6 +225,13 @@ function revenueFieldsFromForm(data: {
   if (data.revenue_mode === "pro_price") {
     return {
       revenue_mode: "pro_price" as const,
+      owner_revenue_share: null as number | null,
+    };
+  }
+
+  if (data.revenue_mode === "monthly_rent") {
+    return {
+      revenue_mode: "monthly_rent" as const,
       owner_revenue_share: null as number | null,
     };
   }
@@ -514,7 +525,11 @@ export async function updateOwnerProfile(
 ): Promise<ActionResult> {
   await requireAdmin();
 
-  if (data.revenue_mode !== "percentage" && data.revenue_mode !== "pro_price") {
+  if (
+    data.revenue_mode !== "percentage" &&
+    data.revenue_mode !== "pro_price" &&
+    data.revenue_mode !== "monthly_rent"
+  ) {
     return { success: false, error: "Mode de rémunération invalide" };
   }
 
