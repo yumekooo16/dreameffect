@@ -9,6 +9,7 @@ import { PUBLIC_ROUTES, SITE_NAME } from "@/src/lib/public/site";
 const NAV_ITEMS = [
   { href: PUBLIC_ROUTES.home, label: "Accueil", exact: true },
   { href: PUBLIC_ROUTES.vehicles, label: "Flotte", exact: false },
+  { href: PUBLIC_ROUTES.calendar, label: "Dispos", exact: false },
   { href: PUBLIC_ROUTES.owners, label: "Propriétaires", exact: false },
   { href: PUBLIC_ROUTES.contact, label: "Contact", exact: false },
 ];
