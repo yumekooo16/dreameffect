@@ -5,6 +5,8 @@ import {
   type VehicleProPricing,
 } from "@/src/lib/revenue/pro-pricing";
 import {
+  isRevenueMode,
+  normalizeMonthlyRent,
   normalizeOwnerShare,
   type RevenueMode,
   type RevenueSplitContext,
@@ -21,7 +23,7 @@ const DEFAULT_SETTINGS: OwnerRevenueSettings = {
 };
 
 function parseMode(value: unknown): RevenueMode {
-  return value === "pro_price" ? "pro_price" : "percentage";
+  return isRevenueMode(value) ? value : "percentage";
 }
 
 export function parseOwnerRevenueSettings(row: {
@@ -79,6 +81,60 @@ export async function fetchVehicleProPricing(
   return normalizeVehicleProPricing(data);
 }
 
+export async function fetchVehicleMonthlyRent(
+  supabase: SupabaseClient,
+  vehicleId: string
+): Promise<number | null> {
+  const { data, error } = await supabase
+    .from("vehicles")
+    .select("monthly_rent")
+    .eq("id", vehicleId)
+    .maybeSingle();
+
+  if (error) {
+    if (isMissingColumnError(error.message)) {
+      return null;
+    }
+    console.error("[fetchVehicleMonthlyRent]", error.message);
+    return null;
+  }
+
+  return normalizeMonthlyRent(
+    data?.monthly_rent != null ? Number(data.monthly_rent) : null
+  );
+}
+
+export async function fetchVehiclesMonthlyRentMap(
+  supabase: SupabaseClient,
+  vehicleIds: string[]
+): Promise<Map<string, number | null>> {
+  const map = new Map<string, number | null>();
+  if (vehicleIds.length === 0) return map;
+
+  const { data, error } = await supabase
+    .from("vehicles")
+    .select("id, monthly_rent")
+    .in("id", vehicleIds);
+
+  if (error) {
+    if (!isMissingColumnError(error.message)) {
+      console.error("[fetchVehiclesMonthlyRentMap]", error.message);
+    }
+    return map;
+  }
+
+  for (const row of data ?? []) {
+    map.set(
+      row.id,
+      normalizeMonthlyRent(
+        row.monthly_rent != null ? Number(row.monthly_rent) : null
+      )
+    );
+  }
+
+  return map;
+}
+
 export async function buildRevenueSplitContextForVehicle(
   supabase: SupabaseClient,
   vehicleId: string,
@@ -91,13 +147,37 @@ export async function buildRevenueSplitContextForVehicle(
   const { data: vehicle, error: vehicleError } = await supabase
     .from("vehicles")
     .select(
-      "owner_id, pro_price_24h_weekday, pro_price_24h_weekend, pro_price_48h_weekend, pro_price_72h_weekend, pro_price_7_days, pro_included_km, pro_extra_km_rate"
+      "owner_id, monthly_rent, pro_price_24h_weekday, pro_price_24h_weekend, pro_price_48h_weekend, pro_price_72h_weekend, pro_price_7_days, pro_included_km, pro_extra_km_rate"
     )
     .eq("id", vehicleId)
     .maybeSingle();
 
   if (vehicleError || !vehicle) {
-    if (vehicleError && !isMissingColumnError(vehicleError.message)) {
+    if (vehicleError && isMissingColumnError(vehicleError.message)) {
+      const legacy = await supabase
+        .from("vehicles")
+        .select(
+          "owner_id, pro_price_24h_weekday, pro_price_24h_weekend, pro_price_48h_weekend, pro_price_72h_weekend, pro_price_7_days, pro_included_km, pro_extra_km_rate"
+        )
+        .eq("id", vehicleId)
+        .maybeSingle();
+
+      if (legacy.data) {
+        const settings = await fetchOwnerRevenueSettings(
+          supabase,
+          legacy.data.owner_id
+        );
+        return {
+          mode: settings.mode,
+          ownerShare: settings.ownerShare,
+          startDate: options.startDate,
+          endDate: options.endDate,
+          distanceKm: options.distanceKm,
+          proPricing: normalizeVehicleProPricing(legacy.data),
+          monthlyRent: null,
+        };
+      }
+    } else if (vehicleError && !isMissingColumnError(vehicleError.message)) {
       console.error("[buildRevenueSplitContextForVehicle]", vehicleError.message);
     }
     return {
@@ -107,6 +187,7 @@ export async function buildRevenueSplitContextForVehicle(
       endDate: options.endDate,
       distanceKm: options.distanceKm,
       proPricing: null,
+      monthlyRent: null,
     };
   }
 
@@ -119,6 +200,9 @@ export async function buildRevenueSplitContextForVehicle(
     endDate: options.endDate,
     distanceKm: options.distanceKm,
     proPricing: normalizeVehicleProPricing(vehicle),
+    monthlyRent: normalizeMonthlyRent(
+      vehicle.monthly_rent != null ? Number(vehicle.monthly_rent) : null
+    ),
   };
 }
 
@@ -127,26 +211,40 @@ export type VehicleRevenueFormConfig = {
   mode: RevenueMode;
   ownerSharePercent: number;
   proPricing: VehicleProPricing;
+  monthlyRent: number | null;
 };
 
 export async function fetchVehiclesRevenueFormConfigs(
   supabase: SupabaseClient
 ): Promise<VehicleRevenueFormConfig[]> {
-  const { data: vehicles, error: vehiclesError } = await supabase
+  const withRent = await supabase
     .from("vehicles")
     .select(
-      "id, owner_id, pro_price_24h_weekday, pro_price_24h_weekend, pro_price_48h_weekend, pro_price_72h_weekend, pro_price_7_days, pro_included_km, pro_extra_km_rate"
+      "id, owner_id, monthly_rent, pro_price_24h_weekday, pro_price_24h_weekend, pro_price_48h_weekend, pro_price_72h_weekend, pro_price_7_days, pro_included_km, pro_extra_km_rate"
     );
 
-  if (vehiclesError) {
-    if (!isMissingColumnError(vehiclesError.message)) {
-      console.error("[fetchVehiclesRevenueFormConfigs]", vehiclesError.message);
+  const vehiclesResult =
+    withRent.error && isMissingColumnError(withRent.error.message)
+      ? await supabase
+          .from("vehicles")
+          .select(
+            "id, owner_id, pro_price_24h_weekday, pro_price_24h_weekend, pro_price_48h_weekend, pro_price_72h_weekend, pro_price_7_days, pro_included_km, pro_extra_km_rate"
+          )
+      : withRent;
+
+  if (vehiclesResult.error) {
+    if (!isMissingColumnError(vehiclesResult.error.message)) {
+      console.error(
+        "[fetchVehiclesRevenueFormConfigs]",
+        vehiclesResult.error.message
+      );
     }
     return [];
   }
 
+  const vehicles = vehiclesResult.data ?? [];
   const ownerIds = [
-    ...new Set((vehicles ?? []).map((vehicle) => vehicle.owner_id).filter(Boolean)),
+    ...new Set(vehicles.map((vehicle) => vehicle.owner_id).filter(Boolean)),
   ];
 
   const settingsByOwner = new Map<string, OwnerRevenueSettings>();
@@ -168,14 +266,22 @@ export async function fetchVehiclesRevenueFormConfigs(
     }
   }
 
-  return (vehicles ?? []).map((vehicle) => {
+  return vehicles.map((vehicle) => {
     const settings =
       settingsByOwner.get(vehicle.owner_id) ?? DEFAULT_SETTINGS;
+    const monthlyRent =
+      "monthly_rent" in vehicle
+        ? normalizeMonthlyRent(
+            vehicle.monthly_rent != null ? Number(vehicle.monthly_rent) : null
+          )
+        : null;
+
     return {
       vehicleId: vehicle.id,
       mode: settings.mode,
       ownerSharePercent: Math.round(settings.ownerShare * 100),
       proPricing: normalizeVehicleProPricing(vehicle),
+      monthlyRent,
     };
   });
 }

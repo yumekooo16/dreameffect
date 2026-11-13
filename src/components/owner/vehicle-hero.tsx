@@ -31,6 +31,7 @@ type VehicleHeroProps = {
   nextReservation: NextReservation;
   fleetCount?: number;
   revenueMode?: RevenueMode | null;
+  monthlyRent?: number | null;
 };
 
 function formatDate(date: string) {
@@ -62,19 +63,33 @@ export default function VehicleHero({
   nextReservation,
   fleetCount = 1,
   revenueMode = "percentage",
+  monthlyRent = null,
 }: VehicleHeroProps) {
   const imageSrc =
     resolveVehicleImageUrl(heroImageUrl) ??
     resolveVehicleImageUrl(fallbackImageUrl);
   const displayModel = [model, version?.trim()].filter(Boolean).join(" ");
-  const ownerShareLabel =
-    revenueMode === "pro_price"
+  const isMonthlyRent = revenueMode === "monthly_rent";
+  const ownerShareLabel = isMonthlyRent
+    ? "Loyer mensuel"
+    : revenueMode === "pro_price"
       ? "Votre part (prix pro)"
       : `Votre part (${OWNER_REVENUE_SHARE_PERCENT} %)`;
-  const companyShareLabel =
-    revenueMode === "pro_price"
+  const companyShareLabel = isMonthlyRent
+    ? "CA locations (DreamEffect)"
+    : revenueMode === "pro_price"
       ? "DreamEffect (marge)"
       : `DreamEffect (${COMPANY_REVENUE_SHARE_PERCENT} %)`;
+  const ownerShareDisplay = isMonthlyRent
+    ? monthlyRent != null && monthlyRent > 0
+      ? monthlyRent
+      : 0
+    : ownerShare;
+  const monthDisplay = isMonthlyRent
+    ? monthlyRent != null && monthlyRent > 0
+      ? monthlyRent
+      : 0
+    : monthlyRevenue;
 
   return (
     <section className="de-vehicle-hero" aria-labelledby="owner-vehicle-hero-title">
@@ -143,15 +158,22 @@ export default function VehicleHero({
         </div>
         <div className="de-vehicle-hero__stat de-vehicle-hero__stat--highlight">
           <p className="de-label">{ownerShareLabel}</p>
-          <p className="de-vehicle-hero__stat-value">{formatEuro(ownerShare)}</p>
+          <p className="de-vehicle-hero__stat-value">
+            {formatEuro(ownerShareDisplay)}
+            {isMonthlyRent ? (
+              <span className="ml-1 text-sm font-normal de-muted">/ mois</span>
+            ) : null}
+          </p>
         </div>
         <div className="de-vehicle-hero__stat">
           <p className="de-label">{companyShareLabel}</p>
           <p className="de-vehicle-hero__stat-value">{formatEuro(companyShare)}</p>
         </div>
         <div className="de-vehicle-hero__stat">
-          <p className="de-label">Votre mois en cours</p>
-          <p className="de-vehicle-hero__stat-value">{formatEuro(monthlyRevenue)}</p>
+          <p className="de-label">
+            {isMonthlyRent ? "Loyer ce mois" : "Votre mois en cours"}
+          </p>
+          <p className="de-vehicle-hero__stat-value">{formatEuro(monthDisplay)}</p>
         </div>
         <div className="de-vehicle-hero__stat">
           <p className="de-label">Prochaine réservation</p>

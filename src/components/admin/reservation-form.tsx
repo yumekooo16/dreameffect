@@ -29,6 +29,7 @@ export type ReservationVehicleRevenueConfig = {
   mode: RevenueMode;
   ownerSharePercent: number;
   proPricing: VehicleProPricing;
+  monthlyRent?: number | null;
 };
 
 type Props = {
@@ -201,31 +202,42 @@ export default function ReservationForm({
   }
 
   const isProPriceMode = activeConfig?.mode === "pro_price";
+  const isMonthlyRentMode = activeConfig?.mode === "monthly_rent";
   const hasProGrid =
     !!activeConfig?.proPricing && hasAnyProPrice(activeConfig.proPricing);
   const hasDates = Boolean(form.start_date && form.end_date);
 
-  const ownerHint = isProPriceMode
-    ? previewSplit.tierLabel
-      ? `Prix pro — ${previewSplit.tierLabel}`
-      : "Prix pro"
-    : `Part propriétaire (${activeConfig?.ownerSharePercent ?? 60} %)`;
+  const ownerHint = isMonthlyRentMode
+    ? activeConfig?.monthlyRent != null && activeConfig.monthlyRent > 0
+      ? `Loyer mensuel ${activeConfig.monthlyRent.toLocaleString("fr-FR")} € (hors location)`
+      : "Loyer mensuel (hors location)"
+    : isProPriceMode
+      ? previewSplit.tierLabel
+        ? `Prix pro — ${previewSplit.tierLabel}`
+        : "Prix pro"
+      : `Part propriétaire (${activeConfig?.ownerSharePercent ?? 60} %)`;
 
-  const companyHint = isProPriceMode
-    ? "Marge DreamEffect (CA − prix pro)"
-    : `Commission DreamEffect (${
-        100 - (activeConfig?.ownerSharePercent ?? 60)
-      } %)`;
+  const companyHint = isMonthlyRentMode
+    ? "CA location (DreamEffect)"
+    : isProPriceMode
+      ? "Marge DreamEffect (CA − prix pro)"
+      : `Commission DreamEffect (${
+          100 - (activeConfig?.ownerSharePercent ?? 60)
+        } %)`;
 
-  const proPriceWarning = !isProPriceMode
-    ? null
-    : !hasProGrid
-      ? "Aucune grille prix pro sur ce véhicule — renseignez-la dans la fiche véhicule."
-      : !hasDates
-        ? "Indiquez le début et la fin pour calculer le reversement prix pro."
-        : previewSplit.tierLabel
-          ? null
-          : "Impossible de calculer le prix pro pour ces dates.";
+  const proPriceWarning = isMonthlyRentMode
+    ? activeConfig?.monthlyRent == null || activeConfig.monthlyRent <= 0
+      ? "Aucun loyer mensuel sur ce véhicule — renseignez-le dans la fiche véhicule."
+      : null
+    : !isProPriceMode
+      ? null
+      : !hasProGrid
+        ? "Aucune grille prix pro sur ce véhicule — renseignez-la dans la fiche véhicule."
+        : !hasDates
+          ? "Indiquez le début et la fin pour calculer le reversement prix pro."
+          : previewSplit.tierLabel
+            ? null
+            : "Impossible de calculer le prix pro pour ces dates.";
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">

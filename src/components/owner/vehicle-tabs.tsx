@@ -47,6 +47,7 @@ type Props = {
     totalRentals: number;
     reservations: Reservation[];
     revenueMode?: RevenueMode | null;
+    monthlyRent?: number | null;
   };
 };
 

@@ -16,6 +16,7 @@ import {
   normalizeVehicleProPricing,
   type VehicleProPricing,
 } from "@/src/lib/revenue/pro-pricing";
+import { normalizeMonthlyRent } from "@/src/lib/revenue/split";
 import { isMissingColumnError } from "@/src/lib/vehicles/db-columns";
 import { syncVehicleStatusFromReservations } from "@/src/lib/vehicles/sync-status";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
@@ -99,6 +100,8 @@ export type VehicleFormData = {
   location?: string;
   description?: string;
   is_published?: boolean;
+  /** Loyer mensuel fixe (€) — mode rémunération monthly_rent. */
+  monthly_rent?: number | null;
 };
 
 function pricingPayload(data: VehicleFormData) {
@@ -109,9 +112,10 @@ function proPricingPayload(data: VehicleFormData) {
   return normalizeVehicleProPricing(data.proPricing);
 }
 
-function catalogPayload(data: VehicleFormData) {
+function catalogPayload(data: VehicleFormData, options?: { includeMonthlyRent?: boolean }) {
   const pricing = pricingPayload(data);
   const proPricing = proPricingPayload(data);
+  const includeMonthlyRent = options?.includeMonthlyRent ?? true;
 
   return {
     ...pricing,
@@ -123,6 +127,9 @@ function catalogPayload(data: VehicleFormData) {
     location: data.location?.trim() || null,
     description: data.description?.trim() || null,
     is_published: data.is_published ?? true,
+    ...(includeMonthlyRent
+      ? { monthly_rent: normalizeMonthlyRent(data.monthly_rent) }
+      : {}),
   };
 }
 
@@ -232,6 +239,22 @@ export async function createVehicle(
     .select("id")
     .single();
 
+  if (
+    insertResult.error &&
+    isMissingColumnError(insertResult.error.message) &&
+    insertResult.error.message.includes("monthly_rent")
+  ) {
+    insertResult = await supabase
+      .from("vehicles")
+      .insert({
+        ...coreVehiclePayload(data),
+        slug,
+        ...catalogPayload(data, { includeMonthlyRent: false }),
+      })
+      .select("id")
+      .single();
+  }
+
   if (insertResult.error && isMissingColumnError(insertResult.error.message)) {
     insertResult = await supabase
       .from("vehicles")
@@ -292,6 +315,22 @@ export async function updateVehicle(
       updated_at: new Date().toISOString(),
     })
     .eq("id", vehicleId);
+
+  if (
+    updateResult.error &&
+    isMissingColumnError(updateResult.error.message) &&
+    updateResult.error.message.includes("monthly_rent")
+  ) {
+    updateResult = await supabase
+      .from("vehicles")
+      .update({
+        ...coreVehiclePayload(data),
+        slug,
+        ...catalogPayload(data, { includeMonthlyRent: false }),
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", vehicleId);
+  }
 
   if (updateResult.error && isMissingColumnError(updateResult.error.message)) {
     updateResult = await supabase

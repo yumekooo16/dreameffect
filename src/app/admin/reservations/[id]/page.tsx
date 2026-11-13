@@ -217,11 +217,13 @@ export default async function ReservationDetailPage({
           </div>
           <div className="de-card-inner">
             <p className="de-label">
-              {reservation.finance.mode === "pro_price"
-                ? reservation.finance.tierLabel
-                  ? `Prix pro — ${reservation.finance.tierLabel}`
-                  : "Prix pro"
-                : "Part propriétaire"}
+              {reservation.finance.mode === "monthly_rent"
+                ? "Part propriétaire (loyer hors location)"
+                : reservation.finance.mode === "pro_price"
+                  ? reservation.finance.tierLabel
+                    ? `Prix pro — ${reservation.finance.tierLabel}`
+                    : "Prix pro"
+                  : "Part propriétaire"}
             </p>
             <p className="de-stat-value mt-1 text-xl">
               {formatEuro(reservation.finance.ownerAmount)}
@@ -229,9 +231,11 @@ export default async function ReservationDetailPage({
           </div>
           <div className="de-card-inner">
             <p className="de-label">
-              {reservation.finance.mode === "pro_price"
-                ? "Marge DreamEffect"
-                : "Commission DreamEffect"}
+              {reservation.finance.mode === "monthly_rent"
+                ? "CA location (DreamEffect)"
+                : reservation.finance.mode === "pro_price"
+                  ? "Marge DreamEffect"
+                  : "Commission DreamEffect"}
             </p>
             <p className="de-stat-value mt-1 text-xl text-[var(--blue-soft)]">
               {formatEuro(reservation.finance.companyAmount)}

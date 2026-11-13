@@ -4,6 +4,7 @@ import RevenueChart from "@/src/components/revenue-chart";
 import RevenueSplitCard from "@/src/components/owner/revenue-split-card";
 import {
   computeRevenueSummary,
+  formatEuro,
   resolveReservationSplit,
   type RevenueMode,
 } from "@/src/lib/revenue/split";
@@ -24,6 +25,7 @@ type Props = {
   totalRentals: number;
   reservations: Reservation[];
   revenueMode?: RevenueMode | null;
+  monthlyRent?: number | null;
 };
 
 export default function VehicleRevenue({
@@ -31,7 +33,10 @@ export default function VehicleRevenue({
   totalRentals,
   reservations,
   revenueMode = "percentage",
+  monthlyRent = null,
 }: Props) {
+  const mode = revenueMode ?? "percentage";
+  const isMonthlyRent = mode === "monthly_rent";
   const history = reservations.filter((r) => r.status === "finished");
   const summary = computeRevenueSummary(history, { finishedOnly: false });
 
@@ -39,7 +44,9 @@ export default function VehicleRevenue({
   for (const r of history) {
     const date = new Date(r.end_date);
     const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-01`;
-    const amount = resolveReservationSplit(r).ownerAmount;
+    const amount = isMonthlyRent
+      ? Number(r.total_price ?? 0)
+      : resolveReservationSplit(r).ownerAmount;
     byMonth.set(key, (byMonth.get(key) ?? 0) + amount);
   }
 
@@ -53,22 +60,33 @@ export default function VehicleRevenue({
         totalRevenue={summary.totalRevenue}
         ownerShare={summary.ownerShare}
         companyShare={summary.companyShare}
-        title="Répartition des revenus"
+        title={isMonthlyRent ? "Loyer mensuel" : "Répartition des revenus"}
         compact
-        revenueMode={revenueMode}
+        revenueMode={mode}
+        monthlyRent={monthlyRent}
       />
 
       <div className="grid gap-3 sm:grid-cols-3">
         <div className="de-card-inner">
-          <p className="de-label">Votre part ce mois</p>
+          <p className="de-label">
+            {isMonthlyRent ? "Loyer mensuel" : "Votre part ce mois"}
+          </p>
           <p className="de-stat-value mt-1 text-lg sm:text-xl">
-            {monthlyRevenue.toLocaleString("fr-FR")} €
+            {isMonthlyRent
+              ? monthlyRent != null && monthlyRent > 0
+                ? formatEuro(monthlyRent)
+                : "—"
+              : `${monthlyRevenue.toLocaleString("fr-FR")} €`}
           </p>
         </div>
         <div className="de-card-inner">
-          <p className="de-label">Votre part totale</p>
+          <p className="de-label">
+            {isMonthlyRent ? "CA locations" : "Votre part totale"}
+          </p>
           <p className="de-stat-value mt-1 text-lg sm:text-xl">
-            {summary.ownerShare.toLocaleString("fr-FR")} €
+            {isMonthlyRent
+              ? formatEuro(summary.totalRevenue)
+              : `${summary.ownerShare.toLocaleString("fr-FR")} €`}
           </p>
         </div>
         <div className="de-card-inner">
@@ -79,7 +97,9 @@ export default function VehicleRevenue({
 
       {chartData.length > 0 && (
         <div>
-          <p className="de-label mb-3">Évolution</p>
+          <p className="de-label mb-3">
+            {isMonthlyRent ? "Évolution du CA locations" : "Évolution"}
+          </p>
           <RevenueChart data={chartData} />
         </div>
       )}
@@ -108,7 +128,9 @@ export default function VehicleRevenue({
                   )}
                 </div>
                 <p className="text-sm font-medium text-[var(--blue-soft)]">
-                  {resolveReservationSplit(reservation).ownerAmount.toLocaleString("fr-FR")} €
+                  {isMonthlyRent
+                    ? formatEuro(Number(reservation.total_price ?? 0))
+                    : `${resolveReservationSplit(reservation).ownerAmount.toLocaleString("fr-FR")} €`}
                 </p>
               </div>
             ))}

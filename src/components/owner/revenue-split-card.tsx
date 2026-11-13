@@ -13,6 +13,7 @@ type RevenueSplitCardProps = {
   title?: string;
   compact?: boolean;
   revenueMode?: RevenueMode | null;
+  monthlyRent?: number | null;
 };
 
 export default function RevenueSplitCard({
@@ -22,6 +23,7 @@ export default function RevenueSplitCard({
   title = "Répartition des revenus",
   compact = false,
   revenueMode = "percentage",
+  monthlyRent = null,
 }: RevenueSplitCardProps) {
   const mode = revenueMode ?? "percentage";
   const ownerPercent =
@@ -34,19 +36,39 @@ export default function RevenueSplitCard({
       : COMPANY_REVENUE_SHARE_PERCENT;
 
   const hint =
-    mode === "pro_price"
-      ? "Répartition automatique — grille prix pro (+ km supp.) · marge DreamEffect"
-      : `Répartition automatique — ${OWNER_REVENUE_SHARE_PERCENT} % propriétaire · ${COMPANY_REVENUE_SHARE_PERCENT} % DreamEffect`;
+    mode === "monthly_rent"
+      ? monthlyRent != null && monthlyRent > 0
+        ? `Loyer mensuel fixe de ${formatEuro(monthlyRent)} · CA location DreamEffect`
+        : "Loyer mensuel fixe · CA location DreamEffect"
+      : mode === "pro_price"
+        ? "Répartition automatique — grille prix pro (+ km supp.) · marge DreamEffect"
+        : `Répartition automatique — ${OWNER_REVENUE_SHARE_PERCENT} % propriétaire · ${COMPANY_REVENUE_SHARE_PERCENT} % DreamEffect`;
 
   return (
     <div className={`de-revenue-split ${compact ? "de-revenue-split--compact" : ""}`}>
       <div className="de-revenue-split__header">
         <p className="de-label">{title}</p>
-        <p className="de-revenue-split__total">{formatEuro(totalRevenue)}</p>
-        <p className="de-revenue-split__hint">
-          {hint}
-          <span className="ml-1 opacity-80">({revenueModeLabel(mode)})</span>
-        </p>
+        {mode === "monthly_rent" ? (
+          <>
+            <p className="de-revenue-split__total">
+              {monthlyRent != null && monthlyRent > 0
+                ? formatEuro(monthlyRent)
+                : "—"}
+            </p>
+            <p className="de-revenue-split__hint">
+              {hint}
+              <span className="ml-1 opacity-80">({revenueModeLabel(mode)})</span>
+            </p>
+          </>
+        ) : (
+          <>
+            <p className="de-revenue-split__total">{formatEuro(totalRevenue)}</p>
+            <p className="de-revenue-split__hint">
+              {hint}
+              <span className="ml-1 opacity-80">({revenueModeLabel(mode)})</span>
+            </p>
+          </>
+        )}
       </div>
 
       {mode === "percentage" && (
@@ -62,22 +84,41 @@ export default function RevenueSplitCard({
         </div>
       )}
 
-      <div className="de-revenue-split__grid">
-        <div className="de-revenue-split__item de-revenue-split__item--owner">
-          <p className="de-label">Votre part</p>
-          <p className="de-revenue-split__amount">{formatEuro(ownerShare)}</p>
-          <p className="de-revenue-split__percent">
-            {mode === "pro_price" ? "Prix pro" : `${ownerPercent} %`}
-          </p>
+      {mode === "monthly_rent" ? (
+        <div className="de-revenue-split__grid">
+          <div className="de-revenue-split__item de-revenue-split__item--owner">
+            <p className="de-label">Votre loyer</p>
+            <p className="de-revenue-split__amount">
+              {monthlyRent != null && monthlyRent > 0
+                ? formatEuro(monthlyRent)
+                : "—"}
+            </p>
+            <p className="de-revenue-split__percent">Par mois</p>
+          </div>
+          <div className="de-revenue-split__item de-revenue-split__item--company">
+            <p className="de-label">CA locations</p>
+            <p className="de-revenue-split__amount">{formatEuro(totalRevenue)}</p>
+            <p className="de-revenue-split__percent">DreamEffect</p>
+          </div>
         </div>
-        <div className="de-revenue-split__item de-revenue-split__item--company">
-          <p className="de-label">Part DreamEffect</p>
-          <p className="de-revenue-split__amount">{formatEuro(companyShare)}</p>
-          <p className="de-revenue-split__percent">
-            {mode === "pro_price" ? "Marge" : `${companyPercent} %`}
-          </p>
+      ) : (
+        <div className="de-revenue-split__grid">
+          <div className="de-revenue-split__item de-revenue-split__item--owner">
+            <p className="de-label">Votre part</p>
+            <p className="de-revenue-split__amount">{formatEuro(ownerShare)}</p>
+            <p className="de-revenue-split__percent">
+              {mode === "pro_price" ? "Prix pro" : `${ownerPercent} %`}
+            </p>
+          </div>
+          <div className="de-revenue-split__item de-revenue-split__item--company">
+            <p className="de-label">Part DreamEffect</p>
+            <p className="de-revenue-split__amount">{formatEuro(companyShare)}</p>
+            <p className="de-revenue-split__percent">
+              {mode === "pro_price" ? "Marge" : `${companyPercent} %`}
+            </p>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

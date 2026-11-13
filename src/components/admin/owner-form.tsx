@@ -154,8 +154,8 @@ export default function OwnerForm({ cancelHref }: { cancelHref: string }) {
           Rémunération automatique
         </h3>
         <p className="text-sm de-muted">
-          Pourcentage du CA client, ou grille de prix pro sur chaque véhicule
-          (saisie dans la fiche véhicule).
+          Pourcentage du CA client, grille prix pro, ou loyer mensuel fixe
+          (saisie sur la fiche véhicule).
         </p>
 
         <fieldset className="grid gap-2">
@@ -193,6 +193,24 @@ export default function OwnerForm({ cancelHref }: { cancelHref: string }) {
               <span className="text-xs de-muted">
                 Gain calculé via la grille prix pro du véhicule (+ km
                 supplémentaires).
+              </span>
+            </span>
+          </label>
+          <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-[var(--blue-border)] p-3">
+            <input
+              type="radio"
+              name="revenue_mode"
+              className="mt-1"
+              checked={form.revenue_mode === "monthly_rent"}
+              onChange={() =>
+                updateField("revenue_mode", "monthly_rent" as RevenueMode)
+              }
+            />
+            <span>
+              <span className="block text-sm font-medium">Loyer mensuel</span>
+              <span className="text-xs de-muted">
+                Montant fixe à payer chaque mois pour chaque véhicule (saisi
+                sur la fiche véhicule).
               </span>
             </span>
           </label>
@@ -234,6 +252,13 @@ export default function OwnerForm({ cancelHref }: { cancelHref: string }) {
           <p className="text-sm de-muted">
             Renseignez ensuite la grille prix pro sur chaque véhicule de ce
             propriétaire (ex. 24 h semaine, week-end, km inclus).
+          </p>
+        )}
+
+        {form.revenue_mode === "monthly_rent" && (
+          <p className="text-sm de-muted">
+            Renseignez ensuite le loyer mensuel sur chaque véhicule de ce
+            propriétaire. Le CA des locations reste chez DreamEffect.
           </p>
         )}
       </div>

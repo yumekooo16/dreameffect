@@ -249,6 +249,7 @@ export default async function AdminVehicleDetailPage({
             location: vehicle.location ?? "",
             description: vehicle.description ?? "",
             is_published: vehicle.is_published ?? true,
+            monthly_rent: vehicle.monthly_rent ?? null,
           }}
         />
       </Section>

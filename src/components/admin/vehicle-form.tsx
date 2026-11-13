@@ -57,6 +57,7 @@ const defaultForm: VehicleFormData = {
   location: "",
   description: "",
   is_published: true,
+  monthly_rent: null,
 };
 
 export default function VehicleForm({
@@ -362,6 +363,38 @@ export default function VehicleForm({
               />
               <span>Visible sur le site public</span>
             </label>
+          </div>
+        </div>
+      </div>
+
+      <div className="border-t border-[var(--border)] pt-5">
+        <h3 className="de-display mb-4 text-base tracking-tight">
+          Loyer mensuel
+        </h3>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div className="sm:col-span-2">
+            <p className="mb-3 text-sm de-muted">
+              Utilisé si le propriétaire est en mode « loyer mensuel ». Montant
+              fixe versé chaque mois pour ce véhicule, indépendamment des
+              locations.
+            </p>
+          </div>
+          <div>
+            <label className="de-label mb-1 block">Loyer mensuel (€)</label>
+            <input
+              type="number"
+              min={0}
+              step={1}
+              value={form.monthly_rent ?? ""}
+              onChange={(e) =>
+                updateField(
+                  "monthly_rent",
+                  e.target.value === "" ? null : Number(e.target.value)
+                )
+              }
+              className="de-input w-full"
+              placeholder="Ex. 450"
+            />
           </div>
         </div>
       </div>

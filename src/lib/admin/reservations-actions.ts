@@ -109,6 +109,15 @@ async function buildPayload(data: ReservationFormData) {
     );
   }
 
+  if (
+    context.mode === "monthly_rent" &&
+    (context.monthlyRent == null || context.monthlyRent <= 0)
+  ) {
+    throw new Error(
+      "Ce propriétaire est en mode loyer mensuel — renseignez le loyer sur le véhicule avant d'enregistrer la réservation."
+    );
+  }
+
   const split = splitRevenueForContext(data.total_price, context);
   if (context.mode === "pro_price" && !split.tierLabel) {
     throw new Error(
